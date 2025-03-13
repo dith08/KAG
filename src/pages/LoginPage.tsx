@@ -88,7 +88,7 @@ const LoginPage: React.FC = () => {
 
       <div className="mt-6 text-center">
         Tidak punya akun?{" "}
-        <a href="#" className="text-green-700 font-medium hover:text-green-600">
+        <a href="/register" className="text-green-700 font-medium hover:text-green-600">
           Register
         </a>
       </div>
