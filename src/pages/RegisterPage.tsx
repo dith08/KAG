@@ -14,10 +14,10 @@ const RegisterPage: React.FC = () => {
   return (
     <AuthLayout imageSrc="/images/auth_image.png">
       <h2 className="text-[24px] md:text-[32px] font-medium mb-2">
-        Buat Akun Baru
+        Get Started Now
       </h2>
       <p className="mb-6 text-[18px]">
-        Daftar untuk mendapatkan akses ke akun Anda
+        Daftarkan diri anda untuk menikmati <br /> layanan dari kami
       </p>
 
       <form>
@@ -53,7 +53,6 @@ const RegisterPage: React.FC = () => {
           />
         </div>
 
-
         <div className="mb-4">
           <InputField
             type="tel"
@@ -66,26 +65,26 @@ const RegisterPage: React.FC = () => {
 
         <Button
           type="submit"
-          text="Daftar"
+          text="Register"
           className="bg-green-700 text-white hover:bg-green-600"
         />
 
         <div className="flex items-center my-6">
           <div className="flex-grow border-t border-gray-300"></div>
-          <span className="mx-4 text-sm text-gray-500">Atau</span>
+          <span className="mx-4 text-sm text-gray-500">Or</span>
           <div className="flex-grow border-t border-gray-300"></div>
         </div>
 
         <div className="flex justify-between gap-4">
           <SocialButton
             icon="logos:google-icon"
-            text="Daftar dengan Google"
+            text="Register dengan Google"
             onClick={() => console.log("Daftar dengan Google")}
           />
 
           <SocialButton
             icon="fa6-brands:facebook"
-            text="Daftar dengan Facebook"
+            text="Register dengan Facebook"
             onClick={() => console.log("Daftar dengan Facebook")}
             iconClassName="text-[#1877F2]"
           />
