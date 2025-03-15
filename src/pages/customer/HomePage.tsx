@@ -63,7 +63,7 @@ const HomePage = () => {
           3 LANGKAH MUDAH ORDER <br /> PRINT ONLINE
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
           {/* Langkah 1 */}
           <div className="bg-white rounded-2xl shadow-lg p-6 relative">
             <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 w-20 h-20 bg-green-700 rounded-full flex items-center justify-center">
@@ -111,7 +111,7 @@ const HomePage = () => {
           </div>
         </div>
         <div className="p-10">
-          <h2 className="text-2xl font-bold mb-6 text-green-700 text-center">
+          <h2 className="text-2xl md:text-3xl font-bold mb-20 text-green-700 text-center">
             APA KATA PELANGGAN KAMI?
           </h2>
           <div className="grid grid-flow-col grid-rows-2 gap-4">

@@ -1,9 +1,19 @@
 import React from "react";
+import Navbar from "../../components/Navbar";
 
 const ProfilePage = () => {
   return (
     <div>
-      <h1>Profile Page</h1>
+      <Navbar
+        brand="KARYA ADI GRAFIKA"
+        navItems={[
+          { label: "Home", href: "/customer" },
+          { label: "Produk", href: "/customer/produk" },
+          { label: "Pesanan Saya", href: "/customer/pesanan" },
+          { label: "Keranjang", href: "/customer/keranjang" },
+        ]}
+        isLoggedIn={true} // Ganti ke true kalau user sudah login
+      />
     </div>
   );
 };

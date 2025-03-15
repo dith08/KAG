@@ -8,13 +8,15 @@ const Footer: React.FC = () => {
         <div className="flex justify-around">
           {/* Company Info */}
           <div className="flex flex-col pl-4 md:pl-0">
-            <h2 className="text-2xl font-bold mb-6">KARYA ADI GRAFIKA</h2>
+            <h2 className="text-3xl font-bold mb-6">
+              KARYA ADI <br /> GRAFIKA
+            </h2>
             <div className="flex items-start mb-4">
               <Icon
                 icon="mdi:map-marker"
                 className="mt-1 mr-3 text-xl flex-shrink-0"
               />
-              <span>Jl. Raya Percetakan No. 123, Kota XYZ, Indonesia</span>
+              <span>Jl. Pemuda Desa Mijen, Kaliwungu, Kudus</span>
             </div>
             <div className="flex items-center mb-6">
               <Icon
@@ -28,19 +30,34 @@ const Footer: React.FC = () => {
                 href="#"
                 className="bg-white text-green-700 p-2 rounded-full hover:bg-green-100 transition-colors"
               >
-                <Icon icon="mdi:whatsapp" width="20" height="20" />
+                <Icon
+                  icon="ri:whatsapp-fill"
+                  width="20"
+                  height="20"
+                  className="text-yellow-500"
+                />
               </a>
               <a
                 href="#"
                 className="bg-white text-green-700 p-2 rounded-full hover:bg-green-100 transition-colors"
               >
-                <Icon icon="mdi:facebook" width="20" height="20" />
+                <Icon
+                  icon="mdi:facebook"
+                  width="20"
+                  height="20"
+                  className="text-yellow-500"
+                />
               </a>
               <a
                 href="#"
                 className="bg-white text-green-700 p-2 rounded-full hover:bg-green-100 transition-colors"
               >
-                <Icon icon="mdi:email" width="20" height="20" />
+                <Icon
+                  icon="mdi:email"
+                  width="20"
+                  height="20"
+                  className="text-yellow-500"
+                />
               </a>
             </div>
           </div>
@@ -51,27 +68,30 @@ const Footer: React.FC = () => {
             <nav>
               <ul className="space-y-3">
                 <li>
-                  <a href="#" className="hover:underline block">
+                  <a href="/customer" className="hover:underline block">
                     Home
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:underline block">
+                  <a href="/customer/produk" className="hover:underline block">
                     Produk
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:underline block">
+                  <a href="/customer/pesanan" className="hover:underline block">
                     Pesanan Saya
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:underline block">
+                  <a
+                    href="/customer/keranjang"
+                    className="hover:underline block"
+                  >
                     Keranjang
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:underline block">
+                  <a href="/customer/profile" className="hover:underline block">
                     Profile
                   </a>
                 </li>
@@ -115,7 +135,7 @@ const Footer: React.FC = () => {
         </div>
 
         {/* Copyright */}
-        <div className="mt-12 pt-6 border-t border-green-600 text-center">
+        <div className="mt-20 pt-6 border-t border-white text-center">
           <p>© 2025 KARYA ADI GRAFIKA. All Rights Reserved.</p>
         </div>
       </div>
