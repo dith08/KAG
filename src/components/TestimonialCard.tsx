@@ -47,16 +47,21 @@ const TestimonialCard: React.FC<{ testimonial: Testimonial }> = ({
   testimonial,
 }) => {
   return (
-    <div className="w-full h-64 bg-yellow-500 rounded-lg shadow-lg flex">
-      <div className="w-1/4 bg-green-600 rounded-l-lg flex items-center justify-center">
+    <div className="w-full bg-yellow-500 rounded-lg shadow-lg flex flex-col md:flex-row">
+      {/* Bagian Gambar */}
+      <div className="md:w-1/4 w-full bg-green-600 rounded-t-lg md:rounded-l-lg md:rounded-tr-none flex items-center justify-center p-4">
         <img
           src={testimonial.image}
           alt={testimonial.name}
-          className="w-20 h-20 rounded-full border-2 border-white"
+          className="w-24 h-24 md:w-20 md:h-20 rounded-full border-4 border-white object-cover"
         />
       </div>
-      <div className="w-3/4 p-4 flex flex-col text-start">
-        <h3 className="font-bold text-white text-2xl mb-2">{testimonial.name}</h3>
+
+      {/* Bagian Konten */}
+      <div className="md:w-3/4 w-full p-6 flex flex-col text-start">
+        <h3 className="font-bold text-white text-xl md:text-2xl mb-2">
+          {testimonial.name}
+        </h3>
         <p className="text-base text-white mb-4">{testimonial.review}</p>
         <div className="flex mt-auto pt-4">
           {Array.from({ length: 5 }, (_, i) => (

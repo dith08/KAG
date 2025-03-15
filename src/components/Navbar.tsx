@@ -1,5 +1,7 @@
-import React, { useState, useRef, useEffect } from "react";
+import React from "react";
 import { Icon } from "@iconify/react";
+import { useLocation } from "react-router-dom";
+import { useNavbar } from "./useNavbar";
 
 interface NavItem {
   label: string;
@@ -9,95 +11,160 @@ interface NavItem {
 interface NavbarProps {
   brand: string;
   navItems: NavItem[];
-  profileImage?: string;
   isLoggedIn: boolean;
 }
 
-const Navbar: React.FC<NavbarProps> = ({
-  brand,
-  navItems,
-  profileImage,
-  isLoggedIn,
-}) => {
-  const [showDropdown, setShowDropdown] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+const Navbar: React.FC<NavbarProps> = ({ brand, navItems, isLoggedIn }) => {
+  const location = useLocation(); // Dapatkan halaman aktif
+  const {
+    isDrawerOpen,
+    setIsDrawerOpen,
+    isDropdownOpen,
+    setIsDropdownOpen,
+    drawerRef,
+    dropdownRef,
+  } = useNavbar();
 
-  // Tutup dropdown saat klik di luar
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setShowDropdown(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
-  const currentPath = window.location.pathname;
+  const profileImage = isLoggedIn ? "/images/man.png" : "/images/user.png";
 
   return (
-    <nav className="bg-green-700 px-20 py-4">
+    <nav className="bg-green-700 px-6 md:px-20 py-4 fixed top-0 left-0 w-full z-50 shadow-md">
       <div className="container mx-auto flex justify-between items-center">
         {/* Brand */}
-        <div className="text-white font-bold text-[24px]">{brand}</div>
+        <div className="text-white font-bold text-xl md:text-2xl">{brand}</div>
 
-        {/* Navigation Links */}
-        <ul className="flex space-x-6">
+        {/* Mobile Menu Button */}
+        <button
+          className="md:hidden text-white text-2xl"
+          onClick={() => setIsDrawerOpen(true)}
+        >
+          <Icon icon="mdi:menu" />
+        </button>
+
+        {/* Drawer (Mobile Menu) */}
+        <div
+          ref={drawerRef}
+          className={`fixed top-0 left-0 h-full w-64 bg-white z-50 shadow-lg transform ${
+            isDrawerOpen ? "translate-x-0" : "-translate-x-full"
+          } transition-transform duration-300`}
+        >
+          <div className="p-6">
+            {/* Close Button */}
+            <button
+              className="text-gray-600 text-2xl mb-4"
+              onClick={() => setIsDrawerOpen(false)}
+            >
+              <Icon icon="mdi:close" />
+            </button>
+
+            {/* Profile Drawer */}
+            <div className="border-b pb-4 mb-4">
+              <div className="flex items-center space-x-4">
+                <div className="w-16 h-16 bg-gray-300 rounded-full overflow-hidden">
+                  <img
+                    src={profileImage}
+                    alt="User Avatar"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="text-left">
+                  <p className="text-green-700 font-medium text-lg">
+                    {isLoggedIn ? "Akun Saya" : "Selamat Datang"}
+                  </p>
+                </div>
+              </div>
+
+              {/* Profile Menu */}
+              <div className="mt-6">
+                {isLoggedIn ? (
+                  <>
+                    <a
+                      href="/customer/profile"
+                      className="block px-4 py-2 text-green-700 hover:bg-green-100 rounded-md"
+                    >
+                      Profile Saya
+                    </a>
+                    <a
+                      href="/customer/pesanan"
+                      className="block px-4 py-2 text-green-700 hover:bg-green-100 rounded-md"
+                    >
+                      Pesanan Saya
+                    </a>
+                    <a
+                      href="/"
+                      className="block px-4 py-2 text-red-600 hover:bg-red-50 rounded-md"
+                    >
+                      Logout
+                    </a>
+                  </>
+                ) : (
+                  <>
+                    <a
+                      href="/"
+                      className="block px-4 py-2 text-green-700 hover:bg-green-100 rounded-md"
+                    >
+                      Login
+                    </a>
+                    <a
+                      href="/register"
+                      className="block px-4 py-2 text-green-700 hover:bg-green-100 rounded-md"
+                    >
+                      Register
+                    </a>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Navigation Links */}
+            <ul className="space-y-4 mt-6">
+              {navItems.map((item) => (
+                <li key={item.href}>
+                  <a
+                    href={item.href}
+                    className={`text-green-700 block px-4 py-2 hover:bg-green-100 rounded-md ${
+                      location.pathname === item.href
+                        ? "font-bold underline"
+                        : ""
+                    }`}
+                  >
+                    {item.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        {/* Desktop Navigation */}
+        <ul className="hidden md:flex space-x-6 items-center">
           {navItems.map((item) => (
             <li key={item.href}>
               <a
                 href={item.href}
-                className={`text-white px-4 py-2 rounded-lg transition duration-300 hover:underline hover:underline-offset-10 focus:outline-none focus:underline focus:underline-offset-10 ${
-                  currentPath === item.href
-                    ? "underline underline-offset-10"
-                    : ""
+                className={`text-white px-4 py-2 rounded-lg hover:underline underline-offset-8 ${
+                  location.pathname === item.href ? "underline font-bold" : ""
                 }`}
               >
                 {item.label}
               </a>
             </li>
           ))}
-        </ul>
 
-        {/* Icons & Profile */}
-        <div className="flex items-center space-x-4">
-          {/* Notifikasi */}
-          <a
-            href="/customer/notification"
-            className="text-white px-3 py-2 rounded-lg transition duration-300 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400"
-          >
-            <Icon icon="mdi:bell" className="text-2xl hover:bg-green-600" />
-          </a>
-
-          {/* Profile */}
+          {/* Profile Dropdown */}
           <div className="relative" ref={dropdownRef}>
             <div
               className="w-8 h-8 bg-gray-300 rounded-full overflow-hidden cursor-pointer"
-              onClick={() => setShowDropdown((prev) => !prev)}
+              onClick={() => setIsDropdownOpen((prev) => !prev)}
             >
-              {isLoggedIn ? (
-                <img
-                  src={profileImage || "/images/man.png"}
-                  alt="User Avatar"
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <img
-                  src="/images/user.png"
-                  alt="Default Avatar"
-                  className="w-full h-full object-cover"
-                />
-              )}
+              <img
+                src={profileImage}
+                alt="User Avatar"
+                className="w-full h-full object-cover"
+              />
             </div>
 
-            {/* Dropdown */}
-            {showDropdown && (
+            {isDropdownOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg z-10 border border-gray-200">
                 {isLoggedIn ? (
                   <>
@@ -115,7 +182,7 @@ const Navbar: React.FC<NavbarProps> = ({
                     </a>
                     <a
                       href="/"
-                      className="block px-4 py-2 text-green-700 hover:bg-green-50 focus:bg-green-100 rounded-b-lg"
+                      className="block px-4 py-2 text-red-600 hover:bg-red-50 focus:bg-red-100 rounded-b-lg"
                     >
                       Logout
                     </a>
@@ -139,7 +206,7 @@ const Navbar: React.FC<NavbarProps> = ({
               </div>
             )}
           </div>
-        </div>
+        </ul>
       </div>
     </nav>
   );
