@@ -24,13 +24,13 @@ const HomePage = () => {
       <Slider />
       <div className="py-20 bg-green-700 text-white">
         <div className="container mx-auto px-4">
-          <h2 className="text-4xl font-bold text-center mb-10">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-10">
             PRODUK TERLARIS KAMI!
           </h2>
 
           <div className="flex items-center my-8 max-w-3xl mx-auto">
             <div className="flex-grow border-t border-4 border-yellow-500"></div>
-            <span className="mx-6 text-3xl text-yellow-500 font-bold">
+            <span className="mx-6 text-2xl md:text-3xl text-yellow-500 font-bold">
               PAPERBAG
             </span>
             <div className="flex-grow border-t border-4 border-yellow-500"></div>
@@ -63,9 +63,9 @@ const HomePage = () => {
           3 LANGKAH MUDAH ORDER <br /> PRINT ONLINE
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-14 md:gap-8 mb-20">
           {/* Langkah 1 */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 relative">
+          <div className="bg-white rounded-2xl shadow-lg p-6 relative ">
             <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 w-20 h-20 bg-green-700 rounded-full flex items-center justify-center">
               <Icon icon="mdi:gesture-tap" className="text-white text-3xl" />
             </div>
@@ -114,7 +114,7 @@ const HomePage = () => {
           <h2 className="text-2xl md:text-3xl font-bold mb-20 text-green-700 text-center">
             APA KATA PELANGGAN KAMI?
           </h2>
-          <div className="grid grid-flow-col grid-rows-2 gap-4">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             {testimonials.map((testimonial) => (
               <TestimonialCard key={testimonial.id} testimonial={testimonial} />
             ))}
