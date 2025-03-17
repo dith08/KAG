@@ -1,4 +1,5 @@
 import { Icon } from "@iconify/react";
+import React from "react";
 
 interface Testimonial {
   id: number;
@@ -8,7 +9,7 @@ interface Testimonial {
   rating: number;
 }
 
-export const testimonials: Testimonial[] = [
+const testimonials: Testimonial[] = [
   {
     id: 1,
     name: "John Doe",
@@ -59,7 +60,7 @@ const TestimonialCard: React.FC<{ testimonial: Testimonial }> = ({
 
       {/* Bagian Konten */}
       <div className="md:w-2/3 lg:w-3/4 w-full p-6 flex flex-col text-start">
-        <h3 className="font-bold text-white text-xl md:text-2xl lg:text-3xl mb-2">
+        <h3 className="font-bold text-white text-xl md:text-xl lg:text-2xl mb-2">
           {testimonial.name}
         </h3>
         <p className="text-base lg:text-lg text-white mb-4">
@@ -79,4 +80,14 @@ const TestimonialCard: React.FC<{ testimonial: Testimonial }> = ({
   );
 };
 
-export default TestimonialCard;
+const TestimonialList = () => {
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 p-6">
+      {testimonials.map((testimonial) => (
+        <TestimonialCard key={testimonial.id} testimonial={testimonial} />
+      ))}
+    </div>
+  );
+};
+
+export default TestimonialList;

@@ -4,13 +4,11 @@ import Slider from "../../components/Slider";
 import ProdukTerlarisCard from "../../components/ProdukTerlarisCard";
 import { Icon } from "@iconify/react";
 import Footer from "../../components/Footer";
-import TestimonialCard, {
-  testimonials,
-} from "../../components/TestimonialCard";
+import TestimonialList from "../../components/TestimonialCard";
 
 const HomePage = () => {
   return (
-    <>
+    <div className="bg-[#D9D9D9] min-h-screen">
       <Navbar
         brand="KARYA ADI GRAFIKA"
         navItems={[
@@ -114,15 +112,11 @@ const HomePage = () => {
           <h2 className="text-2xl md:text-3xl font-bold mb-20 text-green-700 text-center">
             APA KATA PELANGGAN KAMI?
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-            {testimonials.map((testimonial) => (
-              <TestimonialCard key={testimonial.id} testimonial={testimonial} />
-            ))}
-          </div>
+          <TestimonialList />
         </div>
       </div>
       <Footer />
-    </>
+    </div>
   );
 };
 
