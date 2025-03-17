@@ -3,42 +3,43 @@ import { Icon } from "@iconify/react";
 
 const Footer: React.FC = () => {
   return (
-    <footer className="bg-green-700 text-white py-8 md:py-12">
-      <div className="container mx-auto px-4 md:px-8 lg:px-12">
-        <div className="flex flex-col md:flex-row md:justify-around gap-8 md:gap-4">
+    <footer className="bg-green-700 text-white py-6 sm:py-8 md:py-10 lg:py-12">
+      <div className="container mx-auto px-4 sm:px-6 md:px-8 lg:px-20">
+        {/* Main Content */}
+        <div className="flex flex-col md:grid md:grid-cols-3 md:gap-6 lg:gap-8">
           {/* Company Info */}
-          <div className="flex flex-col">
-            <h2 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 md:text-left">
+          <div className="mb-6 md:mb-0">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 md:mb-6">
               KARYA ADI <br /> GRAFIKA
             </h2>
-            <div className="flex items-start mb-3 md:mb-4">
+            <div className="flex items-start mb-3">
               <Icon
                 icon="mdi:map-marker"
-                className="mt-1 mr-3 text-xl flex-shrink-0"
+                className="mt-1 mr-3 text-lg sm:text-xl flex-shrink-0"
               />
-              <span className="text-sm md:text-base">
+              <span className="text-xs sm:text-sm md:text-base">
                 Jl. Pemuda Desa Mijen, Kaliwungu, Kudus
               </span>
             </div>
-            <div className="flex items-center mb-4 md:mb-6">
+            <div className="flex items-center mb-4">
               <Icon
                 icon="mdi:clock-outline"
-                className="mr-3 text-xl flex-shrink-0"
+                className="mr-3 text-lg sm:text-xl flex-shrink-0"
               />
-              <span className="text-sm md:text-base">
+              <span className="text-xs sm:text-sm md:text-base">
                 Senin - Sabtu: 08.00 - 16.00
               </span>
             </div>
-            <div className="flex space-x-4 md:justify-start">
+            <div className="flex space-x-4">
               <a
                 href="#"
                 className="bg-white text-green-700 p-2 rounded-full hover:bg-green-100 transition-colors"
               >
                 <Icon
                   icon="ri:whatsapp-fill"
-                  width="20"
-                  height="20"
-                  className="text-yellow-500"
+                  width="18"
+                  height="18"
+                  className="text-yellow-500 sm:w-5 sm:h-5"
                 />
               </a>
               <a
@@ -47,9 +48,9 @@ const Footer: React.FC = () => {
               >
                 <Icon
                   icon="mdi:facebook"
-                  width="20"
-                  height="20"
-                  className="text-yellow-500"
+                  width="18"
+                  height="18"
+                  className="text-yellow-500 sm:w-5 sm:h-5"
                 />
               </a>
               <a
@@ -58,23 +59,23 @@ const Footer: React.FC = () => {
               >
                 <Icon
                   icon="mdi:email"
-                  width="20"
-                  height="20"
-                  className="text-yellow-500"
+                  width="18"
+                  height="18"
+                  className="text-yellow-500 sm:w-5 sm:h-5"
                 />
               </a>
             </div>
           </div>
 
-          {/* Quick Links & Services in a row on mobile */}
-          <div className="flex flex-row justify-start md:justify-around md:flex-row gap-8 md:gap-8">
+          {/* Quick Links & Services in one row on mobile */}
+          <div className="grid grid-cols-2 gap-6 md:col-span-2 md:grid md:grid-cols-2">
             {/* Quick Links */}
-            <div className="flex flex-col">
-              <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-6 text-center md:text-left">
+            <div>
+              <h2 className="text-lg sm:text-xl md:text-2xl font-bold mb-3 md:mb-4">
                 QUICK LINK
               </h2>
               <nav>
-                <ul className="space-y-2 md:space-y-3 text-sm md:text-base">
+                <ul className="space-y-2 text-xs sm:text-sm md:text-base">
                   <li>
                     <a href="/customer" className="hover:underline block">
                       Home
@@ -117,12 +118,12 @@ const Footer: React.FC = () => {
             </div>
 
             {/* Services */}
-            <div className="flex flex-col">
-              <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-6 text-left md:text-left">
+            <div>
+              <h2 className="text-lg sm:text-xl md:text-2xl font-bold mb-3 md:mb-4">
                 SERVICES
               </h2>
               <nav>
-                <ul className="space-y-2 md:space-y-3 text-sm md:text-base">
+                <ul className="space-y-2 text-xs sm:text-sm md:text-base">
                   <li>
                     <a href="#" className="hover:underline block">
                       Cetak Custom
@@ -155,8 +156,10 @@ const Footer: React.FC = () => {
         </div>
 
         {/* Copyright */}
-        <div className="mt-8 md:mt-20 pt-4 md:pt-6 border-t border-white text-center text-sm md:text-base">
-          <p>© 2025 KARYA ADI GRAFIKA. All Rights Reserved.</p>
+        <div className="mt-8 sm:mt-10 md:mt-12 lg:mt-16 pt-4 border-t border-white text-center">
+          <p className="text-xs sm:text-sm md:text-base">
+            © 2025 KARYA ADI GRAFIKA. All Rights Reserved.
+          </p>
         </div>
       </div>
     </footer>
