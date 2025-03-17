@@ -49,20 +49,22 @@ const TestimonialCard: React.FC<{ testimonial: Testimonial }> = ({
   return (
     <div className="w-full bg-yellow-500 rounded-lg shadow-lg flex flex-col md:flex-row">
       {/* Bagian Gambar */}
-      <div className="md:w-1/4 w-full bg-green-600 rounded-t-lg md:rounded-l-lg md:rounded-tr-none flex items-center justify-center p-4">
+      <div className="md:w-1/3 lg:w-1/4 w-full bg-green-600 rounded-t-lg md:rounded-l-lg md:rounded-tr-none flex items-center justify-center p-4">
         <img
           src={testimonial.image}
           alt={testimonial.name}
-          className="w-24 h-24 md:w-20 md:h-20 rounded-full border-4 border-white object-cover"
+          className="w-24 h-24 md:w-20 md:h-20 lg:w-24 lg:h-24 rounded-full border-4 border-white object-cover"
         />
       </div>
 
       {/* Bagian Konten */}
-      <div className="md:w-3/4 w-full p-6 flex flex-col text-start">
-        <h3 className="font-bold text-white text-xl md:text-2xl mb-2">
+      <div className="md:w-2/3 lg:w-3/4 w-full p-6 flex flex-col text-start">
+        <h3 className="font-bold text-white text-xl md:text-2xl lg:text-3xl mb-2">
           {testimonial.name}
         </h3>
-        <p className="text-base text-white mb-4">{testimonial.review}</p>
+        <p className="text-base lg:text-lg text-white mb-4">
+          {testimonial.review}
+        </p>
         <div className="flex mt-auto pt-4">
           {Array.from({ length: 5 }, (_, i) => (
             <Icon
