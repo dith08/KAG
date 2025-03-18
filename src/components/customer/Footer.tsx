@@ -3,7 +3,7 @@ import { Icon } from "@iconify/react";
 
 const Footer: React.FC = () => {
   return (
-    <footer className="bg-green-700 text-white py-6 sm:py-8 md:py-10 lg:py-12">
+    <footer className="bg-green-700 text-white py-6 sm:py-8 md:py-10 lg:py-12 lg:px-20">
       <div className="container mx-auto px-4 sm:px-6 md:px-8 lg:px-20">
         {/* Main Content */}
         <div className="flex flex-col md:grid md:grid-cols-3 md:gap-6 lg:gap-8">
