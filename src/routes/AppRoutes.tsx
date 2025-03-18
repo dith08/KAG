@@ -10,6 +10,7 @@ import PesananSayaPage from "../pages/customer/PesananSayaPage";
 import KeranjangPage from "../pages/customer/KeranjangPage";
 import NotificationPage from "../pages/customer/NotificationPage";
 import ProfilePage from "../pages/customer/ProfilePage";
+import ProductPage from "../pages/admin/ProductAdmin";
 
 const AppRoutes: React.FC = () => {
   return (
@@ -34,6 +35,7 @@ const AppRoutes: React.FC = () => {
         <Route path="/admin">
           {/* Halaman Default Admin */}
           <Route index element={<DashboardAdmin />} />
+          <Route path="produk" element={<ProductPage />} />
         </Route>
 
         {/* Not Found */}
