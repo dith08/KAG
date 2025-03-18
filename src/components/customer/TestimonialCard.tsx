@@ -32,7 +32,7 @@ const testimonials: Testimonial[] = [
     image: "/images/man.png",
     review:
       "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
-    rating: 3,
+    rating: 4,
   },
   {
     id: 4,
