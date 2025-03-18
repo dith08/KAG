@@ -1,10 +1,10 @@
 import React from "react";
-import Navbar from "../../components/Navbar";
-import Slider from "../../components/Slider";
-import ProdukTerlarisCard from "../../components/ProdukTerlarisCard";
+import Navbar from "../../components/customer/Navbar";
+import Slider from "../../components/customer/Slider";
+import ProdukTerlarisCard from "../../components/customer/ProdukTerlarisCard";
 import { Icon } from "@iconify/react";
-import Footer from "../../components/Footer";
-import TestimonialList from "../../components/TestimonialCard";
+import Footer from "../../components/customer/Footer";
+import TestimonialList from "../../components/customer/TestimonialCard";
 
 const HomePage = () => {
   return (

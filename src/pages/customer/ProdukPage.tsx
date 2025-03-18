@@ -1,8 +1,8 @@
 import React from "react";
 import { Icon } from "@iconify/react";
-import Navbar from "../../components/Navbar";
-import ProductList from "../../components/ProductCard";
-import Footer from "../../components/Footer";
+import Navbar from "../../components/customer/Navbar";
+import ProductList from "../../components/customer/ProductCard";
+import Footer from "../../components/customer/Footer";
 
 const ProdukPage = () => {
   return (
@@ -38,7 +38,7 @@ const ProdukPage = () => {
               className="w-full px-3 sm:px-4 py-2 bg-white rounded-l-md focus:outline-none border border-gray-200 border-r-0"
             />
             <button className="bg-yellow-500 text-white px-3 sm:px-4 py-2 rounded-r-md cursor-pointer">
-              <Icon icon="cuida:search-outline" className="w-5 h-5"/>
+              <Icon icon="cuida:search-outline" className="w-5 h-5" />
             </button>
           </div>
         </div>
