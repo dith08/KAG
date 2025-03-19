@@ -37,7 +37,7 @@ const Navbar: React.FC<NavbarProps> = ({ brand, navItems, isLoggedIn }) => {
 
         {/* Mobile & Tablet Menu Button (visible on sm and md screens) */}
         <button
-          className="lg:hidden text-white text-xl sm:text-2xl"
+          className="lg:hidden text-white text-xl sm:text-2xl cursor-pointer"
           onClick={() => setIsDrawerOpen(true)}
         >
           <Icon icon="mdi:menu" />
@@ -53,7 +53,7 @@ const Navbar: React.FC<NavbarProps> = ({ brand, navItems, isLoggedIn }) => {
           <div className="p-4 sm:p-6">
             {/* Close Button */}
             <button
-              className="text-gray-600 text-xl sm:text-2xl mb-4"
+              className="text-gray-600 text-xl sm:text-2xl mb-4 cursor-pointer"
               onClick={() => setIsDrawerOpen(false)}
             >
               <Icon icon="mdi:close" />

@@ -54,7 +54,7 @@ const TestimonialCard: React.FC<{ testimonial: Testimonial }> = ({
         <img
           src={testimonial.image}
           alt={testimonial.name}
-          className="w-24 h-24 md:w-20 md:h-20 lg:w-24 lg:h-24 rounded-full border-4 border-white object-cover"
+          className="w-24 h-24 md:w-20 md:h-20 lg:w-24 lg:h-24 rounded-full object-cover"
         />
       </div>
 

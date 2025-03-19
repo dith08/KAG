@@ -45,13 +45,13 @@ const ProfilePage = () => {
                 <img
                   src="/images/man.png"
                   alt="Profile"
-                  className="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover border border-gray-300"
+                  className="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover shadow-md"
                 />
                 <button
                   type="button"
                   className="absolute bottom-0 right-0 bg-white p-2 rounded-full border border-gray-300 shadow"
                 >
-                  <Icon icon="mdi:pencil" className="text-lg text-gray-700" />
+                  <Icon icon="mdi:pencil" className="text-lg text-gray-500" />
                 </button>
               </div>
               <div className="flex-1 w-full">

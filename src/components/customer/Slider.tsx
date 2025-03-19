@@ -55,7 +55,7 @@ export default function Slider() {
   }, []);
 
   return (
-    <div className="relative w-full h-full overflow-hidden bg-[#D9D9D9] mt-14">
+    <div className="relative w-full h-full overflow-hidden bg-[#D9D9D9] pt-14">
       <motion.div
         className="flex w-full h-full"
         animate={{ x: `-${currentSlide * 100}%` }}
