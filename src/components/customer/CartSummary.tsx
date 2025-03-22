@@ -41,7 +41,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({ products, onCheckout }) => {
         </div>
 
         <button
-          className="w-full sm:w-auto px-6 py-2 bg-amber-500 text-white rounded-md cursor-pointer ml-0 sm:ml-10"
+          className="w-full sm:w-auto px-6 py-2 bg-yellow-500 text-white rounded-md cursor-pointer ml-0 sm:ml-10"
           onClick={onCheckout}
           disabled={totalProducts === 0}
         >
