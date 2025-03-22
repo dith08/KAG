@@ -10,19 +10,29 @@ interface ProcessingCardProps {
 const ProcessingCard: React.FC<ProcessingCardProps> = ({ order }) => {
   // Action section
   const actionSection = (
-    <div className="p-6 border-b border-gray-200 flex justify-between items-center">
+    <div className="p-3 sm:p-4 md:p-6 border-b border-gray-200 flex flex-col md:flex-row md:justify-between md:items-center">
+      {/* Total Pesanan di atas untuk mobile, tidak ditampilkan di desktop */}
+      <div className="text-gray-600 flex items-center mb-3 md:hidden text-sm">
+        Total Pesanan:
+        <span className="text-green-600 font-medium text-base ml-2">
+          Rp. {order.totalPrice.toLocaleString("id-ID")}
+        </span>
+      </div>
+
       {/* Tahap Verifikasi */}
       <div className="flex items-center">
         <Icon
           icon="material-symbols:file-png"
-          className="text-green-700 text-2xl mr-2"
+          className="text-green-700 text-xl md:text-2xl mr-2"
         />
-        <span className="mr-1 text-gray-700">Tahap:</span>
-        <span className="text-black font-medium">{order.verificationStep}</span>
+        <span className="mr-1 text-gray-700 text-sm md:text-base">Tahap:</span>
+        <span className="text-black font-medium text-sm md:text-base">
+          {order.verificationStep}
+        </span>
       </div>
 
-      {/* Total Pesanan */}
-      <div className="text-gray-600 flex items-center">
+      {/* Total Pesanan untuk desktop, disembunyikan di mobile */}
+      <div className="text-gray-600 hidden md:flex items-center text-base">
         Total Pesanan:
         <span className="text-green-600 font-medium text-lg ml-2">
           Rp. {order.totalPrice.toLocaleString("id-ID")}
