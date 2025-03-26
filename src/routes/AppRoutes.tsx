@@ -11,6 +11,7 @@ import KeranjangPage from "../pages/customer/KeranjangPage";
 import NotificationPage from "../pages/customer/NotificationPage";
 import ProfilePage from "../pages/customer/ProfilePage";
 import ProductPage from "../pages/admin/ProductAdmin";
+import CheckoutPage from "../pages/customer/CheckoutPage";
 
 const AppRoutes: React.FC = () => {
   return (
@@ -29,6 +30,7 @@ const AppRoutes: React.FC = () => {
           <Route path="keranjang" element={<KeranjangPage />} />
           <Route path="notification" element={<NotificationPage />} />
           <Route path="profile" element={<ProfilePage />} />
+          <Route path="checkout" element={<CheckoutPage />} />
         </Route>
 
         {/* Admin Routes */}
