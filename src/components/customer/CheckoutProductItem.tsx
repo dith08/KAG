@@ -1,4 +1,3 @@
-// components/checkout/CheckoutProductItem.tsx
 import React from "react";
 
 interface CheckoutProductItemProps {
@@ -15,22 +14,27 @@ const CheckoutProductItem: React.FC<CheckoutProductItemProps> = ({
   image,
 }) => {
   return (
-    <div className="flex items-center border rounded-lg p-4 mb-2">
-      <div className="mr-4">
+    <div className="grid grid-cols-4 items-center border-green-700 border rounded-lg p-4 mb-2 bg-white">
+      <div className="flex items-center col-span-1">
         <img
           src={image || "/images/paperbag3.png"}
           alt={name}
-          className="w-16 h-16 object-cover rounded"
+          className="w-16 h-16 object-cover rounded mr-4"
         />
-      </div>
-      <div className="flex-grow">
         <div className="font-semibold">{name}</div>
-        <div className="text-sm text-gray-600">
-          Rp. {price.toLocaleString()} x {quantity}
+      </div>
+      <div className="text-center">
+        <div className="text-sm font-semibold">
+          Rp. {price.toLocaleString()}
         </div>
       </div>
-      <div className="font-semibold">
-        Rp. {(price * quantity).toLocaleString()}
+      <div className="text-center">
+        <div className="text-sm font-semibold">{quantity}</div>
+      </div>
+      <div className="text-center">
+        <div className="font-semibold">
+          Rp. {(price * quantity).toLocaleString()}
+        </div>
       </div>
     </div>
   );

@@ -1,9 +1,9 @@
-import React from 'react';
-import { Order, OrderStatus } from './Types';
-import CompletedCard from './CompletedCard';
-import ProcessingCard from './ProcessingCard';
-import ShippedCard from './ShippedCard';
-import WaitingConfirmationCard from './WaitingConfirmationCard';
+import React from "react";
+import { Order, OrderStatus } from "./Types";
+import CompletedCard from "./CompletedCard";
+import ProcessingCard from "./ProcessingCard";
+import ShippedCard from "./ShippedCard";
+import WaitingConfirmationCard from "./WaitingConfirmationCard";
 
 interface OrderListProps {
   orders: Order[];
