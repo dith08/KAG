@@ -13,6 +13,7 @@ import ProfilePage from "../pages/customer/ProfilePage";
 import ProductPage from "../pages/admin/ProductAdmin";
 import CheckoutPage from "../pages/customer/CheckoutPage";
 import PesananPage from "../pages/admin/PesananAdmin";
+import AdminShippingPage from "../pages/admin/PengrimanAdmin";
 
 
 const AppRoutes: React.FC = () => {
@@ -41,6 +42,7 @@ const AppRoutes: React.FC = () => {
           <Route index element={<DashboardAdmin />} />
           <Route path="produk" element={<ProductPage />} />
           <Route path="pesanan" element={<PesananPage />} />
+          <Route path="pengiriman" element={<AdminShippingPage/>} />
         </Route>
 
         {/* Not Found */}
