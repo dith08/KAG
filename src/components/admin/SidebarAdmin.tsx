@@ -6,11 +6,13 @@ const SidebarAdmin: React.FC = () => {
   const location = useLocation();
 
   return (
-    <div className="w-64 bg-green-700/90 text-white min-h-screen flex flex-col">
+    <div className="w-64 bg-[#2E7D32]/90 text-white min-h-screen flex flex-col">
       {/* Background untuk logo dengan ukuran navbar */}
-      <div className="bg-green-700 h-24 flex items-center justify-center">
-        <h2 className="text-2xl font-bold">KARYA ADI GRAFIKA</h2>
-      </div>
+      <div className="bg-green-700 h-24 flex flex-col items-center justify-center">
+  <h2 className="text-2xl font-bold leading-tight">KARYA ADI</h2>
+  <h2 className="text-2xl font-bold">GRAFIKA</h2>
+</div>
+
 
       {/* Menu Sidebar */}
       <ul className="space-y-2 p-4">
