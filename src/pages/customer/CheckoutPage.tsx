@@ -55,7 +55,7 @@ const CheckoutPage = () => {
             <h3 className="text-xl font-semibold mb-4 uppercase">
               Pilih Metode Pengiriman
             </h3>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
               {deliveryMethods.map((method) => (
                 <DeliveryMethodCard
                   key={method.id}
@@ -76,8 +76,14 @@ const CheckoutPage = () => {
 
           {/* Product Section */}
           <div className="mb-6">
-            <div className="grid grid-cols-4 items-center justify-around text-sm mb-4">
-              <h3 className="text-xl font-semibold col-span-1 uppercase">
+            {/* Mobile Only: Tulisan Produk yang Dipesan di atas */}
+            <h3 className="text-xl font-semibold uppercase mb-4 md:hidden">
+              Produk yang Dipesan
+            </h3>
+
+            {/* Header untuk desktop */}
+            <div className="hidden md:grid grid-cols-4 items-center text-sm mb-4 gap-2">
+              <h3 className="text-xl font-semibold uppercase col-span-1">
                 Produk yang Dipesan
               </h3>
               <div className="text-center text-black/50 font-medium">
@@ -90,6 +96,8 @@ const CheckoutPage = () => {
                 Subtotal Produk
               </div>
             </div>
+
+            {/* Daftar produk */}
             <CheckoutProductItem name="Paperbag" price={30000} quantity={1} />
             <CheckoutProductItem name="Paperbag" price={30000} quantity={1} />
           </div>
@@ -125,7 +133,11 @@ const CheckoutPage = () => {
 
           {/* Order Button */}
           <div className="flex items-center mb-4">
-            <input type="checkbox" id="terms" className="mr-2" />
+            <input
+              type="checkbox"
+              id="terms"
+              className="mr-2 accent-green-700 cursor-pointer"
+            />
             <label htmlFor="terms" className="text-sm">
               Dengan melanjutkan, Saya setuju dengan Syarat & Ketentuan yang
               berlaku.

@@ -21,9 +21,11 @@ const DeliveryMethodCard: React.FC<DeliveryMethodCardProps> = ({
   return (
     <div
       className={`
-        relative flex flex-col items-center p-4 border-2 rounded-lg cursor-pointer 
-        ${isSelected ? "border-green-700 bg-white" : "border-black/50 bg-white"}
-      `}
+    relative flex flex-col items-center 
+    p-4 sm:p-4 md:p-5 lg:p-6 
+    border-2 rounded-lg cursor-pointer 
+    ${isSelected ? "border-green-700 bg-white" : "border-black/50 bg-white"}
+  `}
       onClick={onSelect}
     >
       {isSelected ? (
