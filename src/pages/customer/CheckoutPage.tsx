@@ -45,11 +45,11 @@ const CheckoutPage = () => {
         isLoggedIn={true}
       />
 
-      <div className="container max-w-screen-xl mx-auto my-10">
-        <h2 className="text-3xl font-bold pt-16 pb-5 text-green-700">
+      <div className="container mx-auto my-10 px-4 sm:px-6 lg:px-8">
+        <h2 className="text-2xl md:text-3xl font-bold pt-16 pb-5 text-green-700">
           CHECKOUT
         </h2>
-        <div className="w-full bg-white rounded-lg shadow-lg p-8">
+        <div className="w-full bg-white rounded-lg shadow-lg p-4 sm:p-6 md:p-8">
           {/* Delivery Method Section */}
           <div className="mb-6">
             <h3 className="text-xl font-semibold mb-4 uppercase">
@@ -139,8 +139,8 @@ const CheckoutPage = () => {
               className="mr-2 accent-green-700 cursor-pointer"
             />
             <label htmlFor="terms" className="text-sm">
-              Dengan melanjutkan, Saya setuju dengan Syarat & Ketentuan yang
-              berlaku.
+              Dengan melanjutkan, Saya setuju dengan{" "}
+              <span className="text-green-700 font-medium">Syarat & Ketentuan</span> yang berlaku.
             </label>
           </div>
 
