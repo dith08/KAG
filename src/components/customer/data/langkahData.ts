@@ -3,7 +3,7 @@ export const langkahData = [
     step: 1,
     icon: "mdi:gesture-tap",
     title: "Tentukan Pilihanmu",
-    color: "green-700",
+    color: "yellow-500",
     description:
       "Pilih opsi yang kamu inginkan untuk cetakanmu. Kami akan membuatmu senang dengan pilihanmu.",
   },
@@ -19,7 +19,7 @@ export const langkahData = [
     step: 3,
     icon: "gridicons:cart",
     title: "Checkout & Order",
-    color: "green-700",
+    color: "yellow-500",
     description:
       "Checkout dan selesaikan pesanan kamu dengan sangat mudah. Lakukan pembayaran sesuai yang tertera di menu checkout.",
   },

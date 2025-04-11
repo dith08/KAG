@@ -14,6 +14,7 @@ import ProductPage from "../pages/admin/ProductAdmin";
 import CheckoutPage from "../pages/customer/CheckoutPage";
 import PesananPage from "../pages/admin/PesananAdmin";
 import AdminShippingPage from "../pages/admin/PengrimanAdmin";
+import ProdukDetailPage from "../pages/customer/ProductDetailPage";
 
 
 const AppRoutes: React.FC = () => {
@@ -29,6 +30,7 @@ const AppRoutes: React.FC = () => {
           {/* Halaman Default Customer */}
           <Route index element={<HomePage />} />
           <Route path="produk" element={<ProdukPage />} />
+          <Route path="produk/:slug" element={<ProdukDetailPage />} />
           <Route path="pesanan" element={<PesananSayaPage />} />
           <Route path="keranjang" element={<KeranjangPage />} />
           <Route path="notification" element={<NotificationPage />} />
