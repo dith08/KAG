@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Produk } from '../customer/data/produkDummy';
+import { Produk } from "../customer/data/produkDummy";
+import { Icon } from "@iconify/react";
 
 interface Props {
   produk: Produk;
@@ -7,10 +8,20 @@ interface Props {
 
 export default function FormPemesanan({ produk }: Props) {
   const [uploadedImage, setUploadedImage] = useState<File | null>(null);
-  const [jumlah, setJumlah] = useState<number>(0);
+  const [jumlah, setJumlah] = useState<number>(100);
+
+  const [formData, setFormData] = useState<Record<string, string | number>>({});
+
+  const isFormComplete = produk.form.every((input) => {
+    const value = formData[input.label];
+    if (input.type === "readonly") return true; // readonly nggak perlu dicek
+    return value !== undefined && value !== "" && value !== 0;
+  });
 
   // Ambil harga dari form field dengan type 'readonly'
-  const hargaSatuan = produk.form.find((item: { type: string; }) => item.type === "readonly")?.value as number || 0;
+  const hargaSatuan =
+    (produk.form.find((item: { type: string }) => item.type === "readonly")
+      ?.value as number) || 0;
   const totalHarga = jumlah * hargaSatuan;
 
   const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -20,9 +31,11 @@ export default function FormPemesanan({ produk }: Props) {
     }
   };
 
-  const handleJumlahChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseInt(e.target.value) || 0;
-    setJumlah(value);
+  const handleInputChange = (label: string, value: string | number) => {
+    setFormData((prev) => ({
+      ...prev,
+      [label]: value,
+    }));
   };
 
   return (
@@ -31,20 +44,26 @@ export default function FormPemesanan({ produk }: Props) {
         {/* Langkah 1 */}
         <div>
           <div className="flex items-center mb-4">
-            <div className="bg-orange-400 text-white font-bold text-2xl w-12 h-12 flex items-center justify-center rounded-md">
+            <div className="bg-yellow-500 text-white font-bold text-2xl w-12 h-12 flex items-center justify-center rounded-md">
               1
             </div>
-            <h3 className="ml-4 text-xl font-bold text-green-700 border-b-4 border-orange-400 pb-1">
+            <h3 className="ml-4 text-xl font-bold text-green-700 border-b-4 border-yellow-500 pb-1">
               TENTUKAN PILIHANMU
             </h3>
           </div>
           <form className="space-y-4">
             {produk.form.map((input, index) => (
               <div key={index} className="flex flex-col">
-                <label className="font-semibold mb-1">{input.label}</label>
+                <label className="font-medium mb-1">{input.label}</label>
 
                 {input.type === "select" && (
-                  <select className="border p-2 rounded text-gray-700">
+                  <select
+                    className="border p-2 rounded"
+                    onChange={(e) =>
+                      handleInputChange(input.label, e.target.value)
+                    }
+                  >
+                    <option value="">Pilih {input.label}</option>
                     {input.options?.map((option, idx) => (
                       <option key={idx} value={option}>
                         {option}
@@ -54,28 +73,45 @@ export default function FormPemesanan({ produk }: Props) {
                 )}
 
                 {input.type === "number" && input.label === "Jumlah" && (
-                  <input
-                    type="number"
-                    className="border p-2 rounded text-gray-700"
-                    placeholder="Masukkan jumlah"
-                    onChange={handleJumlahChange}
-                  />
+                  <>
+                    <input
+                      type="number"
+                      className="border p-2 rounded-lg text-black"
+                      placeholder="Masukkan jumlah"
+                      min={100}
+                      value={jumlah === 0 ? "" : jumlah} // agar bisa kosong saat user hapus angka
+                      onChange={(e) => {
+                        const value =
+                          e.target.value === "" ? 0 : parseInt(e.target.value);
+                        setJumlah(value);
+                        handleInputChange(input.label, value);
+                      }}
+                    />
+                    {jumlah > 0 && jumlah < 100 && (
+                      <p className="text-red-500 text-sm mt-1">
+                        Jumlah minimal pemesanan adalah 100 pcs
+                      </p>
+                    )}
+                  </>
+                )}
+
+                {input.type === "textarea" && (
+                  <textarea
+                    className="border p-2 rounded"
+                    rows={3}
+                    placeholder="Masukkan catatan untuk penjual"
+                    onChange={(e) =>
+                      handleInputChange(input.label, e.target.value)
+                    }
+                  ></textarea>
                 )}
 
                 {input.type === "readonly" && (
                   <input
                     type="text"
-                    readOnly
+                    className="border p-2 rounded"
                     value={`Rp. ${input.value?.toLocaleString()}`}
-                    className="border p-2 rounded text-gray-700 bg-gray-100"
-                  />
-                )}
-
-                {input.type === "textarea" && (
-                  <textarea
-                    className="border p-2 rounded text-gray-700"
-                    rows={3}
-                    placeholder={input.label}
+                    readOnly
                   />
                 )}
               </div>
@@ -88,10 +124,10 @@ export default function FormPemesanan({ produk }: Props) {
           {/* Langkah 2 */}
           <div>
             <div className="flex items-center mb-4">
-              <div className="bg-orange-400 text-white font-bold text-2xl w-12 h-12 flex items-center justify-center rounded-md">
+              <div className="bg-yellow-500 text-white font-bold text-2xl w-12 h-12 flex items-center justify-center rounded-md">
                 2
               </div>
-              <h3 className="ml-4 text-xl font-bold text-green-700 border-b-4 border-orange-400 pb-1">
+              <h3 className="ml-4 text-xl font-bold text-green-700 border-b-4 border-yellow-500 pb-1">
                 UPLOAD DESAIN
               </h3>
             </div>
@@ -101,13 +137,13 @@ export default function FormPemesanan({ produk }: Props) {
             </p>
 
             <div className="flex items-center gap-4 mb-2">
-              <label className="bg-orange-400 hover:bg-orange-500 text-white px-6 py-2 rounded cursor-pointer inline-flex items-center gap-2">
-                📤 BROWSE
+              <label className="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-2 rounded cursor-pointer inline-flex items-center gap-2">
+                <Icon icon="mage:file-upload-fill" className="w-5 h-5"/> BROWSE
                 <input type="file" className="hidden" onChange={handleUpload} />
               </label>
               <span>
                 Tidak punya desain?{" "}
-                <a href="#" className="text-blue-600 underline">
+                <a href="#" className="text-blue-500">
                   Klik disini
                 </a>
               </span>
@@ -125,10 +161,10 @@ export default function FormPemesanan({ produk }: Props) {
           {/* Langkah 3 */}
           <div>
             <div className="flex items-center mb-4">
-              <div className="bg-orange-400 text-white font-bold text-2xl w-12 h-12 flex items-center justify-center rounded-md">
+              <div className="bg-yellow-500 text-white font-bold text-2xl w-12 h-12 flex items-center justify-center rounded-md">
                 3
               </div>
-              <h3 className="ml-4 text-xl font-bold text-green-700 border-b-4 border-orange-400 pb-1">
+              <h3 className="ml-4 text-xl font-bold text-green-700 border-b-4 border-yellow-500 pb-1">
                 TAMBAH KE KERANJANG
               </h3>
             </div>
@@ -142,9 +178,14 @@ export default function FormPemesanan({ produk }: Props) {
 
             <button
               type="submit"
-              className="bg-orange-500 hover:bg-orange-600 text-white py-2 px-6 rounded inline-flex items-center gap-2"
+              className={`py-2 px-4 rounded text-white ${
+                isFormComplete
+                  ? "bg-yellow-500 hover:bg-yellow-600"
+                  : "bg-gray-400 cursor-not-allowed"
+              }`}
+              disabled={!isFormComplete}
             >
-              🛒 ADD TO CART
+              Tambah ke Keranjang
             </button>
           </div>
         </div>
