@@ -51,7 +51,7 @@ const ProdukDetailPage = () => {
           </div>
 
           {/* Deskripsi */}
-          <div className="p-4 space-y-3 w-full md:w-3/5 text-center md:text-left">
+          <div className="p-4 space-y-3 w-full md:w-3/5 text-start">
             <h1 className="text-xl sm:text-2xl font-bold text-black mb-2">
               {produk.nama}
             </h1>
@@ -59,7 +59,7 @@ const ProdukDetailPage = () => {
               {produk.deskripsi.map((item, index) => (
                 <li
                   key={index}
-                  className="flex items-start gap-2 justify-center md:justify-start"
+                  className="flex items-start gap-2 justify-start"
                 >
                   <Icon
                     icon="mdi:check-bold"
