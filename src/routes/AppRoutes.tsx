@@ -15,6 +15,7 @@ import CheckoutPage from "../pages/customer/CheckoutPage";
 import PesananPage from "../pages/admin/PesananAdmin";
 import AdminShippingPage from "../pages/admin/PengrimanAdmin";
 import ProdukDetailPage from "../pages/customer/ProductDetailPage";
+import AdminSettings from "../pages/admin/SettingsAdmin";
 
 
 const AppRoutes: React.FC = () => {
@@ -45,6 +46,7 @@ const AppRoutes: React.FC = () => {
           <Route path="produk" element={<ProductPage />} />
           <Route path="pesanan" element={<PesananPage />} />
           <Route path="pengiriman" element={<AdminShippingPage/>} />
+          <Route path="pengaturan" element={<AdminSettings/>} />
         </Route>
 
         {/* Not Found */}

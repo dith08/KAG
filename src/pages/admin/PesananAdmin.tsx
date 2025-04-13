@@ -1,7 +1,7 @@
 import React from "react";
 import SidebarAdmin from "../../components/admin/SidebarAdmin";
 import NavbarAdmin from "../../components/admin/NavbarAdmin";
-import { Eye } from "lucide-react";
+import OrderCard from "../../components/admin/OrderCardAdmin";
 
 const PesananPage: React.FC = () => {
   const orders = [
@@ -59,57 +59,24 @@ const PesananPage: React.FC = () => {
 
           <div className="space-y-6">
             {orders.map((order) => (
-              <div key={order.id} className="bg-[#FFE082] rounded-lg p-4 shadow">
-                <div className="flex justify-between">
-                  <div className="flex gap-4">
-                    <img
-                      src={order.image}
-                      alt={order.title}
-                      className="w-20 h-20 object-cover rounded-md"
-                    />
-                    <div>
-                      <h2 className="font-bold text-lg">{order.title}</h2>
-                      <p className="text-sm">Variasi<br />{order.variant}</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm">{order.quantity}</p>
-                    <p className="text-sm font-bold">{order.price}</p>
-                    <p className="text-sm text-blue-800 underline cursor-pointer">{order.design}</p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-5 gap-4 mt-4 text-sm">
-                  <div>
-                    <p className="text-gray-700 font-medium">Pembeli</p>
-                    <p>{order.buyer}</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-700 font-medium">Alamat</p>
-                    <p>{order.address}</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-700 font-medium">Status</p>
-                    <p>{order.status}</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-700 font-medium">Catatan</p>
-                    <p>{order.note}</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-700 font-medium">Pembayaran</p>
-                    <p>{order.payment}</p>
-                  </div>
-                </div>
-
-                <div className="flex justify-end mt-2">
-                  <button className="text-gray-700 hover:text-black">
-                    <Eye size={20} />
-                  </button>
-                </div>
-              </div>
+              <OrderCard
+                key={order.id}
+                image={order.image}
+                title={order.title}
+                variant={order.variant}
+                quantity={order.quantity}
+                price={order.price}
+                design={order.design}
+                buyer={order.buyer}
+                address={order.address}
+                status={order.status}
+                note={order.note}
+                payment={order.payment}
+                onView={() => console.log("Lihat detail pesanan", order.id)}
+              />
             ))}
           </div>
+
 
         </div>
       </div>

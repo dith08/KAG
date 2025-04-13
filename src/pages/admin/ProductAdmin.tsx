@@ -2,6 +2,7 @@ import React from "react";
 import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 import NavbarAdmin from "../../components/admin/NavbarAdmin";
 import SidebarAdmin from "../../components/admin/SidebarAdmin";
+import ProductTableRow from "../../components/admin/ProductTableRowAdmin";
 
 const ProductPage: React.FC = () => {
   const products = [
@@ -31,25 +32,18 @@ const ProductPage: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {products.map((product, index) => (
-                  <tr key={product.id} className="bg-orange-200 border-b">
-                    <td className="p-3">{index + 1}.</td>
-                    <td className="p-3 flex items-center space-x-2">
-                      <img src={product.image} alt="Product" className="w-10 h-10" />
-                      <span>{product.name}</span>
-                    </td>
-                    <td className="p-3">{product.stock}</td>
-                    <td className="p-3 flex space-x-2">
-                      <button className="p-2 bg-transparent hover:text-blue-600">
-                        <FaEdit />
-                      </button>
-                      <button className="p-2 bg-transparent hover:text-red-600">
-                        <FaTrash />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
+              {products.map((product, index) => (
+                <ProductTableRow
+                  key={product.id}
+                  index={index}
+                  name={product.name}
+                  stock={product.stock}
+                  image={product.image}
+                  onEdit={() => console.log("Edit product", product.id)}
+                  onDelete={() => console.log("Delete product", product.id)}
+                />
+              ))}
+            </tbody>
             </table>
           </div>
 
