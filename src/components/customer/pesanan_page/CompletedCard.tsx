@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Order } from "./Types";
 import BaseOrderCard from "./BaseOrderCard";
 import { Icon } from "@iconify/react";
-import ReviewModal from "./ReviewModal";
+import ReviewModal from "../feedback/ReviewModal";
 
 interface CompletedCardProps {
   order: Order;

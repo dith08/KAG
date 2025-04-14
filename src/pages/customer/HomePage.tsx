@@ -1,9 +1,9 @@
 import React from "react";
 import Navbar from "../../components/customer/Navbar";
-import Slider from "../../components/customer/Slider";
-import ProdukTerlarisCard from "../../components/customer/ProdukTerlarisCard";
+import Slider from "../../components/customer/home_page/Slider";
+import ProdukTerlarisCard from "../../components/customer/home_page/ProdukTerlarisCard";
 import Footer from "../../components/customer/Footer";
-import TestimonialList from "../../components/customer/TestimonialCard";
+import TestimonialList from "../../components/customer/home_page/TestimonialCard";
 import LangkahPesan from "../../components/customer/LangkahPesan";
 import { langkahData } from "../../components/customer/data/langkahData";
 

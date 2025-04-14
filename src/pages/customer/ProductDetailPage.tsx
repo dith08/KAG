@@ -5,7 +5,7 @@ import Footer from "../../components/customer/Footer";
 import { langkahData } from "../../components/customer/data/langkahData";
 import LangkahPesan from "../../components/customer/LangkahPesan";
 import { Icon } from "@iconify/react";
-import FormPemesanan from "../../components/customer/FormPemesanan";
+import FormPemesanan from "../../components/customer/detail_produk_page/FormPemesanan";
 
 const ProdukDetailPage = () => {
   const { slug } = useParams();

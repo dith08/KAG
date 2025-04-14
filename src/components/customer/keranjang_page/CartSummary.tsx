@@ -1,5 +1,5 @@
 import React from "react";
-import { Product } from "./CartItem";
+import { Product } from "../keranjang_page/CartItem";
 
 interface CartSummaryProps {
   products: Product[];

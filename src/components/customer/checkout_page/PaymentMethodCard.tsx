@@ -52,9 +52,7 @@ const PaymentOptions: React.FC = () => {
     { id: "tunai", method: "Tunai" },
   ];
 
-  const banks = [
-    { id: "bri", name: "BRI" }
-  ];
+  const banks = [{ id: "bri", name: "BRI" }];
 
   return (
     <div className="mb-6">
