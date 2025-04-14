@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Produk } from "../customer/data/produkDummy";
+import { Produk } from "../data/produkDummy";
 import { Icon } from "@iconify/react";
 
 interface Props {

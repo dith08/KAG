@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react";
-import { Order } from "./Types";
+import { Order } from "../pesanan_page/Types";
 
 interface BaseOrderCardProps {
   order: Order;

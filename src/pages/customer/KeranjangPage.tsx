@@ -1,7 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import Navbar from "../../components/customer/Navbar";
-import CartItem, { Product } from "../../components/customer/CartItem";
-import CartSummary from "../../components/customer/CartSummary";
+import CartItem, {
+  Product,
+} from "../../components/customer/keranjang_page/CartItem";
+import CartSummary from "../../components/customer/keranjang_page/CartSummary";
 import Footer from "../../components/customer/Footer";
 
 const KeranjangPage = () => {

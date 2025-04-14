@@ -4,9 +4,9 @@ import {
   Order,
   OrderStatus,
   PaymentStatus,
-} from "../../components/customer/Types";
-import TabBar from "../../components/customer/TabBar";
-import OrderList from "../../components/customer/OrderList";
+} from "../../components/customer/pesanan_page/Types";
+import TabBar from "../../components/customer/pesanan_page/TabBar";
+import OrderList from "../../components/customer/pesanan_page/OrderList";
 import Footer from "../../components/customer/Footer";
 
 const PesananSayaPage: React.FC = () => {

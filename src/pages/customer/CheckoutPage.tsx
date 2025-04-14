@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import Navbar from "../../components/customer/Navbar";
-import CheckoutProductItem from "../../components/customer/CheckoutProductItem";
-import DeliveryMethodCard from "../../components/customer/DeliveryMethodCard";
-import PaymentMethodCard from "../../components/customer/PaymentMethodCard";
+import CheckoutProductItem from "../../components/customer/checkout_page/CheckoutProductItem";
+import DeliveryMethodCard from "../../components/customer/checkout_page/DeliveryMethodCard";
+import PaymentMethodCard from "../../components/customer/checkout_page/PaymentMethodCard";
 import Footer from "../../components/customer/Footer";
 
 const CheckoutPage = () => {
