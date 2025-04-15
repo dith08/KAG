@@ -58,7 +58,8 @@ export default function Slider() {
     <div className="relative w-full h-full overflow-hidden bg-[#D9D9D9] pt-14">
       <motion.div
         className="flex w-full h-full"
-        animate={{ x: `-${currentSlide * 100}%` }}
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ x: `-${currentSlide * 100}%`, opacity: 1, y: 0 }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
       >
         {slides.map((slide, index) => (
@@ -103,7 +104,7 @@ export default function Slider() {
           <button
             key={index}
             onClick={() => goToSlide(index)}
-            className={`w-3 h-3 md:w-4 md:h-4 rounded-full ${
+            className={`w-3 h-3 md:w-4 md:h-4 rounded-full cursor-pointer ${
               currentSlide === index ? "bg-green-700" : "bg-white"
             }`}
             aria-label={`Slide ${index + 1}`}

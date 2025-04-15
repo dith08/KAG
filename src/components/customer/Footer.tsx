@@ -131,7 +131,7 @@ const Footer: React.FC = () => {
                   </li>
                   <li>
                     <a href="#" className="hover:underline block">
-                      Template Desain
+                      Jasa Desain
                     </a>
                   </li>
                   <li>
