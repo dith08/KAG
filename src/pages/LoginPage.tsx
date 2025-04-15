@@ -70,20 +70,11 @@ const LoginPage: React.FC = () => {
           <div className="flex-grow border-t border-gray-300"></div>
         </div>
 
-        <div className="flex justify-between gap-4">
-          <SocialButton
-            icon="logos:google-icon"
-            text="Login dengan Google"
-            onClick={() => console.log("Login dengan Google")}
-          />
-
-          <SocialButton
-            icon="fa6-brands:facebook"
-            text="Login dengan Facebook"
-            onClick={() => console.log("Login dengan Facebook")}
-            iconClassName="text-[#1877F2]"
-          />
-        </div>
+        <SocialButton
+          icon="logos:google-icon"
+          text="Login dengan Google"
+          onClick={() => console.log("Login dengan Google")}
+        />
       </form>
 
       <div className="mt-6 text-center">

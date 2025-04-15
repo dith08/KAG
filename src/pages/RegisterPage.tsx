@@ -75,20 +75,11 @@ const RegisterPage: React.FC = () => {
           <div className="flex-grow border-t border-gray-300"></div>
         </div>
 
-        <div className="flex justify-between gap-4">
-          <SocialButton
-            icon="logos:google-icon"
-            text="Register dengan Google"
-            onClick={() => console.log("Daftar dengan Google")}
-          />
-
-          <SocialButton
-            icon="fa6-brands:facebook"
-            text="Register dengan Facebook"
-            onClick={() => console.log("Daftar dengan Facebook")}
-            iconClassName="text-[#1877F2]"
-          />
-        </div>
+        <SocialButton
+          icon="logos:google-icon"
+          text="Register dengan Google"
+          onClick={() => console.log("Daftar dengan Google")}
+        />
       </form>
 
       {/* Link ke Login */}
