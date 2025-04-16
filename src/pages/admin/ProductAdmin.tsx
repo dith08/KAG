@@ -20,7 +20,7 @@ const ProductPage: React.FC = () => {
         <NavbarAdmin />
         <div className="p-6">
           <h1 className="text-2xl font-bold mb-4">Kelola Produk</h1>
-          
+
           <div className="bg-white p-4 shadow rounded-lg">
             <table className="w-full border-collapse">
               <thead>
@@ -32,18 +32,18 @@ const ProductPage: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-              {products.map((product, index) => (
-                <ProductTableRow
-                  key={product.id}
-                  index={index}
-                  name={product.name}
-                  stock={product.stock}
-                  image={product.image}
-                  onEdit={() => console.log("Edit product", product.id)}
-                  onDelete={() => console.log("Delete product", product.id)}
-                />
-              ))}
-            </tbody>
+                {products.map((product, index) => (
+                  <ProductTableRow
+                    key={product.id}
+                    index={index}
+                    name={product.name}
+                    stock={product.stock}
+                    image={product.image}
+                    onEdit={() => console.log("Edit product", product.id)}
+                    onDelete={() => console.log("Delete product", product.id)}
+                  />
+                ))}
+              </tbody>
             </table>
           </div>
 
