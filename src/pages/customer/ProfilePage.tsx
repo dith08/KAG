@@ -3,6 +3,7 @@ import Navbar from "../../components/customer/Navbar";
 import InputField from "../../components/InputField";
 import { Icon } from "@iconify/react";
 import Footer from "../../components/customer/Footer";
+import MapPicker from "../../components/customer/profile_page/MapPicker";
 
 const ProfilePage = () => {
   const [username, setUsername] = useState("John Doe");
@@ -12,9 +13,14 @@ const ProfilePage = () => {
   const [password, setPassword] = useState("johndoe123");
   const [showPassword, setShowPassword] = useState(false);
   const [searchLocation, setSearchLocation] = useState("");
+  const [searchTrigger, setSearchTrigger] = useState("");
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
+  };
+
+  const handleSearch = () => {
+    setSearchTrigger(searchLocation);
   };
 
   const handleSaveChanges = (e: { preventDefault: () => void }) => {
@@ -36,7 +42,7 @@ const ProfilePage = () => {
       />
 
       <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8 pt-24 pb-18">
-        <h1 className="text-3xl font-bold text-green-700 mb-6">PROFILE SAYA</h1>
+        <h1 className="text-3xl font-bold text-green-700 mb-6">PROFIL SAYA</h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-white p-6 rounded-lg shadow-md w-full">
           <form onSubmit={handleSaveChanges} className="space-y-6 w-full">
@@ -136,7 +142,10 @@ const ProfilePage = () => {
                   onChange={(e) => setSearchLocation(e.target.value)}
                   className="w-full p-2 focus:outline-none"
                 />
-                <button className="bg-yellow-500 p-3 flex items-center justify-center cursor-pointer">
+                <button
+                  className="bg-yellow-500 p-3 flex items-center justify-center cursor-pointer"
+                  onClick={handleSearch}
+                >
                   <Icon
                     icon="cuida:search-outline"
                     className="text-white text-xl"
@@ -145,10 +154,9 @@ const ProfilePage = () => {
               </div>
 
               <div className="h-64 lg:h-96 w-full bg-gray-200 rounded-lg overflow-hidden mt-4">
-                <img
-                  src="/images/map.png"
-                  alt="Location Map"
-                  className="w-full h-full object-cover"
+                <MapPicker
+                  setAddress={setAddress}
+                  searchLocation={searchTrigger}
                 />
               </div>
             </div>
