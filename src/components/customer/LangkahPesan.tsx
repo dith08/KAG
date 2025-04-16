@@ -21,8 +21,13 @@ const LangkahPesan: FC<LangkahPesanProps> = ({
   return (
     <motion.div
       className="bg-white rounded-2xl shadow-lg p-6 pt-16 relative group transition-all duration-300 hover:-translate-y-2 hover:shadow-xl"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.2 }}
+      variants={{
+        hidden: { opacity: 0, y: 30 },
+        visible: { opacity: 1, y: 0 },
+      }}
       transition={{ duration: 0.8, ease: "easeOut" }}
     >
       {/* Icon Bulat */}
