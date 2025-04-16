@@ -45,15 +45,28 @@ const testimonials: Testimonial[] = [
   },
 ];
 
+const containerVariants = {
+  hidden: {},
+  show: {
+    transition: {
+      staggerChildren: 0.3,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 30 },
+  show: { opacity: 1, y: 0 },
+};
+
 const TestimonialCard: React.FC<{ testimonial: Testimonial }> = ({
   testimonial,
 }) => {
   return (
     <motion.div
       className="w-full bg-yellow-500 rounded-lg shadow-lg flex flex-col md:flex-row transform transition duration-300 ease-in-out hover:scale-105 hover:shadow-2xl"
-      initial={{ opacity: 0, y: 20 }} // Mulai dengan opacity 0 dan sedikit geser ke bawah
-      animate={{ opacity: 1, y: 0 }} // Animasi ke opacity penuh dan posisi normal
-      transition={{ duration: 0.8, ease: "easeOut" }} // Durasi dan easing animasi
+      variants={itemVariants}
+      transition={{ duration: 0.6, ease: "easeOut" }}
     >
       {/* Bagian Gambar */}
       <div className="md:w-1/3 lg:w-1/4 w-full bg-green-600 rounded-t-lg md:rounded-l-lg md:rounded-tr-none flex items-center justify-center p-4">
@@ -86,13 +99,19 @@ const TestimonialCard: React.FC<{ testimonial: Testimonial }> = ({
   );
 };
 
-const TestimonialList = () => {
+const TestimonialList: React.FC = () => {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 p-6">
+    <motion.div
+      className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 p-6"
+      variants={containerVariants}
+      initial="hidden"
+      whileInView="show"
+      viewport={{ once: true, amount: 0.2 }}
+    >
       {testimonials.map((testimonial) => (
         <TestimonialCard key={testimonial.id} testimonial={testimonial} />
       ))}
-    </div>
+    </motion.div>
   );
 };
 

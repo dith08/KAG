@@ -13,8 +13,13 @@ const ProdukTerlarisCard: React.FC<ProdukTerlarisCardProps> = ({
   return (
     <motion.div
       className="relative bg-white rounded-2xl shadow-2xl p-4 overflow-hidden w-full h-72 sm:h-96 md:h-[28rem] group transform transition duration-500 hover:scale-105 hover:-translate-y-2"
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.2 }}
+      variants={{
+        hidden: { opacity: 0, scale: 0.9 },
+        visible: { opacity: 1, scale: 1 },
+      }}
       transition={{ duration: 1, ease: "easeOut" }}
     >
       {/* Background Lingkaran Kuning */}
@@ -27,7 +32,8 @@ const ProdukTerlarisCard: React.FC<ProdukTerlarisCardProps> = ({
           alt="Product image"
           className="max-w-full max-h-52 sm:max-h-64 md:max-h-72 object-contain transition-transform duration-500 group-hover:scale-110"
           initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
           transition={{ duration: 1, delay: 0.2 }}
         />
       </div>
