@@ -4,16 +4,16 @@ import NavbarAdmin from "../../components/admin/NavbarAdmin";
 
 const AdminShippingPage: React.FC = () => {
   const shipments = [
-    { id: 1, product: "majalah", buyer: "isham", status: "Sedang di proses" },
-    { id: 2, product: "majalah", buyer: "isham", status: "Sedang di proses" },
-    { id: 3, product: "majalah", buyer: "isham", status: "Sedang di proses" },
-    { id: 4, product: "majalah", buyer: "isham", status: "Sedang di proses" },
-    { id: 5, product: "majalah", buyer: "isham", status: "Sedang di proses" },
-    { id: 6, product: "majalah", buyer: "isham", status: "Sedang di proses" },
+    { id: 1, product: "majalah", buyer: "Isham", buyerId: "B001", status: "Sedang di proses" },
+    { id: 2, product: "majalah", buyer: "Isham", buyerId: "B001", status: "Sedang di proses" },
+    { id: 3, product: "majalah", buyer: "Isham", buyerId: "B001", status: "Sedang di proses" },
+    { id: 4, product: "majalah", buyer: "Isham", buyerId: "B001", status: "Sedang di proses" },
+    { id: 5, product: "majalah", buyer: "Isham", buyerId: "B001", status: "Sedang di proses" },
+    { id: 6, product: "majalah", buyer: "Isham", buyerId: "B001", status: "Sedang di proses" },
   ];
 
   return (
-    <div className="flex">
+    <div className="flex ml-64 mt-24 p-6">
       <SidebarAdmin />
       <div className="flex-1">
         <NavbarAdmin />
@@ -26,7 +26,8 @@ const AdminShippingPage: React.FC = () => {
                 <tr className="bg-[#FFE082] text-left">
                   <th className="px-4 py-2 rounded-l-lg">No.</th>
                   <th className="px-4 py-2">Produk</th>
-                  <th className="px-4 py-2">Pembeli</th>
+                  <th className="px-4 py-2">ID Pembeli</th>
+                  <th className="px-4 py-2">Nama Pembeli</th>
                   <th className="px-4 py-2 rounded-r-lg">Status Pengiriman</th>
                 </tr>
               </thead>
@@ -35,6 +36,7 @@ const AdminShippingPage: React.FC = () => {
                   <tr key={item.id} className="bg-[#FFECB3]">
                     <td className="px-4 py-2 rounded-l-lg font-semibold">{index + 1}.</td>
                     <td className="px-4 py-2">{item.product}</td>
+                    <td className="px-4 py-2">{item.buyerId}</td>
                     <td className="px-4 py-2">{item.buyer}</td>
                     <td className="px-4 py-2 rounded-r-lg">
                       <select
@@ -51,6 +53,7 @@ const AdminShippingPage: React.FC = () => {
               </tbody>
             </table>
           </div>
+
         </div>
       </div>
     </div>
