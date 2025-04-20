@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import Navbar from "../../components/customer/Navbar";
 import InputField from "../../components/InputField";
 import { Icon } from "@iconify/react";
@@ -15,6 +15,9 @@ const ProfilePage = () => {
   const [searchLocation, setSearchLocation] = useState("");
   const [searchTrigger, setSearchTrigger] = useState("");
 
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [previewImage, setPreviewImage] = useState<string>("/images/man.png");
+
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
@@ -26,6 +29,21 @@ const ProfilePage = () => {
   const handleSaveChanges = (e: { preventDefault: () => void }) => {
     e.preventDefault();
     console.log("Profile updated");
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleClickUpload = () => {
+    fileInputRef.current?.click();
   };
 
   return (
@@ -48,17 +66,30 @@ const ProfilePage = () => {
           <form onSubmit={handleSaveChanges} className="space-y-6 w-full">
             <div className="flex flex-col sm:flex-row items-center gap-4">
               <div className="relative">
+                {/* Foto Profil */}
                 <img
-                  src="/images/man.png"
+                  src={previewImage}
                   alt="Profile"
                   className="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover shadow-md"
                 />
+
+                {/* Tombol Edit */}
                 <button
                   type="button"
-                  className="absolute bottom-0 right-0 bg-white p-2 rounded-full border border-gray-300 shadow"
+                  onClick={handleClickUpload}
+                  className="absolute bottom-0 right-0 bg-white p-2 rounded-full border border-gray-300 shadow cursor-pointer"
                 >
                   <Icon icon="mdi:pencil" className="text-lg text-gray-500" />
                 </button>
+
+                {/* Input File Disembunyikan */}
+                <input
+                  type="file"
+                  accept="image/*"
+                  ref={fileInputRef}
+                  className="hidden"
+                  onChange={handleImageChange}
+                />
               </div>
               <div className="flex-1 w-full">
                 <label className="block text-base font-medium pb-2">
@@ -157,6 +188,9 @@ const ProfilePage = () => {
                 <MapPicker
                   setAddress={setAddress}
                   searchLocation={searchTrigger}
+                  setCoordinates={(lat, lng) => {
+                    console.log("Latitude:", lat, "Longitude:", lng);
+                  }}
                 />
               </div>
             </div>
