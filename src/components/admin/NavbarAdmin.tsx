@@ -3,9 +3,15 @@ import { FaUserCircle, FaSearch } from "react-icons/fa";
 
 const NavbarAdmin: React.FC = () => {
   return (
-    <div className="bg-green-700 text-white flex justify-between items-center px-6 h-24">
+    <div className="fixed top-0 left-0 right-0 z-50 bg-green-700 text-white flex items-center h-24 shadow-md">
+      {/* Logo */}
+      <div className=" h-24 flex flex-col items-center justify-center ml-15 mr-[28px]">
+        <h2 className="text-2xl font-bold leading-tight">KARYA ADI</h2>
+        <h2 className="text-2xl font-bold">GRAFIKA</h2>
+      </div>
+
       {/* Search Bar */}
-      <div className="relative w-1/3">
+      <div className="relative w-1/3 ml-10">
         <input
           type="text"
           placeholder="Search"
@@ -15,7 +21,7 @@ const NavbarAdmin: React.FC = () => {
       </div>
 
       {/* Profile */}
-      <div className="flex items-center bg-[#F9A825]/75 p-2 px-5 rounded-lg">
+      <div className="flex items-center bg-[#F9A825]/75 p-2 px-5 rounded-lg ml-auto mr-10">
         <span className="mr-3 font-semibold">Radith</span>
         <FaUserCircle className="text-xl" />
       </div>

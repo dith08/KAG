@@ -50,7 +50,7 @@ const PesananPage: React.FC = () => {
   ];
 
   return (
-    <div className="flex">
+    <div className="flex ml-64 mt-24 p-6">
       <SidebarAdmin />
       <div className="flex-1">
         <NavbarAdmin />
