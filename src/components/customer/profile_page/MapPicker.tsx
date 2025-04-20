@@ -10,7 +10,7 @@ import { LatLngExpression } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
-// TypeScript-safe fix agar marker icon muncul
+// Fix agar marker icon bisa muncul dengan benar
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -29,7 +29,8 @@ L.Icon.Default.mergeOptions({
 });
 
 interface MapPickerProps {
-  setAddress: (address: string) => void;
+  setAddress: (address: string) => void; // Menyimpan alamat yang ditampilkan
+  setCoordinates: (lat: number, lng: number) => void; // Menyimpan lat/lng untuk dikirim ke backend
   searchLocation: string;
   onSearchResult?: (lat: number, lng: number) => void;
 }
@@ -41,6 +42,7 @@ interface MarkerPosition {
 
 const MapPicker: React.FC<MapPickerProps> = ({
   setAddress,
+  setCoordinates,
   searchLocation,
   onSearchResult,
 }) => {
@@ -51,7 +53,7 @@ const MapPicker: React.FC<MapPickerProps> = ({
 
   const map = useMap();
 
-  // 🧠 Dibungkus biar aman dari re-render
+  // Fungsi untuk mendapatkan alamat berdasarkan lat/lng
   const reverseGeocode = useCallback(
     (lat: number, lng: number) => {
       fetch(
@@ -60,29 +62,23 @@ const MapPicker: React.FC<MapPickerProps> = ({
         .then((res) => res.json())
         .then((data) => {
           const displayName = data.display_name || "Alamat tidak ditemukan";
-          // Tampilkan alamat dengan koordinat
-          const addressWithCoordinates = `${displayName} (Lat: ${lat}, Lng: ${lng})`;
-          setAddress(addressWithCoordinates);
+          setAddress(displayName); // Menampilkan alamat di textarea
+          setCoordinates(lat, lng); // Menyimpan lat/lng
         });
     },
-    [setAddress]
+    [setAddress, setCoordinates]
   );
 
-  // Click event
+  // Ketika peta di-klik
   useMapEvents({
     click(e) {
       const { lat, lng } = e.latlng;
       setMarker({ lat, lng });
-      reverseGeocode(lat, lng);
+      reverseGeocode(lat, lng); // Menampilkan alamat dan menyimpan lat/lng saat klik
     },
   });
 
-  // Load awal reverse geocode Kudus
-  useEffect(() => {
-    reverseGeocode(-6.8059, 110.8417);
-  }, [reverseGeocode]);
-
-  // Handle search input
+  // Untuk menangani pencarian lokasi
   useEffect(() => {
     if (!searchLocation) return;
 
@@ -98,12 +94,13 @@ const MapPicker: React.FC<MapPickerProps> = ({
           const lat = parseFloat(result.lat);
           const lng = parseFloat(result.lon);
           setMarker({ lat, lng });
+          setCoordinates(lat, lng); // Menyimpan lat/lng
           if (map) map.setView([lat, lng], 15);
-          reverseGeocode(lat, lng);
+          reverseGeocode(lat, lng); // Mendapatkan alamat berdasarkan lat/lng
           onSearchResult?.(lat, lng);
         }
       });
-  }, [searchLocation, map, reverseGeocode, onSearchResult]);
+  }, [searchLocation, map, reverseGeocode, onSearchResult, setCoordinates]);
 
   return marker ? (
     <Marker position={[marker.lat, marker.lng] as LatLngExpression} />

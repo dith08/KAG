@@ -61,19 +61,34 @@ const Navbar: React.FC<NavbarProps> = ({ brand, navItems, isLoggedIn }) => {
 
             {/* Profile Drawer */}
             <div className="border-b pb-4 mb-4">
-              <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-300 rounded-full overflow-hidden">
-                  <img
-                    src={profileImage}
-                    alt="User Avatar"
-                    className="w-full h-full object-cover"
-                  />
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-300 rounded-full overflow-hidden">
+                    <img
+                      src={profileImage}
+                      alt="User Avatar"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-green-700 font-medium text-base sm:text-lg">
+                      {isLoggedIn ? "Akun Saya" : "Selamat Datang"}
+                    </p>
+                  </div>
                 </div>
-                <div className="text-left">
-                  <p className="text-green-700 font-medium text-base sm:text-lg">
-                    {isLoggedIn ? "Akun Saya" : "Selamat Datang"}
-                  </p>
-                </div>
+
+                {/* Notification Icon (Mobile/Tablet) */}
+                {isLoggedIn && (
+                  <a
+                    href="/customer/notification"
+                    className="text-green-700 ml-2 sm:ml-4"
+                  >
+                    <Icon
+                      icon="mdi:bell-outline"
+                      className="text-xl sm:text-2xl"
+                    />
+                  </a>
+                )}
               </div>
 
               {/* Profile Menu */}
@@ -152,6 +167,16 @@ const Navbar: React.FC<NavbarProps> = ({ brand, navItems, isLoggedIn }) => {
               </a>
             </li>
           ))}
+
+          {/* Notification Icon (Desktop Only) */}
+          <li>
+            <a
+              href="/customer/notification"
+              className="relative text-white hover:text-green-200"
+            >
+              <Icon icon="mdi:bell" className="text-2xl" />
+            </a>
+          </li>
 
           {/* Profile Dropdown */}
           <div className="relative" ref={dropdownRef}>
