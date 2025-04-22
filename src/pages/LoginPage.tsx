@@ -1,13 +1,61 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import AuthLayout from "../components/AuthLayout";
 import InputField from "../components/InputField";
 import Button from "../components/Button";
 import SocialButton from "../components/SocialButton";
+import api from "../services/api"; // axios instance
+import axios from "axios";
+import { useToast } from "../components/toast/useToast";
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+  const { showToast } = useToast(); // Assuming you have a toast context
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setIsLoading(true);
+
+    if (!email || !password) {
+      setError("Email dan password wajib diisi.");
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const response = await api.post("/login", {
+        email,
+        password,
+      });
+
+      if (response.data?.token) {
+        localStorage.setItem("token", response.data.token);
+        showToast("Login berhasil!", "success"); // Show success toast
+        navigate("/customer"); // arahkan ke halaman customer
+      } else {
+        setError("Login gagal. Token tidak ditemukan.");
+      }
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        const message =
+          err.response?.data?.message || "Email atau password salah.";
+        setError(message);
+      } else {
+        setError("Gagal login. Silakan coba lagi.");
+        console.error(err);
+      }
+    } finally {
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 2000);
+    }
+  };
 
   return (
     <AuthLayout imageSrc="/images/auth_image.png">
@@ -18,7 +66,11 @@ const LoginPage: React.FC = () => {
         Masukkan email dan password untuk akses <br /> akun anda
       </p>
 
-      <form>
+      {error && (
+        <div className="mb-4 text-red-500 text-sm font-medium">{error}</div>
+      )}
+
+      <form onSubmit={handleLogin}>
         <div className="mb-4">
           <InputField
             type="email"
@@ -62,6 +114,7 @@ const LoginPage: React.FC = () => {
           type="submit"
           text="Login"
           className="bg-green-700 text-white hover:bg-green-600"
+          loading={isLoading}
         />
 
         <div className="flex items-center my-6">

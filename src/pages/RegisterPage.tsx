@@ -1,15 +1,60 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import AuthLayout from "../components/AuthLayout";
 import InputField from "../components/InputField";
 import Button from "../components/Button";
 import SocialButton from "../components/SocialButton";
+import api from "../services/api"; // axios instance
+import axios from "axios";
+import { useToast } from "../components/toast/useToast";
 
 const RegisterPage: React.FC = () => {
-  const [username, setUsername] = useState("");
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [phone, setPhone] = useState("");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+  const { showToast } = useToast();
+
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setIsLoading(true);
+
+    if (!name || !email || !password || !phone) {
+      setError("Nama, email, password, dan nomor telepon wajib diisi.");
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const response = await api.post("/register", {
+        name,
+        email,
+        password,
+        phone,
+      });
+
+      showToast("Registrasi berhasil. Silahkan login.", "success");
+      navigate("/");
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        const message =
+          err.response?.data?.message || "Registrasi gagal. Coba lagi.";
+        setError(message);
+      } else {
+        setError("Terjadi kesalahan. Coba lagi.");
+        console.error(err);
+      }
+    } finally {
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 1000);
+    }
+  };
 
   return (
     <AuthLayout imageSrc="/images/auth_image.png">
@@ -17,17 +62,21 @@ const RegisterPage: React.FC = () => {
         Get Started Now
       </h2>
       <p className="mb-6 text-[18px]">
-        Daftarkan diri anda untuk menikmati <br /> layanan dari kami
+        Masukkan informasi anda untuk membuat akun <br /> dan mulai memesan
       </p>
 
-      <form>
+      {error && (
+        <div className="mb-4 text-red-500 text-sm font-medium">{error}</div>
+      )}
+
+      <form onSubmit={handleRegister}>
         <div className="mb-4">
           <InputField
             type="text"
             placeholder="Masukkan username"
             icon="mdi:account"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
           />
         </div>
 
@@ -67,6 +116,7 @@ const RegisterPage: React.FC = () => {
           type="submit"
           text="Register"
           className="bg-green-700 text-white hover:bg-green-600"
+          loading={isLoading}
         />
 
         <div className="flex items-center my-6">
@@ -78,11 +128,10 @@ const RegisterPage: React.FC = () => {
         <SocialButton
           icon="logos:google-icon"
           text="Register dengan Google"
-          onClick={() => console.log("Daftar dengan Google")}
+          onClick={() => console.log("Register dengan Google")}
         />
       </form>
 
-      {/* Link ke Login */}
       <div className="mt-6 text-center">
         Sudah punya akun?{" "}
         <a href="/" className="text-green-700 font-medium hover:text-green-600">
