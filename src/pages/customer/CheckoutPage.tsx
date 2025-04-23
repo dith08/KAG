@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Navbar from "../../components/customer/Navbar";
 import CheckoutProductItem from "../../components/customer/checkout_page/CheckoutProductItem";
 import DeliveryMethodCard from "../../components/customer/checkout_page/DeliveryMethodCard";

@@ -1,4 +1,3 @@
-import React from "react";
 import Navbar from "../../components/customer/Navbar";
 import Slider from "../../components/customer/home_page/Slider";
 import ProdukTerlarisCard from "../../components/customer/home_page/ProdukTerlarisCard";
