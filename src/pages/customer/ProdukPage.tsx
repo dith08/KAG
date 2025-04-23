@@ -1,4 +1,3 @@
-import React from "react";
 import { Icon } from "@iconify/react";
 import Navbar from "../../components/customer/Navbar";
 import ProductList from "../../components/customer/produk_page/ProductCard";
