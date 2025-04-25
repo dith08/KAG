@@ -26,12 +26,11 @@ const ProdukDetailPage = () => {
       <Navbar
         brand="KARYA ADI GRAFIKA"
         navItems={[
-          { label: "Home", href: "/customer" },
+          { label: "Home", href: "/" },
           { label: "Produk", href: "/customer/produk" },
           { label: "Pesanan Saya", href: "/customer/pesanan" },
           { label: "Keranjang", href: "/customer/keranjang" },
         ]}
-        isLoggedIn={true}
       />
 
       {/* Section 1: Gambar dan Deskripsi Produk */}

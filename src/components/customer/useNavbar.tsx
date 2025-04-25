@@ -5,7 +5,8 @@ export const useNavbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const drawerRef = useRef<HTMLDivElement>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  // Mengubah dropdownRef menjadi merujuk ke HTMLLIElement
+  const dropdownRef = useRef<HTMLLIElement>(null); // <-- Ubah tipe di sini
 
   // Tutup drawer & dropdown saat klik di luar
   useEffect(() => {

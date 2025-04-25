@@ -1,7 +1,8 @@
 import React from "react";
 import { Icon } from "@iconify/react";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useNavbar } from "./useNavbar";
+import { useAuth } from "../../context/AuthContext";
 
 interface NavItem {
   label: string;
@@ -11,11 +12,12 @@ interface NavItem {
 interface NavbarProps {
   brand: string;
   navItems: NavItem[];
-  isLoggedIn: boolean;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ brand, navItems, isLoggedIn }) => {
-  const location = useLocation(); // Dapatkan halaman aktif
+const Navbar: React.FC<NavbarProps> = ({ brand, navItems }) => {
+  const { pathname } = useLocation();
+  const navigate = useNavigate();
+  const { isLoggedIn, logout } = useAuth();
   const {
     isDrawerOpen,
     setIsDrawerOpen,
@@ -27,6 +29,13 @@ const Navbar: React.FC<NavbarProps> = ({ brand, navItems, isLoggedIn }) => {
 
   const profileImage = isLoggedIn ? "/images/man.png" : "/images/user.png";
 
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
+
+  const closeDrawer = () => setIsDrawerOpen(false);
+
   return (
     <nav className="bg-green-700 px-4 sm:px-6 lg:px-20 py-3 sm:py-4 fixed top-0 left-0 w-full z-50 shadow-md">
       <div className="container mx-auto flex justify-between items-center">
@@ -35,15 +44,15 @@ const Navbar: React.FC<NavbarProps> = ({ brand, navItems, isLoggedIn }) => {
           {brand}
         </div>
 
-        {/* Mobile & Tablet Menu Button (visible on sm and md screens) */}
+        {/* Mobile menu button */}
         <button
-          className="lg:hidden text-white text-xl sm:text-2xl cursor-pointer"
+          className="lg:hidden text-white text-xl sm:text-2xl"
           onClick={() => setIsDrawerOpen(true)}
         >
           <Icon icon="mdi:menu" />
         </button>
 
-        {/* Drawer (Mobile & Tablet Menu) */}
+        {/* Drawer */}
         <div
           ref={drawerRef}
           className={`fixed top-0 left-0 h-full w-64 sm:w-72 bg-white z-50 shadow-lg transform ${
@@ -51,15 +60,14 @@ const Navbar: React.FC<NavbarProps> = ({ brand, navItems, isLoggedIn }) => {
           } transition-transform duration-300`}
         >
           <div className="p-4 sm:p-6">
-            {/* Close Button */}
             <button
-              className="text-gray-600 text-xl sm:text-2xl mb-4 cursor-pointer"
-              onClick={() => setIsDrawerOpen(false)}
+              className="text-gray-600 text-xl sm:text-2xl mb-4"
+              onClick={closeDrawer}
             >
               <Icon icon="mdi:close" />
             </button>
 
-            {/* Profile Drawer */}
+            {/* Profile Section */}
             <div className="border-b pb-4 mb-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
@@ -70,116 +78,118 @@ const Navbar: React.FC<NavbarProps> = ({ brand, navItems, isLoggedIn }) => {
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <div className="text-left">
-                    <p className="text-green-700 font-medium text-base sm:text-lg">
-                      {isLoggedIn ? "Akun Saya" : "Selamat Datang"}
-                    </p>
-                  </div>
+                  <p className="text-green-700 font-medium text-base sm:text-lg">
+                    {isLoggedIn ? "Akun Saya" : "Selamat Datang"}
+                  </p>
                 </div>
 
-                {/* Notification Icon (Mobile/Tablet) */}
                 {isLoggedIn && (
-                  <a
-                    href="/customer/notification"
+                  <Link
+                    to="/customer/notification"
                     className="text-green-700 ml-2 sm:ml-4"
+                    onClick={closeDrawer}
                   >
                     <Icon
                       icon="mdi:bell-outline"
                       className="text-xl sm:text-2xl"
                     />
-                  </a>
+                  </Link>
                 )}
               </div>
 
-              {/* Profile Menu */}
+              {/* Drawer Actions */}
               <div className="mt-4 sm:mt-6">
                 {isLoggedIn ? (
                   <>
-                    <a
-                      href="/customer/profile"
+                    <Link
+                      to="/customer/profile"
                       className="block px-4 py-2 text-green-700 hover:bg-green-100 rounded-md text-sm sm:text-base"
+                      onClick={closeDrawer}
                     >
                       Profile Saya
-                    </a>
-                    <a
-                      href="/customer/pesanan"
+                    </Link>
+                    <Link
+                      to="/customer/pesanan"
                       className="block px-4 py-2 text-green-700 hover:bg-green-100 rounded-md text-sm sm:text-base"
+                      onClick={closeDrawer}
                     >
                       Pesanan Saya
-                    </a>
-                    <a
-                      href="/"
-                      className="block px-4 py-2 text-red-600 hover:bg-red-50 rounded-md text-sm sm:text-base"
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="block w-full px-4 py-2 text-left text-red-600 hover:bg-red-50 rounded-md text-sm sm:text-base"
                     >
                       Logout
-                    </a>
+                    </button>
                   </>
                 ) : (
                   <>
-                    <a
-                      href="/"
+                    <Link
+                      to="/login"
                       className="block px-4 py-2 text-green-700 hover:bg-green-100 rounded-md text-sm sm:text-base"
+                      onClick={closeDrawer}
                     >
                       Login
-                    </a>
-                    <a
-                      href="/register"
+                    </Link>
+                    <Link
+                      to="/register"
                       className="block px-4 py-2 text-green-700 hover:bg-green-100 rounded-md text-sm sm:text-base"
+                      onClick={closeDrawer}
                     >
                       Register
-                    </a>
+                    </Link>
                   </>
                 )}
               </div>
             </div>
 
-            {/* Navigation Links */}
+            {/* Drawer Navigation Links */}
             <ul className="space-y-3 sm:space-y-4 mt-4 sm:mt-6">
               {navItems.map((item) => (
                 <li key={item.href}>
-                  <a
-                    href={item.href}
-                    className={`text-green-700 block px-4 py-2 hover:bg-green-100 rounded-md text-sm sm:text-base ${
-                      location.pathname === item.href
-                        ? "bg-green-100 font-medium"
-                        : ""
+                  <Link
+                    to={item.href}
+                    className={`block px-4 py-2 rounded-md text-sm sm:text-base text-green-700 hover:bg-green-100 ${
+                      pathname === item.href ? "bg-green-100 font-medium" : ""
                     }`}
+                    onClick={closeDrawer}
                   >
                     {item.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
           </div>
         </div>
 
-        {/* Desktop Navigation (visible only on large screens) */}
+        {/* Desktop Navigation */}
         <ul className="hidden lg:flex space-x-6 items-center">
           {navItems.map((item) => (
             <li key={item.href}>
-              <a
-                href={item.href}
+              <Link
+                to={item.href}
                 className={`text-white px-4 py-2 rounded-lg hover:underline underline-offset-8 ${
-                  location.pathname === item.href ? "underline font-medium" : ""
+                  pathname === item.href ? "underline font-medium" : ""
                 }`}
               >
                 {item.label}
-              </a>
+              </Link>
             </li>
           ))}
 
-          {/* Notification Icon (Desktop Only) */}
-          <li>
-            <a
-              href="/customer/notification"
-              className="relative text-white hover:text-green-200"
-            >
-              <Icon icon="mdi:bell" className="text-2xl" />
-            </a>
-          </li>
+          {isLoggedIn && (
+            <li>
+              <Link
+                to="/customer/notification"
+                className="text-white hover:text-green-200"
+              >
+                <Icon icon="mdi:bell" className="text-2xl" />
+              </Link>
+            </li>
+          )}
 
-          {/* Profile Dropdown */}
-          <div className="relative" ref={dropdownRef}>
+          {/* Dropdown Profile */}
+          <li className="relative" ref={dropdownRef}>
             <div
               className="w-8 h-8 bg-gray-300 rounded-full overflow-hidden cursor-pointer"
               onClick={() => setIsDropdownOpen((prev) => !prev)}
@@ -195,44 +205,44 @@ const Navbar: React.FC<NavbarProps> = ({ brand, navItems, isLoggedIn }) => {
               <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg z-10 border border-gray-200">
                 {isLoggedIn ? (
                   <>
-                    <a
-                      href="/customer/profile"
-                      className="block px-4 py-2 text-green-700 hover:bg-green-50 focus:bg-green-100 rounded-t-lg"
+                    <Link
+                      to="/customer/profile"
+                      className="block px-4 py-2 text-green-700 hover:bg-green-50 rounded-t-lg"
                     >
                       Profile Saya
-                    </a>
-                    <a
-                      href="/customer/pesanan"
-                      className="block px-4 py-2 text-green-700 hover:bg-green-50 focus:bg-green-100"
+                    </Link>
+                    <Link
+                      to="/customer/pesanan"
+                      className="block px-4 py-2 text-green-700 hover:bg-green-50"
                     >
                       Pesanan Saya
-                    </a>
-                    <a
-                      href="/"
-                      className="block px-4 py-2 text-red-600 hover:bg-red-50 focus:bg-red-100 rounded-b-lg"
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="block w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 rounded-b-lg cursor-pointer"
                     >
                       Logout
-                    </a>
+                    </button>
                   </>
                 ) : (
                   <>
-                    <a
-                      href="/"
-                      className="block px-4 py-2 text-green-700 hover:bg-green-50 focus:bg-green-100 rounded-t-lg"
+                    <Link
+                      to="/login"
+                      className="block px-4 py-2 text-green-700 hover:bg-green-50 rounded-t-lg"
                     >
                       Login
-                    </a>
-                    <a
-                      href="/register"
-                      className="block px-4 py-2 text-green-700 hover:bg-green-50 focus:bg-green-100 rounded-b-lg"
+                    </Link>
+                    <Link
+                      to="/register"
+                      className="block px-4 py-2 text-green-700 hover:bg-green-50 rounded-b-lg"
                     >
                       Register
-                    </a>
+                    </Link>
                   </>
                 )}
               </div>
             )}
-          </div>
+          </li>
         </ul>
       </div>
     </nav>

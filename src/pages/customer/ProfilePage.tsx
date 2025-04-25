@@ -51,12 +51,11 @@ const ProfilePage = () => {
       <Navbar
         brand="KARYA ADI GRAFIKA"
         navItems={[
-          { label: "Home", href: "/customer" },
+          { label: "Home", href: "/" },
           { label: "Produk", href: "/customer/produk" },
           { label: "Pesanan Saya", href: "/customer/pesanan" },
           { label: "Keranjang", href: "/customer/keranjang" },
         ]}
-        isLoggedIn={true}
       />
 
       <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8 pt-24 pb-18">

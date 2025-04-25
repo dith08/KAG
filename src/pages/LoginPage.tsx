@@ -7,6 +7,8 @@ import SocialButton from "../components/SocialButton";
 import api from "../services/api"; // axios instance
 import axios from "axios";
 import { useToast } from "../components/toast/useToast";
+import { getBaseUrl } from "../utils/getBaseUrl";
+import { useAuth } from "../context/AuthContext";
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -15,7 +17,8 @@ const LoginPage: React.FC = () => {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { showToast } = useToast(); // Assuming you have a toast context
+  const { showToast } = useToast();
+  const { login } = useAuth();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,15 +32,23 @@ const LoginPage: React.FC = () => {
     }
 
     try {
-      const response = await api.post("/login", {
+      const response = await api.post("/api/login", {
         email,
         password,
       });
 
       if (response.data?.token) {
         localStorage.setItem("token", response.data.token);
-        showToast("Login berhasil!", "success"); // Show success toast
-        navigate("/customer"); // arahkan ke halaman customer
+        login(); // ← panggil dari context agar Navbar re-render
+
+        const userRole = response.data.users?.user_role;
+        showToast("Login berhasil!", "success");
+
+        if (userRole === "admin") {
+          navigate("/admin");
+        } else {
+          navigate("/");
+        }
       } else {
         setError("Login gagal. Token tidak ditemukan.");
       }
@@ -55,6 +66,11 @@ const LoginPage: React.FC = () => {
         setIsLoading(false);
       }, 2000);
     }
+  };
+
+  const handleGoogleLogin = () => {
+    // Redirect user to the Laravel backend for Google authentication
+    window.location.href = `${getBaseUrl()}/auth/google`;
   };
 
   return (
@@ -126,7 +142,7 @@ const LoginPage: React.FC = () => {
         <SocialButton
           icon="logos:google-icon"
           text="Login dengan Google"
-          onClick={() => console.log("Login dengan Google")}
+          onClick={handleGoogleLogin}
         />
       </form>
 
