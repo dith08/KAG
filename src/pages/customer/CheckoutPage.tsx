@@ -37,12 +37,11 @@ const CheckoutPage = () => {
       <Navbar
         brand="KARYA ADI GRAFIKA"
         navItems={[
-          { label: "Home", href: "/customer" },
+          { label: "Home", href: "/" },
           { label: "Produk", href: "/customer/produk" },
           { label: "Pesanan Saya", href: "/customer/pesanan" },
           { label: "Keranjang", href: "/customer/keranjang" },
         ]}
-        isLoggedIn={true}
       />
 
       <div className="container mx-auto my-10 px-4 sm:px-6 lg:px-8">
@@ -140,7 +139,10 @@ const CheckoutPage = () => {
             />
             <label htmlFor="terms" className="text-sm">
               Dengan melanjutkan, Saya setuju dengan{" "}
-              <span className="text-green-700 font-medium">Syarat & Ketentuan</span> yang berlaku.
+              <span className="text-green-700 font-medium">
+                Syarat & Ketentuan
+              </span>{" "}
+              yang berlaku.
             </label>
           </div>
 

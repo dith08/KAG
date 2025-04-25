@@ -7,6 +7,7 @@ import SocialButton from "../components/SocialButton";
 import api from "../services/api"; // axios instance
 import axios from "axios";
 import { useToast } from "../components/toast/useToast";
+import { getBaseUrl } from "../utils/getBaseUrl";
 
 const RegisterPage: React.FC = () => {
   const [name, setName] = useState("");
@@ -31,7 +32,7 @@ const RegisterPage: React.FC = () => {
     }
 
     try {
-      const response = await api.post("/register", {
+      const response = await api.post("/api/register", {
         name,
         email,
         password,
@@ -39,7 +40,7 @@ const RegisterPage: React.FC = () => {
       });
 
       showToast("Registrasi berhasil. Silahkan login.", "success");
-      navigate("/");
+      navigate("/login");
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
         const message =
@@ -54,6 +55,11 @@ const RegisterPage: React.FC = () => {
         setIsLoading(false);
       }, 1000);
     }
+  };
+
+  const handleGoogleRegister = () => {
+    // Redirect user to the Laravel backend for Google authentication
+    window.location.href = `${getBaseUrl()}/auth/google`;
   };
 
   return (
@@ -128,13 +134,16 @@ const RegisterPage: React.FC = () => {
         <SocialButton
           icon="logos:google-icon"
           text="Register dengan Google"
-          onClick={() => console.log("Register dengan Google")}
+          onClick={handleGoogleRegister}
         />
       </form>
 
       <div className="mt-6 text-center">
         Sudah punya akun?{" "}
-        <a href="/" className="text-green-700 font-medium hover:text-green-600">
+        <a
+          href="/login"
+          className="text-green-700 font-medium hover:text-green-600"
+        >
           Login
         </a>
       </div>

@@ -79,12 +79,11 @@ const PesananSayaPage: React.FC = () => {
       <Navbar
         brand="KARYA ADI GRAFIKA"
         navItems={[
-          { label: "Home", href: "/customer" },
+          { label: "Home", href: "/" },
           { label: "Produk", href: "/customer/produk" },
           { label: "Pesanan Saya", href: "/customer/pesanan" },
           { label: "Keranjang", href: "/customer/keranjang" },
         ]}
-        isLoggedIn={true} // Ganti ke true kalau user sudah login
       />
       <div className="w-full mx-auto pt-24 px-4 sm:px-6 md:px-10 lg:px-14 mb-10">
         <TabBar activeTab={activeTab} onChangeTab={setActiveTab} />
