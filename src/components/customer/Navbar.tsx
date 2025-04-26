@@ -27,7 +27,7 @@ const Navbar: React.FC<NavbarProps> = ({ brand, navItems }) => {
     dropdownRef,
   } = useNavbar();
 
-  const profileImage = isLoggedIn ? "/images/man.png" : "/images/user.png";
+  const profileImage = isLoggedIn ? "/images/user.png" : "/images/user.png";
 
   const handleLogout = () => {
     logout();
@@ -188,44 +188,34 @@ const Navbar: React.FC<NavbarProps> = ({ brand, navItems }) => {
             </li>
           )}
 
-          {/* Dropdown Profile */}
-          <li className="relative" ref={dropdownRef}>
-            <div
-              className="w-8 h-8 bg-gray-300 rounded-full overflow-hidden cursor-pointer"
-              onClick={() => setIsDropdownOpen((prev) => !prev)}
-            >
-              <img
-                src={profileImage}
-                alt="User Avatar"
-                className="w-full h-full object-cover"
-              />
-            </div>
+          {/* Profile Button */}
+          <li className="relative">
+            {isLoggedIn ? (
+              <Link
+                to="/customer/profile"
+                className="w-8 h-8 bg-gray-300 rounded-full overflow-hidden block"
+              >
+                <img
+                  src={profileImage}
+                  alt="User Avatar"
+                  className="w-full h-full object-cover"
+                />
+              </Link>
+            ) : (
+              <div className="relative" ref={dropdownRef}>
+                <div
+                  className="w-8 h-8 bg-gray-300 rounded-full overflow-hidden cursor-pointer"
+                  onClick={() => setIsDropdownOpen((prev) => !prev)}
+                >
+                  <img
+                    src={profileImage}
+                    alt="User Avatar"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
 
-            {isDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg z-10 border border-gray-200">
-                {isLoggedIn ? (
-                  <>
-                    <Link
-                      to="/customer/profile"
-                      className="block px-4 py-2 text-green-700 hover:bg-green-50 rounded-t-lg"
-                    >
-                      Profile Saya
-                    </Link>
-                    <Link
-                      to="/customer/pesanan"
-                      className="block px-4 py-2 text-green-700 hover:bg-green-50"
-                    >
-                      Pesanan Saya
-                    </Link>
-                    <button
-                      onClick={handleLogout}
-                      className="block w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 rounded-b-lg cursor-pointer"
-                    >
-                      Logout
-                    </button>
-                  </>
-                ) : (
-                  <>
+                {isDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg z-10 border border-gray-200">
                     <Link
                       to="/login"
                       className="block px-4 py-2 text-green-700 hover:bg-green-50 rounded-t-lg"
@@ -238,7 +228,7 @@ const Navbar: React.FC<NavbarProps> = ({ brand, navItems }) => {
                     >
                       Register
                     </Link>
-                  </>
+                  </div>
                 )}
               </div>
             )}
