@@ -26,7 +26,7 @@ const RegisterPage: React.FC = () => {
     setIsLoading(true);
 
     if (!name || !email || !password || !phone) {
-      setError("Nama, email, password, dan nomor telepon wajib diisi.");
+      setError("Harap isi semua kolom!");
       setIsLoading(false);
       return;
     }

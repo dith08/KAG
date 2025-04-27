@@ -1,6 +1,6 @@
 import React from "react";
 import { Icon } from "@iconify/react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useNavbar } from "./useNavbar";
 import { useAuth } from "../../context/AuthContext";
 
@@ -16,8 +16,7 @@ interface NavbarProps {
 
 const Navbar: React.FC<NavbarProps> = ({ brand, navItems }) => {
   const { pathname } = useLocation();
-  const navigate = useNavigate();
-  const { isLoggedIn, logout } = useAuth();
+  const { isLoggedIn } = useAuth();
   const {
     isDrawerOpen,
     setIsDrawerOpen,
@@ -28,11 +27,6 @@ const Navbar: React.FC<NavbarProps> = ({ brand, navItems }) => {
   } = useNavbar();
 
   const profileImage = isLoggedIn ? "/images/user.png" : "/images/user.png";
-
-  const handleLogout = () => {
-    logout();
-    navigate("/login");
-  };
 
   const closeDrawer = () => setIsDrawerOpen(false);
 
@@ -46,7 +40,7 @@ const Navbar: React.FC<NavbarProps> = ({ brand, navItems }) => {
 
         {/* Mobile menu button */}
         <button
-          className="lg:hidden text-white text-xl sm:text-2xl"
+          className="lg:hidden text-white text-xl sm:text-2xl cursor-pointer"
           onClick={() => setIsDrawerOpen(true)}
         >
           <Icon icon="mdi:menu" />
@@ -68,19 +62,25 @@ const Navbar: React.FC<NavbarProps> = ({ brand, navItems }) => {
             </button>
 
             {/* Profile Section */}
-            <div className="border-b pb-4 mb-4">
+            <div className="">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-300 rounded-full overflow-hidden">
-                    <img
-                      src={profileImage}
-                      alt="User Avatar"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <p className="text-green-700 font-medium text-base sm:text-lg">
-                    {isLoggedIn ? "Akun Saya" : "Selamat Datang"}
-                  </p>
+                  <Link
+                    to={isLoggedIn ? "/customer/profile" : "#"}
+                    onClick={closeDrawer}
+                    className="flex items-center space-x-4"
+                  >
+                    <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-300 rounded-full overflow-hidden">
+                      <img
+                        src={profileImage}
+                        alt="User Avatar"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <p className="text-green-700 font-medium text-base sm:text-lg">
+                      {isLoggedIn ? "Akun Saya" : "Selamat Datang"}
+                    </p>
+                  </Link>
                 </div>
 
                 {isLoggedIn && (
@@ -99,30 +99,7 @@ const Navbar: React.FC<NavbarProps> = ({ brand, navItems }) => {
 
               {/* Drawer Actions */}
               <div className="mt-4 sm:mt-6">
-                {isLoggedIn ? (
-                  <>
-                    <Link
-                      to="/customer/profile"
-                      className="block px-4 py-2 text-green-700 hover:bg-green-100 rounded-md text-sm sm:text-base"
-                      onClick={closeDrawer}
-                    >
-                      Profile Saya
-                    </Link>
-                    <Link
-                      to="/customer/pesanan"
-                      className="block px-4 py-2 text-green-700 hover:bg-green-100 rounded-md text-sm sm:text-base"
-                      onClick={closeDrawer}
-                    >
-                      Pesanan Saya
-                    </Link>
-                    <button
-                      onClick={handleLogout}
-                      className="block w-full px-4 py-2 text-left text-red-600 hover:bg-red-50 rounded-md text-sm sm:text-base"
-                    >
-                      Logout
-                    </button>
-                  </>
-                ) : (
+                {!isLoggedIn && (
                   <>
                     <Link
                       to="/login"
