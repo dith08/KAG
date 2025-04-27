@@ -8,6 +8,8 @@ import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
 import { useToast } from "../../components/toast/useToast";
+import Button from "../../components/Button";
+import ConfirmPopup from "../../components/ConfirmPopup";
 
 const ProfilePage = () => {
   const [username, setUsername] = useState("");
@@ -27,6 +29,8 @@ const ProfilePage = () => {
   const { logout } = useAuth();
   const navigate = useNavigate();
   const { showToast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
 
   // Using useCallback to memoize the fetchUserProfile function
   const fetchUserProfile = useCallback(() => {
@@ -75,6 +79,7 @@ const ProfilePage = () => {
 
   const handleSaveChanges = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
 
     try {
       const formData = new FormData();
@@ -83,8 +88,9 @@ const ProfilePage = () => {
       formData.append("phone", phone);
       formData.append("email", email);
 
-      if (password?.length > 0) {
+      if (password.trim() !== "") {
         formData.append("password", password);
+        formData.append("password_confirmation", password); 
       }
 
       // Cek apakah ada file yang dipilih
@@ -110,6 +116,10 @@ const ProfilePage = () => {
     } catch (error) {
       console.error("Gagal memperbarui profil:", error);
       showToast("Gagal memperbarui profil", "error");
+    } finally {
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 1000);
     }
   };
 
@@ -144,9 +154,19 @@ const ProfilePage = () => {
     fileInputRef.current?.click();
   };
 
-  const handleLogout = () => {
+  const handleConfirm = () => {
+    setIsPopupOpen(false);
     logout();
     navigate("/login");
+  };
+
+  const handleCancel = () => {
+    console.log("Cancelled!");
+    setIsPopupOpen(false);
+  };
+
+  const handleOpenPopup = () => {
+    setIsPopupOpen(true);
   };
 
   return (
@@ -166,16 +186,14 @@ const ProfilePage = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-white p-6 rounded-lg shadow-md w-full">
           <form onSubmit={handleSaveChanges} className="space-y-6 w-full">
+            {/* Foto Profil & Username */}
             <div className="flex flex-col sm:flex-row items-center gap-4">
               <div className="relative">
-                {/* Foto Profil */}
                 <img
                   src={previewImage}
                   alt="Profile"
                   className="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover shadow-md"
                 />
-
-                {/* Tombol Edit */}
                 <button
                   type="button"
                   onClick={handleClickUpload}
@@ -183,8 +201,6 @@ const ProfilePage = () => {
                 >
                   <Icon icon="mdi:pencil" className="text-lg text-gray-500" />
                 </button>
-
-                {/* Input File Disembunyikan */}
                 <input
                   type="file"
                   accept="image/*"
@@ -193,6 +209,7 @@ const ProfilePage = () => {
                   onChange={handleImageChange}
                 />
               </div>
+
               <div className="flex-1 w-full">
                 <label className="block text-base font-medium pb-2">
                   Username
@@ -207,6 +224,7 @@ const ProfilePage = () => {
               </div>
             </div>
 
+            {/* Form Fields */}
             <div>
               <label className="block text-base font-medium pb-2">
                 Alamat (berdasarkan pinpoint)
@@ -244,7 +262,7 @@ const ProfilePage = () => {
 
             <div>
               <label className="block text-base font-medium pb-2">
-                Password
+                Password Baru (Opsional Diisi)
               </label>
               <InputField
                 type={showPassword ? "text" : "password"}
@@ -257,21 +275,35 @@ const ProfilePage = () => {
               />
             </div>
 
-            <button
+            {/* Save Button */}
+            <Button
               type="submit"
-              className="w-full bg-yellow-500 text-white py-3 rounded-lg hover:bg-yellow-600 transition font-medium cursor-pointer"
-            >
-              Save Changes
-            </button>
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="w-full bg-red-500 text-white py-3 rounded-lg hover:bg-red-600 transition font-medium cursor-pointer"
-            >
-              Logout
-            </button>
+              text="Save Changes"
+              className="bg-yellow-500 text-white hover:bg-yellow-600"
+              loading={isLoading}
+            />
+
+            {/* Logout button khusus tampil di desktop */}
+            <div className="hidden md:block">
+              <Button
+                type="button"
+                text="Logout"
+                className="bg-red-500 text-white hover:bg-red-600"
+                onClick={handleOpenPopup}
+              />
+            </div>
+
+            <ConfirmPopup
+              isOpen={isPopupOpen}
+              message="Apakah Anda yakin ingin keluar dari akun ini?"
+              onConfirm={handleConfirm}
+              onCancel={handleCancel}
+              onClose={() => setIsPopupOpen(false)}
+              title="Logout?"
+            />
           </form>
 
+          {/* Map Picker Section */}
           <div className="w-full">
             <div className="bg-white p-4 rounded-lg shadow-md">
               <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden w-full">
@@ -304,6 +336,15 @@ const ProfilePage = () => {
                 />
               </div>
             </div>
+          </div>
+          {/* Logout button khusus tampil di mobile */}
+          <div className="block md:hidden">
+            <Button
+              type="button"
+              text="Logout"
+              className="bg-red-500 text-white hover:bg-red-600 w-full"
+              onClick={handleOpenPopup}
+            />
           </div>
         </div>
       </div>

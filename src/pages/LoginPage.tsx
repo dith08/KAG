@@ -26,7 +26,7 @@ const LoginPage: React.FC = () => {
     setIsLoading(true);
 
     if (!email || !password) {
-      setError("Email dan password wajib diisi.");
+      setError("Harap isi semua kolom!");
       setIsLoading(false);
       return;
     }
