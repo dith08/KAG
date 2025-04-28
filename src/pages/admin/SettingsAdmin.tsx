@@ -21,6 +21,8 @@ const AdminSettings: React.FC = () => {
     { kecamatan: "Gebog", biaya: "20.000" },
   ]);
 
+  const [profilePicture, setProfilePicture] = useState<any>(null); // Untuk menyimpan gambar profil
+
   const handleSaveChanges = () => {
     setShowSuccessPopup(true);
     setTimeout(() => setShowSuccessPopup(false), 3000);
@@ -41,16 +43,47 @@ const AdminSettings: React.FC = () => {
     }
   };
 
+  // Fungsi untuk handle upload gambar profil
+  const handleProfilePictureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setProfilePicture(URL.createObjectURL(e.target.files[0]));
+    }
+  };
+
   return (
-    <div className="relative ml-64 mt-24 p-6">
+    <div className="flex flex-col lg:flex-row lg:ml-64 mt-24 p-4">
       <div className="flex">
         <SidebarAdmin />
         <div className="flex-1">
           <NavbarAdmin />
-          <div className="p-6 grid grid-cols-3 gap-6">
-            <div className="col-span-2 bg-white rounded-xl p-6 shadow">
+          <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="col-span-1 md:col-span-2 lg:col-span-1 bg-white rounded-xl p-6 shadow">
               <h2 className="text-green-700 font-bold text-xl mb-4">PROFILE TOKO</h2>
               <div className="space-y-4">
+                {/* Foto Profil */}
+                <div className="flex items-center space-x-4 mb-4">
+                  <div className="relative">
+                    <img
+                      src={profilePicture || "/default-profile.jpg"} // Gambar default jika belum ada yang diupload
+                      alt="Profile"
+                      className="w-20 h-20 rounded-full object-cover"
+                    />
+                    <label className="absolute bottom-0 right-0 p-2 bg-white rounded-full cursor-pointer">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleProfilePictureChange}
+                        className="hidden"
+                      />
+                      <Pencil size={16} className="text-gray-600" />
+                    </label>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-lg">{namaToko}</h3>
+                    <span className="text-sm text-gray-500">Toko Anda</span>
+                  </div>
+                </div>
+
                 <div>
                   <label className="text-sm font-semibold block mb-1">NAMA TOKO</label>
                   <input
@@ -96,7 +129,7 @@ const AdminSettings: React.FC = () => {
               </div>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-6 col-span-1 lg:col-span-2">
               <div className="bg-[#FFA000] rounded-xl p-4 text-white font-semibold">Biaya Pengiriman</div>
               <div className="bg-[#FFE082] rounded-xl p-4 space-y-3">
                 {biayaPengiriman.map((item, index) => (

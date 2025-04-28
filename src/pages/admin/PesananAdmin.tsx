@@ -67,12 +67,12 @@ const PesananPage: React.FC = () => {
   };
 
   return (
-    <div className="flex ml-64 mt-24 p-6">
+    <div className="flex flex-col lg:flex-row lg:ml-64 mt-24 p-4">
       <SidebarAdmin />
-      <div className="flex-1">
+      <div className="flex-1 w-full">
         <NavbarAdmin />
-        <div className="p-6">
-          <h1 className="text-2xl font-bold mb-4">Kelola Pesanan</h1>
+        <div className="p-4 space-y-6">
+          <h1 className="text-2xl font-bold mb-4 text-center lg:text-left">Kelola Pesanan</h1>
 
           <div className="space-y-6">
             {orders.map((order) => (
@@ -102,15 +102,15 @@ const PesananPage: React.FC = () => {
         {/* Modal Detail Pesanan */}
         {isModalOpen && selectedOrder && (
           <div className="fixed inset-0 bg-black/50 z-50 flex justify-center items-center">
-            <div className="bg-white rounded-xl shadow-lg w-[80%] max-w-5xl overflow-hidden">
+            <div className="bg-white rounded-xl shadow-lg w-[90%] sm:w-[80%] max-w-4xl overflow-hidden">
               <div className="bg-[#FDD47D] px-6 py-4 flex gap-4 items-start">
                 <img
                   src={selectedOrder.image}
                   alt={selectedOrder.title}
                   className="w-20 h-20 object-cover rounded"
                 />
-                <div className="flex-1 grid grid-cols-5 gap-2 text-sm">
-                  <div className="col-span-1">
+                <div className="flex-1 grid grid-cols-2 sm:grid-cols-5 gap-2 text-sm">
+                  <div className="col-span-1 sm:col-span-2">
                     <h2 className="text-base font-semibold underline">{selectedOrder.title}</h2>
                     <p className="text-gray-800">Variasi</p>
                     <p className="text-gray-700">{selectedOrder.variant}</p>
@@ -126,7 +126,7 @@ const PesananPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="bg-[#FDC264] px-6 py-3 grid grid-cols-6 gap-2 text-sm items-center">
+              <div className="bg-[#FDC264] px-6 py-3 grid grid-cols-1 sm:grid-cols-6 gap-2 text-sm items-center">
                 <div>
                   <p className="font-medium">Pembeli</p>
                   <p>{selectedOrder.buyer}</p>
@@ -147,7 +147,7 @@ const PesananPage: React.FC = () => {
                   <p className="font-medium">Pembayaran</p>
                   <p>{selectedOrder.payment}</p>
                 </div>
-                <div className="flex flex-col items-end gap-2">
+                <div className="flex flex-col items-end gap-2 mt-4 sm:mt-0">
                   <button
                     onClick={handlePrintInvoice}
                     className="bg-green-500 text-white py-1 px-3 rounded text-sm"
