@@ -130,13 +130,13 @@ const RegisterPage: React.FC = () => {
           <span className="mx-4 text-sm text-gray-500">Or</span>
           <div className="flex-grow border-t border-gray-300"></div>
         </div>
+      </form>
 
-        <SocialButton
+      <SocialButton
           icon="logos:google-icon"
           text="Register dengan Google"
           onClick={handleGoogleRegister}
         />
-      </form>
 
       <div className="mt-6 text-center">
         Sudah punya akun?{" "}
