@@ -9,19 +9,12 @@ const AdminSettings: React.FC = () => {
   const [email, setEmail] = useState("");
   const [noHp, setNoHp] = useState("");
 
-  const [metodePembayaran, setMetodePembayaran] = useState([
-    { metode: "Bank Indo", info: "No rek" },
-    { metode: "Gopay", info: "Kode QR" },
-  ]);
-
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [showShippingNotification, setShowShippingNotification] = useState(false);
-  const [showMetodePopup, setShowMetodePopup] = useState(false);
-  const [showBiayaPopup, setShowBiayaPopup] = useState(false); // State for shipping cost popup
-  const [newMetode, setNewMetode] = useState("");
-  const [newInfo, setNewInfo] = useState("");
-  const [newKecamatan, setNewKecamatan] = useState(""); // New state for kecamatan
-  const [newBiaya, setNewBiaya] = useState(""); // New state for biaya
+  const [showBiayaPopup, setShowBiayaPopup] = useState(false);
+
+  const [newKecamatan, setNewKecamatan] = useState("");
+  const [newBiaya, setNewBiaya] = useState("");
 
   const [biayaPengiriman, setBiayaPengiriman] = useState([
     { kecamatan: "Bae", biaya: "15.000" },
@@ -33,21 +26,8 @@ const AdminSettings: React.FC = () => {
     setTimeout(() => setShowSuccessPopup(false), 3000);
   };
 
-  const handleTambahMetode = () => {
-    setShowMetodePopup(true);
-  };
-
-  const handleSubmitMetode = () => {
-    if (newMetode && newInfo) {
-      setMetodePembayaran([...metodePembayaran, { metode: newMetode, info: newInfo }]);
-      setNewMetode("");
-      setNewInfo("");
-      setShowMetodePopup(false);
-    }
-  };
-
   const handleTambahLokasi = () => {
-    setShowBiayaPopup(true); // Open shipping cost popup
+    setShowBiayaPopup(true);
   };
 
   const handleSubmitBiaya = () => {
@@ -117,23 +97,6 @@ const AdminSettings: React.FC = () => {
             </div>
 
             <div className="space-y-6">
-              <div className="bg-[#FFA000] rounded-xl p-4 text-white font-semibold">Metode Pembayaran</div>
-              <div className="bg-[#FFE082] rounded-xl p-4 space-y-3">
-                {metodePembayaran.map((item, index) => (
-                  <div key={index} className="bg-gray-200 p-2 flex justify-between rounded items-center">
-                    <span>{item.metode}</span>
-                    <span className="text-sm">{item.info}</span>
-                    <Pencil size={16} />
-                  </div>
-                ))}
-                <button
-                  onClick={handleTambahMetode}
-                  className="w-full bg-orange-400 text-white mt-4 py-2 rounded"
-                >
-                  TAMBAH METODE
-                </button>
-              </div>
-
               <div className="bg-[#FFA000] rounded-xl p-4 text-white font-semibold">Biaya Pengiriman</div>
               <div className="bg-[#FFE082] rounded-xl p-4 space-y-3">
                 {biayaPengiriman.map((item, index) => (
@@ -169,82 +132,42 @@ const AdminSettings: React.FC = () => {
         </div>
       )}
 
-           {/* POPUP TAMBAH METODE PEMBAYARAN */}
-           {showMetodePopup && (
-          <div className="absolute inset-0 bg-black/50 z-40">
-            <div className="absolute inset-0 bg-white p-6 overflow-auto">
+      {/* POPUP TAMBAH BIAYA PENGIRIMAN */}
+      {showBiayaPopup && (
+        <div className="absolute inset-0 bg-black/50 z-40">
+          <div className="absolute inset-0 bg-white p-6 overflow-auto">
+            <button
+              onClick={() => setShowBiayaPopup(false)}
+              className="absolute top-4 right-4 text-gray-500"
+            >
+              <X />
+            </button>
+            <div className="max-w-md mx-auto mt-20">
+              <h2 className="text-2xl font-bold mb-6">Tambah Biaya Pengiriman</h2>
+              <input
+                type="text"
+                placeholder="Nama Kecamatan"
+                value={newKecamatan}
+                onChange={(e) => setNewKecamatan(e.target.value)}
+                className="w-full border rounded px-3 py-2 mb-4"
+              />
+              <input
+                type="text"
+                placeholder="Biaya Pengiriman"
+                value={newBiaya}
+                onChange={(e) => setNewBiaya(e.target.value)}
+                className="w-full border rounded px-3 py-2 mb-6"
+              />
               <button
-                onClick={() => setShowMetodePopup(false)}
-                className="absolute top-4 right-4 text-gray-500"
+                onClick={handleSubmitBiaya}
+                className="w-full bg-green-600 text-white py-2 rounded font-semibold"
               >
-                <X />
+                Tambah
               </button>
-              <div className="max-w-md mx-auto mt-20">
-                <h2 className="text-2xl font-bold mb-6">Tambah Metode Pembayaran</h2>
-                <input
-                  type="text"
-                  placeholder="Nama metode (contoh: Dana)"
-                  value={newMetode}
-                  onChange={(e) => setNewMetode(e.target.value)}
-                  className="w-full border rounded px-3 py-2 mb-4"
-                />
-                <input
-                  type="text"
-                  placeholder="Informasi (contoh: No Rek)"
-                  value={newInfo}
-                  onChange={(e) => setNewInfo(e.target.value)}
-                  className="w-full border rounded px-3 py-2 mb-6"
-                />
-                <button
-                  onClick={handleSubmitMetode}
-                  className="w-full bg-green-600 text-white py-2 rounded font-semibold"
-                >
-                  Tambah
-                </button>
-              </div>
             </div>
           </div>
-        )}
-
-
-
-                    {/* POPUP TAMBAH BIAYA PENGIRIMAN */}
-                    {showBiayaPopup && (
-          <div className="absolute inset-0 bg-black/50 z-40">
-            <div className="absolute inset-0 bg-white p-6 overflow-auto">
-              <button
-                onClick={() => setShowBiayaPopup(false)}
-                className="absolute top-4 right-4 text-gray-500"
-              >
-                <X />
-              </button>
-              <div className="max-w-md mx-auto mt-20">
-                <h2 className="text-2xl font-bold mb-6">Tambah Biaya Pengiriman</h2>
-                <input
-                  type="text"
-                  placeholder="Nama Kecamatan"
-                  value={newKecamatan}
-                  onChange={(e) => setNewKecamatan(e.target.value)}
-                  className="w-full border rounded px-3 py-2 mb-4"
-                />
-                <input
-                  type="text"
-                  placeholder="Biaya Pengiriman"
-                  value={newBiaya}
-                  onChange={(e) => setNewBiaya(e.target.value)}
-                  className="w-full border rounded px-3 py-2 mb-6"
-                />
-                <button
-                  onClick={handleSubmitBiaya}
-                  className="w-full bg-green-600 text-white py-2 rounded font-semibold"
-                >
-                  Tambah
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
+        </div>
+      )}
     </div>
   );
 };
