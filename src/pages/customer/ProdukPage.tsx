@@ -9,12 +9,11 @@ const ProdukPage = () => {
       <Navbar
         brand="KARYA ADI GRAFIKA"
         navItems={[
-          { label: "Home", href: "/customer" },
+          { label: "Home", href: "/" },
           { label: "Produk", href: "/customer/produk" },
           { label: "Pesanan Saya", href: "/customer/pesanan" },
           { label: "Keranjang", href: "/customer/keranjang" },
         ]}
-        isLoggedIn={true} // Ganti ke true kalau user sudah login
       />
       <div className="w-full py-4 sm:py-6 px-4 sm:px-8 pt-10 sm:pt-16 md:pt-20 mt-10">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center sm:items-start md:items-center sm:justify-between gap-4 sm:gap-6">

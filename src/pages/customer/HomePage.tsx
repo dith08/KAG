@@ -12,12 +12,11 @@ const HomePage = () => {
       <Navbar
         brand="KARYA ADI GRAFIKA"
         navItems={[
-          { label: "Home", href: "/customer" },
+          { label: "Home", href: "/" },
           { label: "Produk", href: "/customer/produk" },
           { label: "Pesanan Saya", href: "/customer/pesanan" },
           { label: "Keranjang", href: "/customer/keranjang" },
         ]}
-        isLoggedIn={true} // Ganti ke true kalau user sudah login
       />
       <Slider />
       <div className="py-20 bg-green-700 text-white">

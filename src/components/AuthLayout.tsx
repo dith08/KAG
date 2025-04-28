@@ -4,7 +4,7 @@ interface AuthLayoutProps {
 }
 
 const AuthLayout: React.FC<AuthLayoutProps> = ({ children, imageSrc }) => {
-  const isLoginPage = window.location.pathname === "/";
+  const isLoginPage = window.location.pathname === "/login";
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-white">
