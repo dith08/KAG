@@ -1,4 +1,3 @@
-// src/AppRoutes.tsx
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import LoginPage from "../pages/LoginPage";
@@ -18,6 +17,10 @@ import ProdukDetailPage from "../pages/customer/ProductDetailPage";
 import AdminSettings from "../pages/admin/SettingsAdmin";
 import StatistikPage from "../pages/admin/StatisticAdmin";
 import PrivateRoute from "../components/PrivateRoute";
+import ForgotPasswordPage from "../pages/ForgotPasswordPage";
+import ResetPasswordPage from "../pages/ResetPasswordPage";
+import VerifyCodePage from "../pages/VerifyCodePage";
+import AuthCallback from "../components/AuthCallback";
 
 const AppRoutes: React.FC = () => {
   return (
@@ -27,6 +30,10 @@ const AppRoutes: React.FC = () => {
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/verify-code" element={<VerifyCodePage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
 
         {/* Customer Routes */}
         <Route path="/customer">

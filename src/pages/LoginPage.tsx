@@ -119,7 +119,7 @@ const LoginPage: React.FC = () => {
             <label htmlFor="remember">Ingat saya</label>
           </div>
           <a
-            href="#"
+            href="/forgot-password"
             className="text-green-700 text-base font-medium hover:text-green-600"
           >
             Lupa password?
@@ -138,13 +138,13 @@ const LoginPage: React.FC = () => {
           <span className="mx-4 text-sm text-gray-500">Or</span>
           <div className="flex-grow border-t border-gray-300"></div>
         </div>
-
-        <SocialButton
-          icon="logos:google-icon"
-          text="Login dengan Google"
-          onClick={handleGoogleLogin}
-        />
       </form>
+
+      <SocialButton
+        icon="logos:google-icon"
+        text="Login dengan Google"
+        onClick={handleGoogleLogin}
+      />
 
       <div className="mt-6 text-center">
         Tidak punya akun?{" "}

@@ -22,6 +22,8 @@ const ProfilePage = () => {
   const [searchTrigger, setSearchTrigger] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isProfileUpdated, setIsProfileUpdated] = useState(false);
+  const [latitude, setLatitude] = useState<string>("");
+  const [longitude, setLongitude] = useState<string>("");
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [previewImage, setPreviewImage] = useState<string>();
@@ -39,16 +41,20 @@ const ProfilePage = () => {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       })
       .then((res) => {
+        console.log("Data profil:", res.data);
         const data = res.data;
+        const alamatOnly = data.alamat?.split("| lat:")[0].trim() || "";
         setUsername(data.name);
-        setAddress(data.alamat || "");
+        setAddress(alamatOnly);
         setPhone(data.phone);
         setEmail(data.email);
         setPassword("");
 
         // Only update preview image from server if no local file is selected
         if (!selectedFile) {
-          setPreviewImage(data.avatar || "/images/user.png");
+          setPreviewImage(
+            data.avatar && data.avatar !== "" ? data.avatar : "/images/user.png"
+          );
         }
       })
       .catch((err) => {
@@ -84,16 +90,18 @@ const ProfilePage = () => {
     try {
       const formData = new FormData();
       formData.append("name", username);
-      formData.append("alamat", address);
+      formData.append(
+        "alamat",
+        `${address} | lat: ${latitude}, lng: ${longitude}`
+      );
       formData.append("phone", phone);
       formData.append("email", email);
 
       if (password.trim() !== "") {
         formData.append("password", password);
-        formData.append("password_confirmation", password); 
+        formData.append("password_confirmation", password);
       }
 
-      // Cek apakah ada file yang dipilih
       if (selectedFile) {
         formData.append("avatar", selectedFile);
       }
@@ -107,11 +115,7 @@ const ProfilePage = () => {
 
       console.log("Profile berhasil diperbarui:", response.data);
       showToast("Profil berhasil diperbarui", "success");
-
-      // Clear the selected file after successful upload
       setSelectedFile(null);
-
-      // Set flag to trigger profile refresh
       setIsProfileUpdated(true);
     } catch (error) {
       console.error("Gagal memperbarui profil:", error);
@@ -313,6 +317,11 @@ const ProfilePage = () => {
                   value={searchLocation}
                   onChange={(e) => setSearchLocation(e.target.value)}
                   className="w-full p-2 focus:outline-none"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      handleSearch();
+                    }
+                  }}
                 />
                 <button
                   type="button"
@@ -332,6 +341,8 @@ const ProfilePage = () => {
                   searchLocation={searchTrigger}
                   setCoordinates={(lat, lng) => {
                     console.log("Latitude:", lat, "Longitude:", lng);
+                    setLatitude(lat.toString());
+                    setLongitude(lng.toString());
                   }}
                 />
               </div>
