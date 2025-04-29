@@ -3,6 +3,8 @@ import { Icon } from "@iconify/react";
 import { Link, useLocation } from "react-router-dom";
 import { useNavbar } from "./useNavbar";
 import { useAuth } from "../../context/AuthContext";
+import { useEffect, useState } from "react";
+import api from "../../services/api";
 
 interface NavItem {
   label: string;
@@ -17,6 +19,7 @@ interface NavbarProps {
 const Navbar: React.FC<NavbarProps> = ({ brand, navItems }) => {
   const { pathname } = useLocation();
   const { isLoggedIn } = useAuth();
+  const [userAvatar, setUserAvatar] = useState("/images/user.png");
   const {
     isDrawerOpen,
     setIsDrawerOpen,
@@ -26,7 +29,23 @@ const Navbar: React.FC<NavbarProps> = ({ brand, navItems }) => {
     dropdownRef,
   } = useNavbar();
 
-  const profileImage = isLoggedIn ? "/images/user.png" : "/images/user.png";
+  // Fetch user profile data to get the avatar
+  useEffect(() => {
+    if (isLoggedIn) {
+      api
+        .get("/api/profile", {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        })
+        .then((res) => {
+          if (res.data.avatar && res.data.avatar !== "") {
+            setUserAvatar(res.data.avatar);
+          }
+        })
+        .catch((err) => {
+          console.error("Failed to fetch profile avatar:", err);
+        });
+    }
+  }, [isLoggedIn]);
 
   const closeDrawer = () => setIsDrawerOpen(false);
 
@@ -72,8 +91,8 @@ const Navbar: React.FC<NavbarProps> = ({ brand, navItems }) => {
                   >
                     <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-300 rounded-full overflow-hidden">
                       <img
-                        src={profileImage}
-                        alt="User Avatar"
+                        src={userAvatar}
+                        alt="Profile"
                         className="w-full h-full object-cover"
                       />
                     </div>
@@ -173,8 +192,8 @@ const Navbar: React.FC<NavbarProps> = ({ brand, navItems }) => {
                 className="w-8 h-8 bg-gray-300 rounded-full overflow-hidden block"
               >
                 <img
-                  src={profileImage}
-                  alt="User Avatar"
+                  src={userAvatar}
+                  alt="Profile"
                   className="w-full h-full object-cover"
                 />
               </Link>
@@ -185,8 +204,8 @@ const Navbar: React.FC<NavbarProps> = ({ brand, navItems }) => {
                   onClick={() => setIsDropdownOpen((prev) => !prev)}
                 >
                   <img
-                    src={profileImage}
-                    alt="User Avatar"
+                    src={userAvatar}
+                    alt="Profile"
                     className="w-full h-full object-cover"
                   />
                 </div>
