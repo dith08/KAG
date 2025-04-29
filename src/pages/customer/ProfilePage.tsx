@@ -203,7 +203,7 @@ const ProfilePage = () => {
                   onClick={handleClickUpload}
                   className="absolute bottom-0 right-0 bg-white p-2 rounded-full border border-gray-300 shadow cursor-pointer"
                 >
-                  <Icon icon="mdi:pencil" className="text-lg text-gray-500" />
+                  <Icon icon="mdi:image-edit" className="text-lg text-gray-500" />
                 </button>
                 <input
                   type="file"
