@@ -15,7 +15,7 @@ const slides: Slide[] = [
     title: "PAPER BAG",
     subtitle: "| TAS KERTAS",
     description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
     price: "Start from Rp.30K!",
     buttonText: "Pesan Sekarang",
     image: "/images/paperbag1.png",
@@ -24,7 +24,7 @@ const slides: Slide[] = [
     title: "CALENDAR",
     subtitle: "| KALENDER",
     description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
     price: "Start from Rp.50K!",
     buttonText: "Pesan Sekarang",
     image: "/images/calendar.png",
@@ -33,7 +33,7 @@ const slides: Slide[] = [
     title: "MAGAZINE",
     subtitle: "| MAJALAH",
     description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
     price: "Start from Rp.10K!",
     buttonText: "Pesan Sekarang",
     image: "/images/magazine.png",
@@ -68,25 +68,25 @@ export default function Slider() {
             className="w-full flex-shrink-0 grid grid-cols-1 md:grid-cols-2 items-center"
             style={{ minWidth: "100%" }}
           >
-            <div className="px-6 py-10 md:px-16 lg:px-32 max-w-3xl mx-auto text-start md:text-start ">
-              <h2 className="text-3xl md:text-4xl font-bold">
+            <div className="px-4 py-8 md:px-12 md:py-16 lg:px-24 max-w-3xl mx-auto md:text-start">
+              <h2 className="text-2xl md:text-4xl font-bold leading-tight">
                 <span className="text-green-700">{slide.title}</span>{" "}
                 <span className="text-yellow-500 font-light">
                   {slide.subtitle}
                 </span>
               </h2>
-              <p className="mt-4 md:mt-6 text-sm md:text-base leading-relaxed font-normal">
+              <p className="mt-3 md:mt-5 text-sm md:text-base leading-relaxed text-gray-700">
                 {slide.description}
               </p>
-              <p className="mt-4 md:mt-6 font-bold text-gray-500">
+              <p className="mt-3 md:mt-5 font-semibold text-gray-600">
                 {slide.price}
               </p>
-              <button className="mt-4 md:mt-6 px-6 md:px-8 py-2 md:py-3 border-2 border-yellow-500 text-yellow-500 font-semibold rounded-lg hover:bg-yellow-500 hover:text-white transition cursor-pointer">
+              <button className="mt-4 md:mt-6 px-4 py-2 md:px-6 md:py-3 text-sm md:text-base border-2 border-yellow-500 text-yellow-500 font-semibold rounded-lg hover:bg-yellow-500 hover:text-white transition duration-300">
                 {slide.buttonText}
               </button>
             </div>
 
-            {/* Image hanya ditampilkan pada desktop */}
+            {/* Image hanya muncul di desktop */}
             <div className="hidden md:flex h-full items-center justify-center p-8 md:p-16">
               <img
                 src={slide.image}
@@ -104,7 +104,7 @@ export default function Slider() {
           <button
             key={index}
             onClick={() => goToSlide(index)}
-            className={`w-3 h-3 md:w-4 md:h-4 rounded-full cursor-pointer ${
+            className={`w-2.5 h-2.5 md:w-3.5 md:h-3.5 rounded-full cursor-pointer transition ${
               currentSlide === index ? "bg-green-700" : "bg-white"
             }`}
             aria-label={`Slide ${index + 1}`}

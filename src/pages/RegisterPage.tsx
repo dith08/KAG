@@ -3,11 +3,9 @@ import { useNavigate } from "react-router-dom";
 import AuthLayout from "../components/AuthLayout";
 import InputField from "../components/InputField";
 import Button from "../components/Button";
-import SocialButton from "../components/SocialButton";
 import api from "../services/api"; // axios instance
 import axios from "axios";
 import { useToast } from "../components/toast/useToast";
-import { getBaseUrl } from "../utils/getBaseUrl";
 
 const RegisterPage: React.FC = () => {
   const [name, setName] = useState("");
@@ -57,95 +55,80 @@ const RegisterPage: React.FC = () => {
     }
   };
 
-  const handleGoogleRegister = () => {
-    // Redirect user to the Laravel backend for Google authentication
-    window.location.href = `${getBaseUrl()}/auth/google`;
-  };
-
   return (
     <AuthLayout imageSrc="/images/auth_image.png">
-      <h2 className="text-[24px] md:text-[32px] font-medium mb-2">
-        Get Started Now
-      </h2>
-      <p className="mb-6 text-[18px]">
-        Masukkan informasi anda untuk membuat akun <br /> dan mulai memesan
-      </p>
+      <div className="flex flex-col justify-center min-h-[80vh] w-full">
+        <h2 className="text-[24px] md:text-[32px] font-medium mb-2">
+          Get Started Now
+        </h2>
+        <p className="mb-6 text-[18px]">
+          Masukkan informasi anda untuk membuat akun <br /> dan mulai memesan
+        </p>
 
-      {error && (
-        <div className="mb-4 text-red-500 text-sm font-medium">{error}</div>
-      )}
+        {error && (
+          <div className="mb-4 text-red-500 text-sm font-medium">{error}</div>
+        )}
 
-      <form onSubmit={handleRegister}>
-        <div className="mb-4">
-          <InputField
-            type="text"
-            placeholder="Masukkan username"
-            icon="mdi:account"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+        <form onSubmit={handleRegister}>
+          <div className="mb-4">
+            <InputField
+              type="text"
+              placeholder="Masukkan username"
+              icon="mdi:account"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </div>
+
+          <div className="mb-4">
+            <InputField
+              type="email"
+              placeholder="Masukkan email"
+              icon="mdi:email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+
+          <div className="mb-4">
+            <InputField
+              type={showPassword ? "text" : "password"}
+              placeholder="Masukkan password"
+              icon="mdi:lock"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              showPassword={showPassword}
+              togglePasswordVisibility={() => setShowPassword(!showPassword)}
+            />
+          </div>
+
+          <div className="mb-4">
+            <InputField
+              type="tel"
+              placeholder="Masukkan nomor telepon"
+              icon="mdi:phone"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+            />
+          </div>
+
+          <Button
+            type="submit"
+            text="Register"
+            className="bg-green-700 text-white hover:bg-green-600"
+            loading={isLoading}
           />
+        </form>
+
+        <div className="mt-6 text-center">
+          Sudah punya akun?{" "}
+          <a
+            href="/login"
+            className="text-green-700 font-medium hover:text-green-600"
+          >
+            Login
+          </a>
         </div>
-
-        <div className="mb-4">
-          <InputField
-            type="email"
-            placeholder="Masukkan email"
-            icon="mdi:email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
-
-        <div className="mb-4">
-          <InputField
-            type={showPassword ? "text" : "password"}
-            placeholder="Masukkan password"
-            icon="mdi:lock"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            showPassword={showPassword}
-            togglePasswordVisibility={() => setShowPassword(!showPassword)}
-          />
-        </div>
-
-        <div className="mb-4">
-          <InputField
-            type="tel"
-            placeholder="Masukkan nomor telepon"
-            icon="mdi:phone"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-          />
-        </div>
-
-        <Button
-          type="submit"
-          text="Register"
-          className="bg-green-700 text-white hover:bg-green-600"
-          loading={isLoading}
-        />
-
-        <div className="flex items-center my-6">
-          <div className="flex-grow border-t border-gray-300"></div>
-          <span className="mx-4 text-sm text-gray-500">Or</span>
-          <div className="flex-grow border-t border-gray-300"></div>
-        </div>
-      </form>
-
-      <SocialButton
-          icon="logos:google-icon"
-          text="Register dengan Google"
-          onClick={handleGoogleRegister}
-        />
-
-      <div className="mt-6 text-center">
-        Sudah punya akun?{" "}
-        <a
-          href="/login"
-          className="text-green-700 font-medium hover:text-green-600"
-        >
-          Login
-        </a>
       </div>
     </AuthLayout>
   );
