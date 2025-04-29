@@ -13,10 +13,8 @@ import ProfilePage from "../pages/customer/ProfilePage";
 import ProductPage from "../pages/admin/ProductAdmin";
 import CheckoutPage from "../pages/customer/CheckoutPage";
 import PesananPage from "../pages/admin/PesananAdmin";
-import AdminShippingPage from "../pages/admin/PengrimanAdmin";
 import ProdukDetailPage from "../pages/customer/ProductDetailPage";
 import AdminSettings from "../pages/admin/SettingsAdmin";
-import AdminPaymentPage from "../pages/admin/PaymentAdmin";
 import StatistikPage from "../pages/admin/StatisticAdmin";
 import PrivateRoute from "../components/PrivateRoute";
 import ForgotPasswordPage from "../pages/ForgotPasswordPage";
@@ -57,10 +55,9 @@ const AppRoutes: React.FC = () => {
           <Route index element={<DashboardAdmin />} />
           <Route path="produk" element={<ProductPage />} />
           <Route path="pesanan" element={<PesananPage />} />
-          <Route path="pengiriman" element={<AdminShippingPage />} />
-          <Route path="pengaturan" element={<AdminSettings />} />
-          <Route path="pembayaran" element={<AdminPaymentPage />} />
-          <Route path="statistik" element={<StatistikPage />} />
+          <Route path="pengaturan" element={<AdminSettings/>} />
+          <Route path="statistik" element={<StatistikPage/>} />
+
         </Route>
 
         {/* Not Found */}

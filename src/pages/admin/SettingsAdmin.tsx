@@ -9,45 +9,27 @@ const AdminSettings: React.FC = () => {
   const [email, setEmail] = useState("");
   const [noHp, setNoHp] = useState("");
 
-  const [metodePembayaran, setMetodePembayaran] = useState([
-    { metode: "Bank Indo", info: "No rek" },
-    { metode: "Gopay", info: "Kode QR" },
-  ]);
-
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [showShippingNotification, setShowShippingNotification] = useState(false);
-  const [showMetodePopup, setShowMetodePopup] = useState(false);
-  const [showBiayaPopup, setShowBiayaPopup] = useState(false); // State for shipping cost popup
-  const [newMetode, setNewMetode] = useState("");
-  const [newInfo, setNewInfo] = useState("");
-  const [newKecamatan, setNewKecamatan] = useState(""); // New state for kecamatan
-  const [newBiaya, setNewBiaya] = useState(""); // New state for biaya
+  const [showBiayaPopup, setShowBiayaPopup] = useState(false);
+
+  const [newKecamatan, setNewKecamatan] = useState("");
+  const [newBiaya, setNewBiaya] = useState("");
 
   const [biayaPengiriman, setBiayaPengiriman] = useState([
     { kecamatan: "Bae", biaya: "15.000" },
     { kecamatan: "Gebog", biaya: "20.000" },
   ]);
 
+  const [profilePicture, setProfilePicture] = useState<any>(null); // Untuk menyimpan gambar profil
+
   const handleSaveChanges = () => {
     setShowSuccessPopup(true);
     setTimeout(() => setShowSuccessPopup(false), 3000);
   };
 
-  const handleTambahMetode = () => {
-    setShowMetodePopup(true);
-  };
-
-  const handleSubmitMetode = () => {
-    if (newMetode && newInfo) {
-      setMetodePembayaran([...metodePembayaran, { metode: newMetode, info: newInfo }]);
-      setNewMetode("");
-      setNewInfo("");
-      setShowMetodePopup(false);
-    }
-  };
-
   const handleTambahLokasi = () => {
-    setShowBiayaPopup(true); // Open shipping cost popup
+    setShowBiayaPopup(true);
   };
 
   const handleSubmitBiaya = () => {
@@ -61,16 +43,47 @@ const AdminSettings: React.FC = () => {
     }
   };
 
+  // Fungsi untuk handle upload gambar profil
+  const handleProfilePictureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setProfilePicture(URL.createObjectURL(e.target.files[0]));
+    }
+  };
+
   return (
-    <div className="relative ml-64 mt-24 p-6">
+    <div className="flex flex-col lg:flex-row lg:ml-64 mt-24 p-4">
       <div className="flex">
         <SidebarAdmin />
         <div className="flex-1">
           <NavbarAdmin />
-          <div className="p-6 grid grid-cols-3 gap-6">
-            <div className="col-span-2 bg-white rounded-xl p-6 shadow">
+          <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="col-span-1 md:col-span-2 lg:col-span-1 bg-white rounded-xl p-6 shadow">
               <h2 className="text-green-700 font-bold text-xl mb-4">PROFILE TOKO</h2>
               <div className="space-y-4">
+                {/* Foto Profil */}
+                <div className="flex items-center space-x-4 mb-4">
+                  <div className="relative">
+                    <img
+                      src={profilePicture || "/default-profile.jpg"} // Gambar default jika belum ada yang diupload
+                      alt="Profile"
+                      className="w-20 h-20 rounded-full object-cover"
+                    />
+                    <label className="absolute bottom-0 right-0 p-2 bg-white rounded-full cursor-pointer">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleProfilePictureChange}
+                        className="hidden"
+                      />
+                      <Pencil size={16} className="text-gray-600" />
+                    </label>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-lg">{namaToko}</h3>
+                    <span className="text-sm text-gray-500">Toko Anda</span>
+                  </div>
+                </div>
+
                 <div>
                   <label className="text-sm font-semibold block mb-1">NAMA TOKO</label>
                   <input
@@ -116,24 +129,7 @@ const AdminSettings: React.FC = () => {
               </div>
             </div>
 
-            <div className="space-y-6">
-              <div className="bg-[#FFA000] rounded-xl p-4 text-white font-semibold">Metode Pembayaran</div>
-              <div className="bg-[#FFE082] rounded-xl p-4 space-y-3">
-                {metodePembayaran.map((item, index) => (
-                  <div key={index} className="bg-gray-200 p-2 flex justify-between rounded items-center">
-                    <span>{item.metode}</span>
-                    <span className="text-sm">{item.info}</span>
-                    <Pencil size={16} />
-                  </div>
-                ))}
-                <button
-                  onClick={handleTambahMetode}
-                  className="w-full bg-orange-400 text-white mt-4 py-2 rounded"
-                >
-                  TAMBAH METODE
-                </button>
-              </div>
-
+            <div className="space-y-6 col-span-1 lg:col-span-2">
               <div className="bg-[#FFA000] rounded-xl p-4 text-white font-semibold">Biaya Pengiriman</div>
               <div className="bg-[#FFE082] rounded-xl p-4 space-y-3">
                 {biayaPengiriman.map((item, index) => (
@@ -169,82 +165,42 @@ const AdminSettings: React.FC = () => {
         </div>
       )}
 
-           {/* POPUP TAMBAH METODE PEMBAYARAN */}
-           {showMetodePopup && (
-          <div className="absolute inset-0 bg-black/50 z-40">
-            <div className="absolute inset-0 bg-white p-6 overflow-auto">
+      {/* POPUP TAMBAH BIAYA PENGIRIMAN */}
+      {showBiayaPopup && (
+        <div className="absolute inset-0 bg-black/50 z-40">
+          <div className="absolute inset-0 bg-white p-6 overflow-auto">
+            <button
+              onClick={() => setShowBiayaPopup(false)}
+              className="absolute top-4 right-4 text-gray-500"
+            >
+              <X />
+            </button>
+            <div className="max-w-md mx-auto mt-20">
+              <h2 className="text-2xl font-bold mb-6">Tambah Biaya Pengiriman</h2>
+              <input
+                type="text"
+                placeholder="Nama Kecamatan"
+                value={newKecamatan}
+                onChange={(e) => setNewKecamatan(e.target.value)}
+                className="w-full border rounded px-3 py-2 mb-4"
+              />
+              <input
+                type="text"
+                placeholder="Biaya Pengiriman"
+                value={newBiaya}
+                onChange={(e) => setNewBiaya(e.target.value)}
+                className="w-full border rounded px-3 py-2 mb-6"
+              />
               <button
-                onClick={() => setShowMetodePopup(false)}
-                className="absolute top-4 right-4 text-gray-500"
+                onClick={handleSubmitBiaya}
+                className="w-full bg-green-600 text-white py-2 rounded font-semibold"
               >
-                <X />
+                Tambah
               </button>
-              <div className="max-w-md mx-auto mt-20">
-                <h2 className="text-2xl font-bold mb-6">Tambah Metode Pembayaran</h2>
-                <input
-                  type="text"
-                  placeholder="Nama metode (contoh: Dana)"
-                  value={newMetode}
-                  onChange={(e) => setNewMetode(e.target.value)}
-                  className="w-full border rounded px-3 py-2 mb-4"
-                />
-                <input
-                  type="text"
-                  placeholder="Informasi (contoh: No Rek)"
-                  value={newInfo}
-                  onChange={(e) => setNewInfo(e.target.value)}
-                  className="w-full border rounded px-3 py-2 mb-6"
-                />
-                <button
-                  onClick={handleSubmitMetode}
-                  className="w-full bg-green-600 text-white py-2 rounded font-semibold"
-                >
-                  Tambah
-                </button>
-              </div>
             </div>
           </div>
-        )}
-
-
-
-                    {/* POPUP TAMBAH BIAYA PENGIRIMAN */}
-                    {showBiayaPopup && (
-          <div className="absolute inset-0 bg-black/50 z-40">
-            <div className="absolute inset-0 bg-white p-6 overflow-auto">
-              <button
-                onClick={() => setShowBiayaPopup(false)}
-                className="absolute top-4 right-4 text-gray-500"
-              >
-                <X />
-              </button>
-              <div className="max-w-md mx-auto mt-20">
-                <h2 className="text-2xl font-bold mb-6">Tambah Biaya Pengiriman</h2>
-                <input
-                  type="text"
-                  placeholder="Nama Kecamatan"
-                  value={newKecamatan}
-                  onChange={(e) => setNewKecamatan(e.target.value)}
-                  className="w-full border rounded px-3 py-2 mb-4"
-                />
-                <input
-                  type="text"
-                  placeholder="Biaya Pengiriman"
-                  value={newBiaya}
-                  onChange={(e) => setNewBiaya(e.target.value)}
-                  className="w-full border rounded px-3 py-2 mb-6"
-                />
-                <button
-                  onClick={handleSubmitBiaya}
-                  className="w-full bg-green-600 text-white py-2 rounded font-semibold"
-                >
-                  Tambah
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
+        </div>
+      )}
     </div>
   );
 };

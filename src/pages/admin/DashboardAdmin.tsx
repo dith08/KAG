@@ -39,14 +39,20 @@ const AdminDashboard: React.FC = () => {
   ];
 
   return (
-    <div className="flex ml-64 mt-24 p-6">
+    <div className="flex flex-col md:flex-row min-h-screen">
+      {/* Sidebar */}
       <SidebarAdmin />
-      <div className="flex-1">
+
+      <div className="flex-1 p-6 md:ml-64">
+        {/* Navbar */}
         <NavbarAdmin />
+
+        {/* Pesanan Title */}
         <div className="p-6">
           <h1 className="text-2xl font-bold mb-4">Pesanan</h1>
 
-          <div className="grid grid-cols-4 gap-4 mb-6">
+          {/* Grid Pesanan */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
             {orders.map((order) => (
               <div key={order.id} className="bg-[#F9A825]/75 rounded-lg shadow p-4">
                 <div className="bg-white p-3 rounded-xl flex justify-center mx-auto w-28 h-28">
@@ -66,7 +72,8 @@ const AdminDashboard: React.FC = () => {
             ))}
           </div>
 
-          <div className="grid grid-cols-3 gap-6 mb-6">
+          {/* Statistik */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
             <div className="flex justify-around bg-white shadow rounded-lg p-4">
               <div className="flex flex-col items-center">
                 <div className="bg-yellow-300 w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold">12</div>
@@ -101,6 +108,7 @@ const AdminDashboard: React.FC = () => {
             </div>
           </div>
 
+          {/* Total Pendapatan */}
           <div className="bg-white shadow rounded-lg p-6">
             <h2 className="text-xl font-semibold mb-2">Total Pendapatan</h2>
             <p className="text-2xl font-bold text-gray-800">Rp. 1.000.000.000.000,00</p>

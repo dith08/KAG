@@ -54,7 +54,7 @@ const ProductPage: React.FC = () => {
   };
 
   return (
-    <div className="flex ml-64 mt-24 p-6">
+    <div className="flex flex-col lg:flex-row lg:ml-64 mt-24 p-4">
       <SidebarAdmin />
       <div className="flex-1">
         <NavbarAdmin />
