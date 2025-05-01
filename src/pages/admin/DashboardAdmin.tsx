@@ -1,117 +1,113 @@
 import React from "react";
 import SidebarAdmin from "../../components/admin/SidebarAdmin";
 import NavbarAdmin from "../../components/admin/NavbarAdmin";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+  ResponsiveContainer,
+} from "recharts";
 
 const AdminDashboard: React.FC = () => {
-  const orders = [
-    {
-      id: 1,
-      image: "https://i.pinimg.com/474x/ad/6f/e9/ad6fe9b9c301067ddcc039a56294bd78.jpg",
-      name: "Isham",
-      quantity: "500pcs",
-      productType: "Paper Bag",
-      date: "17-07-1945",
-    },
-    {
-      id: 2,
-      image: "https://i.pinimg.com/474x/ad/6f/e9/ad6fe9b9c301067ddcc039a56294bd78.jpg",
-      name: "Isham",
-      quantity: "500pcs",
-      productType: "Paper Bag",
-      date: "17-07-1945",
-    },
-    {
-      id: 3,
-      image: "https://i.pinimg.com/474x/ad/6f/e9/ad6fe9b9c301067ddcc039a56294bd78.jpg",
-      name: "Isham",
-      quantity: "500pcs",
-      productType: "Paper Bag",
-      date: "17-07-1945",
-    },
-    {
-      id: 4,
-      image: "https://i.pinimg.com/474x/ad/6f/e9/ad6fe9b9c301067ddcc039a56294bd78.jpg",
-      name: "Isham",
-      quantity: "500pcs",
-      productType: "Paper Bag",
-      date: "17-07-1945",
-    },
+  const notifications = [
+    { icon: "📦", label: "Order Baru", count: 3 },
+    { icon: "💰", label: "Pembayaran Masuk", count: 1 },
+    { icon: "⚠", label: "Stok Habis", count: 2 },
+  ];
+
+  const recentOrders = [
+    { id: 1, name: "Isham", product: "Paper Bag", quantity: "500pcs", status: "Proses" },
+    { id: 2, name: "Amir", product: "Kertas Kado", quantity: "300pcs", status: "Terkirim" },
+    { id: 3, name: "Siti", product: "Box Packaging", quantity: "100pcs", status: "Belum Dikirim" },
+  ];
+
+  const salesData = [
+    { date: "01 Apr", total: 1200000 },
+    { date: "02 Apr", total: 800000 },
+    { date: "03 Apr", total: 1400000 },
+    { date: "04 Apr", total: 1000000 },
+    { date: "05 Apr", total: 1600000 },
+    { date: "06 Apr", total: 900000 },
+    { date: "07 Apr", total: 1300000 },
   ];
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen">
-      {/* Sidebar */}
+    <div className="flex min-h-screen">
       <SidebarAdmin />
-
-      <div className="flex-1 p-6 md:ml-64">
-        {/* Navbar */}
+      <div className="flex-1 flex flex-col p-4 md:ml-64">
         <NavbarAdmin />
 
-        {/* Pesanan Title */}
-        <div className="p-6">
-          <h1 className="text-2xl font-bold mb-4">Pesanan</h1>
+        <div className="flex flex-col lg:flex-row gap-6 mt-6">
+          {/* Kiri (Main) */}
+          <div className="w-full lg:w-7/10 space-y-6">
+            {/* Total Pendapatan */}
+            <div className="bg-white p-6 rounded-xl shadow">
+              <h2 className="text-xl font-semibold mb-1">Total Pendapatan Bulan Ini</h2>
+              <p className="text-2xl font-bold text-gray-800">Rp 12.000.000 <span className="text-green-500 text-sm ml-2">🔺 +10%</span></p>
+            </div>
 
-          {/* Grid Pesanan */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            {orders.map((order) => (
-              <div key={order.id} className="bg-[#F9A825]/75 rounded-lg shadow p-4">
-                <div className="bg-white p-3 rounded-xl flex justify-center mx-auto w-28 h-28">
-                  <img
-                    src={order.image}
-                    alt={order.name}
-                    className="w-full h-full object-contain rounded-lg"
-                  />
-                </div>
-                <div className="mt-4 text-center">
-                  <h2 className="text-sm font-semibold text-gray-800">{order.name}</h2>
-                  <p className="text-sm font-bold">{order.quantity}</p>
-                  <p className="text-sm text-gray-800">{order.productType}</p>
-                  <p className="text-xs text-gray-700 mt-2">{order.date}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Statistik */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-            <div className="flex justify-around bg-white shadow rounded-lg p-4">
-              <div className="flex flex-col items-center">
-                <div className="bg-yellow-300 w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold">12</div>
-                <p className="mt-2 text-sm font-medium">dalam proses</p>
-              </div>
-              <div className="flex flex-col items-center">
-                <div className="bg-yellow-300 w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold">12</div>
-                <p className="mt-2 text-sm font-medium">belum terkirim</p>
-              </div>
-              <div className="flex flex-col items-center">
-                <div className="bg-yellow-300 w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold">12</div>
-                <p className="mt-2 text-sm font-medium">terkirim</p>
+            {/* Grafik Penjualan */}
+            <div className="bg-white p-6 rounded-xl shadow">
+              <h2 className="text-xl font-semibold mb-4">Grafik Penjualan</h2>
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={salesData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" />
+                    <YAxis tickFormatter={(value) => `Rp ${value / 1000000}jt`} />
+                    <Tooltip formatter={(value) => `Rp ${value.toLocaleString()}`} />
+                    <Line type="monotone" dataKey="total" stroke="#F9A825" strokeWidth={3} dot={{ r: 4 }} />
+                  </LineChart>
+                </ResponsiveContainer>
               </div>
             </div>
 
-            <div className="bg-white shadow rounded-lg p-4">
-              <h2 className="text-xl font-semibold mb-2">Penjualan Teratas</h2>
-              <img
-                src="https://via.placeholder.com/400x200"
-                alt="Chart"
-                className="w-full h-auto max-h-40 object-contain"
-              />
-            </div>
-
-            <div className="bg-white shadow rounded-lg p-4">
-              <h2 className="text-xl font-semibold mb-2">Notifikasi</h2>
-              <div className="flex justify-around mt-4">
-                <div className="p-4 bg-green-600 text-white rounded-full text-xl">📦</div>
-                <div className="p-4 bg-green-600 text-white rounded-full text-xl">📜</div>
-                <div className="p-4 bg-green-600 text-white rounded-full text-xl">💰</div>
-              </div>
+            {/* Tabel Pesanan Terbaru */}
+            <div className="bg-white p-6 rounded-xl shadow">
+              <h2 className="text-xl font-semibold mb-4">Pesanan Terbaru</h2>
+              <table className="w-full text-left">
+                <thead>
+                  <tr>
+                    <th className="py-2">Customer</th>
+                    <th>Produk</th>
+                    <th>Jumlah</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {recentOrders.map((order) => (
+                    <tr key={order.id} className="border-t text-sm">
+                      <td className="py-2">{order.name}</td>
+                      <td>{order.product}</td>
+                      <td>{order.quantity}</td>
+                      <td>{order.status}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
 
-          {/* Total Pendapatan */}
-          <div className="bg-white shadow rounded-lg p-6">
-            <h2 className="text-xl font-semibold mb-2">Total Pendapatan</h2>
-            <p className="text-2xl font-bold text-gray-800">Rp. 1.000.000.000.000,00</p>
+          {/* Kanan (Sidebar) */}
+          <div className="w-full lg:w-3/10 space-y-6">
+            {/* Notifikasi */}
+            <div className="bg-white p-6 rounded-xl shadow">
+              <h2 className="text-xl font-semibold mb-4">Notifikasi</h2>
+              <ul className="space-y-3">
+                {notifications.map((notif, index) => (
+                  <li key={index} className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-gray-700">
+                      <span className="text-xl">{notif.icon}</span>
+                      <span>{notif.label}</span>
+                    </div>
+                    <span className="font-bold bg-gray-200 px-2 py-0.5 rounded-md text-sm">{notif.count}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
       </div>
@@ -120,3 +116,4 @@ const AdminDashboard: React.FC = () => {
 };
 
 export default AdminDashboard;
+ 

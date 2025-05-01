@@ -46,9 +46,7 @@ const ProductPage: React.FC = () => {
   const handleModalSubmit = () => {
     if (!selectedProduct) return;
     setProducts((prev) =>
-      prev.map((p) =>
-        p.id === selectedProduct.id ? { ...selectedProduct } : p
-      )
+      prev.map((p) => (p.id === selectedProduct.id ? { ...selectedProduct } : p))
     );
     setEditModalOpen(false);
   };
@@ -105,15 +103,18 @@ const ProductPage: React.FC = () => {
             </table>
           </div>
 
-          {/* Tombol Tambah Produk */}
-          <button className="fixed bottom-6 right-6 bg-green-600 text-white p-4 rounded-full shadow-lg hover:bg-green-700">
+          {/* Tombol Tambah Produk - Responsif */}
+          <button
+            className="fixed bottom-6 right-6 md:right-6 md:left-auto md:transform-none left-1/2 transform -translate-x-1/2 md:translate-x-0 bg-green-600 text-white p-4 rounded-full shadow-lg hover:bg-green-700 z-50"
+            onClick={() => alert("Fitur tambah produk belum dibuat")}
+          >
             <FaPlus size={20} />
           </button>
 
           {/* Modal Edit Produk */}
           {isEditModalOpen && selectedProduct && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-              <div className="bg-white p-6 rounded-lg w-[400px] shadow-lg">
+              <div className="bg-white p-6 rounded-lg w-full sm:w-[400px] shadow-lg">
                 <h2 className="text-xl font-bold mb-4 text-orange-600">Edit Produk</h2>
 
                 <div className="mb-3">
