@@ -38,13 +38,19 @@ const LoginPage: React.FC = () => {
       });
 
       if (response.data?.token) {
-        localStorage.setItem("token", response.data.token);
-        login(); // ← panggil dari context agar Navbar re-render
+        const userData = {
+          id: response.data.users.id,
+          name: response.data.users.name,
+          role: response.data.users.user_role,
+        };
 
-        const userRole = response.data.users?.user_role;
+        const token = response.data.token;
+
+        login(userData, token);
+
         showToast("Login berhasil!", "success");
 
-        if (userRole === "admin") {
+        if (userData.role === "admin") {
           navigate("/admin");
         } else {
           navigate("/");
