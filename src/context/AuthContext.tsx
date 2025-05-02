@@ -1,8 +1,15 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 
+interface User {
+  id: string;
+  name: string;
+  role: string;
+}
+
 interface AuthContextType {
   isLoggedIn: boolean;
-  login: () => void;
+  user: User | null;
+  login: (user: User, token: string) => void;
   logout: () => void;
 }
 
@@ -12,26 +19,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
-    return !!localStorage.getItem("token"); // Cek token dari localStorage
+    return !!localStorage.getItem("token");
+  });
+  const [user, setUser] = useState<User | null>(() => {
+    const userData = localStorage.getItem("user");
+    return userData ? JSON.parse(userData) : null;
   });
 
-  const login = () => {
+  const login = (userData: User, token: string) => {
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(userData));
     setIsLoggedIn(true);
+    setUser(userData);
   };
 
   const logout = () => {
-    setIsLoggedIn(false);
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setIsLoggedIn(false);
+    setUser(null);
   };
 
   useEffect(() => {
-    // Opsional: sinkronkan ulang kalau pakai refresh token
     const token = localStorage.getItem("token");
+    const userData = localStorage.getItem("user");
     setIsLoggedIn(!!token);
+    setUser(userData ? JSON.parse(userData) : null);
   }, []);
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, login, logout }}>
+    <AuthContext.Provider value={{ isLoggedIn, user, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
