@@ -232,15 +232,18 @@ const ProfilePage = () => {
             </div>
 
             {/* Form Fields */}
-            <div>
+            <div className="relative">
               <label className="block text-base font-medium pb-2">
                 Alamat (berdasarkan pinpoint)
               </label>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-2xl">
+                <Icon icon="mdi:map-marker" />
+              </span>
               <textarea
                 disabled
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
-                className="w-full p-3 border border-black/50 rounded-lg focus:outline-none focus:ring-1 focus:ring-green-700"
+                className="w-full pl-10 p-3 border border-black/50 rounded-lg focus:outline-none focus:ring-1 focus:ring-green-700"
                 rows={2}
               />
             </div>

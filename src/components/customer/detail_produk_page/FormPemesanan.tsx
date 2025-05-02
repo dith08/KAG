@@ -8,22 +8,24 @@ interface Props {
 
 export default function FormPemesanan({ produk }: Props) {
   const [uploadedImage, setUploadedImage] = useState<File | null>(null);
-  const [jumlah, setJumlah] = useState<number>(100);
-
   const [formData, setFormData] = useState<Record<string, string | number>>({});
+
+  const jumlahValue = (formData["Jumlah"] as number) || 0;
+  const hargaSatuan =
+    (produk.form.find((item) => item.type === "readonly")?.value as number) ||
+    0;
+  const totalHarga = jumlahValue * hargaSatuan;
 
   const isFormComplete = produk.form.every((input) => {
     const value = formData[input.label];
-    if (input.type === "readonly") return true; // readonly nggak perlu dicek
+    if (input.type === "readonly") return true;
+    if (input.type === "number") {
+      const numValue = Number(value);
+      if (input.label === "Jumlah") return numValue >= 100;
+      if (input.label === "Jumlah Halaman") return numValue >= 20;
+    }
     return value !== undefined && value !== "" && value !== 0;
   });
-
-  // Ambil harga dari form field dengan type 'readonly'
-  const hargaSatuan =
-    (produk.form.find((item: { type: string }) => item.type === "readonly")
-      ?.value as number) || 0;
-  const totalHarga = jumlah * hargaSatuan;
-
   const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -72,26 +74,42 @@ export default function FormPemesanan({ produk }: Props) {
                   </select>
                 )}
 
-                {input.type === "number" && input.label === "Jumlah" && (
+                {input.type === "number" && (
                   <>
                     <input
                       type="number"
                       className="border p-2 rounded-lg text-black"
-                      placeholder="Masukkan jumlah"
-                      min={100}
-                      value={jumlah === 0 ? "" : jumlah} // agar bisa kosong saat user hapus angka
+                      placeholder={`Masukkan ${input.label.toLowerCase()}`}
+                      min={
+                        input.label === "Jumlah"
+                          ? 100
+                          : input.label === "Jumlah Halaman"
+                          ? 20
+                          : undefined
+                      }
+                      value={formData[input.label] ?? ""}
                       onChange={(e) => {
                         const value =
                           e.target.value === "" ? 0 : parseInt(e.target.value);
-                        setJumlah(value);
                         handleInputChange(input.label, value);
                       }}
                     />
-                    {jumlah > 0 && jumlah < 100 && (
-                      <p className="text-red-500 text-sm mt-1">
-                        Jumlah minimal pemesanan adalah 100 pcs
-                      </p>
-                    )}
+
+                    {input.label === "Jumlah" &&
+                      typeof formData[input.label] === "number" &&
+                      (formData[input.label] as number) < 100 && (
+                        <p className="text-red-500 text-sm mt-1">
+                          Jumlah minimal pemesanan adalah 100 pcs
+                        </p>
+                      )}
+
+                    {input.label === "Jumlah Halaman" &&
+                      typeof formData[input.label] === "number" &&
+                      (formData[input.label] as number) < 20 && (
+                        <p className="text-red-500 text-sm mt-1">
+                          Jumlah halaman minimal adalah 20 halaman
+                        </p>
+                      )}
                   </>
                 )}
 
@@ -115,7 +133,7 @@ export default function FormPemesanan({ produk }: Props) {
                   />
                 )}
               </div>
-            ))}
+            ))}{" "}
           </form>
         </div>
 
@@ -138,8 +156,13 @@ export default function FormPemesanan({ produk }: Props) {
 
             <div className="flex items-center gap-4 mb-2">
               <label className="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-2 rounded cursor-pointer inline-flex items-center gap-2">
-                <Icon icon="mage:file-upload-fill" className="w-5 h-5"/> BROWSE
-                <input type="file" className="hidden" onChange={handleUpload} />
+                <Icon icon="mage:file-upload-fill" className="w-5 h-5" /> BROWSE
+                <input
+                  type="file"
+                  accept=".cdr,.pdf,.png,.jpg,.jpeg,.psd"
+                  className="hidden"
+                  onChange={handleUpload}
+                />
               </label>
               <span>
                 Tidak punya desain?{" "}
