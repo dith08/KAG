@@ -37,18 +37,12 @@ const AdminDashboard: React.FC = () => {
   return (
     <div className="flex min-h-screen">
       <SidebarAdmin />
-      <div className="flex-1 flex flex-col p-4 md:ml-64">
+      <div className="flex-1 flex flex-col p-4 pt-28 md:ml-64">
         <NavbarAdmin />
 
         <div className="flex flex-col lg:flex-row gap-6 mt-6">
           {/* Kiri (Main) */}
           <div className="w-full lg:w-7/10 space-y-6">
-            {/* Total Pendapatan */}
-            <div className="bg-white p-6 rounded-xl shadow">
-              <h2 className="text-xl font-semibold mb-1">Total Pendapatan Bulan Ini</h2>
-              <p className="text-2xl font-bold text-gray-800">Rp 12.000.000 <span className="text-green-500 text-sm ml-2">🔺 +10%</span></p>
-            </div>
-
             {/* Grafik Penjualan */}
             <div className="bg-white p-6 rounded-xl shadow">
               <h2 className="text-xl font-semibold mb-4">Grafik Penjualan</h2>
@@ -108,6 +102,14 @@ const AdminDashboard: React.FC = () => {
                 ))}
               </ul>
             </div>
+
+            {/* Total Pendapatan (dipindah ke bawah notifikasi) */}
+            <div className="bg-white p-6 rounded-xl shadow">
+              <h2 className="text-xl font-semibold mb-1">Total Pendapatan Bulan Ini</h2>
+              <p className="text-2xl font-bold text-gray-800">
+                Rp 12.000.000 <span className="text-green-500 text-sm ml-2">🔺 +10%</span>
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -116,4 +118,3 @@ const AdminDashboard: React.FC = () => {
 };
 
 export default AdminDashboard;
- 
