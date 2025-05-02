@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import LoginPage from "../pages/LoginPage";
 import RegisterPage from "../pages/RegisterPage";
 import HomePage from "../pages/customer/HomePage";
@@ -34,30 +34,31 @@ const AppRoutes: React.FC = () => {
         <Route path="/verify-code" element={<VerifyCodePage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
+        <Route path="/customer/produk" element={<ProdukPage />} />
+        <Route path="/customer/produk/:slug" element={<ProdukDetailPage />} />
 
-        {/* Customer Routes */}
-        <Route path="/customer">
-          <Route path="produk" element={<ProdukPage />} />
-          <Route path="produk/:slug" element={<ProdukDetailPage />} />
+        {/* Customer Protected Routes */}
+        <Route
+          path="/customer"
+          element={<PrivateRoute role="customer" element={<Outlet />} />}
+        >
           <Route path="pesanan" element={<PesananSayaPage />} />
           <Route path="keranjang" element={<KeranjangPage />} />
           <Route path="notification" element={<NotificationPage />} />
-          {/* Gunakan PrivateRoute untuk proteksi akses profile */}
-          <Route
-            path="profile"
-            element={<PrivateRoute element={<ProfilePage />} />}
-          />
+          <Route path="profile" element={<ProfilePage />} />
           <Route path="checkout" element={<CheckoutPage />} />
         </Route>
 
-        {/* Admin Routes */}
-        <Route path="/admin">
+        {/* Admin Protected Routes */}
+        <Route
+          path="/admin"
+          element={<PrivateRoute role="admin" element={<Outlet />} />}
+        >
           <Route index element={<DashboardAdmin />} />
           <Route path="produk" element={<ProductPage />} />
           <Route path="pesanan" element={<PesananPage />} />
-          <Route path="pengaturan" element={<AdminSettings/>} />
-          <Route path="statistik" element={<StatistikPage/>} />
-
+          <Route path="pengaturan" element={<AdminSettings />} />
+          <Route path="statistik" element={<StatistikPage />} />
         </Route>
 
         {/* Not Found */}
