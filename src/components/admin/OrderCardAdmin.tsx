@@ -17,7 +17,8 @@ type OrderCardProps = {
   onView: () => void;
   onStatusChange: (newStatus: string) => void;
   onPaymentChange: (newPayment: string) => void;
-  onSave: () => void; // New prop for saving changes
+  onSave: () => void;
+  isActive?: boolean; // Tambahan: card ini sedang aktif
 };
 
 const OrderCard: React.FC<OrderCardProps> = ({
@@ -36,7 +37,8 @@ const OrderCard: React.FC<OrderCardProps> = ({
   onView,
   onStatusChange,
   onPaymentChange,
-  onSave, // Function to save changes
+  onSave,
+  isActive = false, // default false
 }) => {
   const [isPaymentConfirmed, setIsPaymentConfirmed] = useState(payment === "Lunas");
   const [currentStatus, setCurrentStatus] = useState(status);
@@ -56,12 +58,12 @@ const OrderCard: React.FC<OrderCardProps> = ({
   };
 
   return (
-    <div className="rounded-xl overflow-hidden shadow border">
+    <div className="rounded-xl overflow-hidden shadow border relative">
       {/* Bagian atas */}
-      <div className="bg-[#FDD47D] px-6 py-4 flex gap-4 items-start">
+      <div className="bg-[#FDD47D] px-6 py-4 flex flex-col sm:flex-row gap-4 items-start">
         <img src={image} alt={title} className="w-20 h-20 object-cover rounded" />
-        <div className="flex-1 grid grid-cols-5 gap-2 text-sm">
-          <div className="col-span-1">
+        <div className="flex-1 grid grid-cols-2 sm:grid-cols-5 gap-2 text-sm">
+          <div className="col-span-1 sm:col-span-2">
             <h2 className="text-base font-semibold underline">{title}</h2>
             <p className="text-gray-800">Variasi</p>
             <p className="text-gray-700">{variant}</p>
@@ -76,7 +78,7 @@ const OrderCard: React.FC<OrderCardProps> = ({
       </div>
 
       {/* Bagian bawah */}
-      <div className="bg-[#FDC264] px-6 py-3 grid grid-cols-6 gap-2 text-sm items-center">
+      <div className="bg-[#FDC264] px-6 py-3 grid grid-cols-2 sm:grid-cols-6 gap-2 text-sm items-center">
         <div>
           <p className="font-medium">Pembeli</p>
           <p>{buyer}</p>
@@ -105,7 +107,7 @@ const OrderCard: React.FC<OrderCardProps> = ({
         </div>
         <div>
           <p className="font-medium">Pembayaran</p>
-          <p>{currentPayment}</p> {/* Display the payment status */}
+          <p>{currentPayment}</p>
         </div>
         <div className="flex justify-end items-center">
           <button onClick={onView} className="text-black">
@@ -114,15 +116,15 @@ const OrderCard: React.FC<OrderCardProps> = ({
         </div>
       </div>
 
-      {/* Floating Save Button */}
-      <div className="fixed bottom-10 right-10">
+      {/* Tombol Save mengambang hanya saat isActive true */}
+      <div className="fixed bottom-10 right-10 z-50">
         <button
-          onClick={onSave}
-          className="bg-green-500 text-white p-4 rounded-full shadow-lg hover:bg-green-600 transition"
-        >
-          Save Change
+          onClick={() => console.log("Saved all")}
+          className="bg-green-600 text-white px-5 py-3 rounded-full shadow-lg hover:bg-green-700 transition">
+           Save Change
         </button>
       </div>
+
     </div>
   );
 };

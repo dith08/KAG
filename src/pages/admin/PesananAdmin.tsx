@@ -51,15 +51,48 @@ const PesananPage: React.FC = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
+  const [editedStatus, setEditedStatus] = useState<string>("");
+  const [editedPayment, setEditedPayment] = useState<string>("");
 
   const handleViewOrder = (order: any) => {
     setSelectedOrder(order);
+    setEditedStatus(order.status);
+    setEditedPayment(order.payment);
     setIsModalOpen(true);
   };
 
   const handleModalClose = () => {
     setIsModalOpen(false);
     setSelectedOrder(null);
+  };
+
+  const handleStatusChange = (newStatus: string) => {
+    setEditedStatus(newStatus);
+  };
+
+  const handlePaymentChange = (newPayment: string) => {
+    setEditedPayment(newPayment);
+  };
+
+  const handleSaveChange = () => {
+    if (!selectedOrder) return;
+
+    const updatedOrders = orders.map((order) =>
+      order.id === selectedOrder.id
+        ? { ...order, status: editedStatus, payment: editedPayment }
+        : order
+    );
+
+    setOrders(updatedOrders);
+    setSelectedOrder(null);
+    setIsModalOpen(false);
+
+    // ✅ Jika ada koneksi API, bisa kirim PUT ke backend di sini
+    console.log("Data tersimpan:", {
+      id: selectedOrder.id,
+      status: editedStatus,
+      payment: editedPayment,
+    });
   };
 
   const handlePrintInvoice = () => {
@@ -91,9 +124,10 @@ const PesananPage: React.FC = () => {
                 note={order.note}
                 payment={order.payment}
                 onView={() => handleViewOrder(order)}
-                onStatusChange={(newStatus) => console.log("Status changed:", newStatus)}
-                onPaymentChange={(newPayment) => console.log("Payment changed:", newPayment)}
-                onSave={() => console.log("Saved order", order.id)}
+                onStatusChange={handleStatusChange}
+                onPaymentChange={handlePaymentChange}
+                onSave={handleSaveChange}
+                isActive={selectedOrder?.id === order.id}
               />
             ))}
           </div>
@@ -137,7 +171,7 @@ const PesananPage: React.FC = () => {
                 </div>
                 <div>
                   <p className="font-medium">Status</p>
-                  <p>{selectedOrder.status}</p>
+                  <p>{editedStatus}</p>
                 </div>
                 <div>
                   <p className="font-medium">Catatan</p>
@@ -145,7 +179,7 @@ const PesananPage: React.FC = () => {
                 </div>
                 <div>
                   <p className="font-medium">Pembayaran</p>
-                  <p>{selectedOrder.payment}</p>
+                  <p>{editedPayment}</p>
                 </div>
                 <div className="flex flex-col items-end gap-2 mt-4 sm:mt-0">
                   <button
