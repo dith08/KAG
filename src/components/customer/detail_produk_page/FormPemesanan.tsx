@@ -53,67 +53,87 @@ export default function FormPemesanan({ produk }: Props) {
               TENTUKAN PILIHANMU
             </h3>
           </div>
-          <form className="space-y-4">
-            {produk.form.map((input, index) => (
-              <div key={index} className="flex flex-col">
-                <label className="font-medium mb-1">{input.label}</label>
+          <form className="space-y-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {produk.form
+              .filter((input) => input.type !== "textarea")
+              .map((input, index) => (
+                <div key={index} className="flex flex-col">
+                  <label className="font-medium mb-1">{input.label}</label>
 
-                {input.type === "select" && (
-                  <select
-                    className="border p-2 rounded"
-                    onChange={(e) =>
-                      handleInputChange(input.label, e.target.value)
-                    }
-                  >
-                    <option value="">Pilih {input.label}</option>
-                    {input.options?.map((option, idx) => (
-                      <option key={idx} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                  </select>
-                )}
-
-                {input.type === "number" && (
-                  <>
-                    <input
-                      type="number"
-                      className="border p-2 rounded-lg text-black"
-                      placeholder={`Masukkan ${input.label.toLowerCase()}`}
-                      min={
-                        input.label === "Jumlah"
-                          ? 100
-                          : input.label === "Jumlah Halaman"
-                          ? 20
-                          : undefined
+                  {input.type === "select" && (
+                    <select
+                      className="border p-2 rounded"
+                      onChange={(e) =>
+                        handleInputChange(input.label, e.target.value)
                       }
-                      value={formData[input.label] ?? ""}
-                      onChange={(e) => {
-                        const value =
-                          e.target.value === "" ? 0 : parseInt(e.target.value);
-                        handleInputChange(input.label, value);
-                      }}
+                    >
+                      <option value="">Pilih {input.label}</option>
+                      {input.options?.map((option, idx) => (
+                        <option key={idx} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+
+                  {input.type === "number" && (
+                    <>
+                      <input
+                        type="number"
+                        className="border p-2 rounded-lg text-black"
+                        placeholder={`Masukkan ${input.label.toLowerCase()}`}
+                        min={
+                          input.label === "Jumlah"
+                            ? 100
+                            : input.label === "Jumlah Halaman"
+                            ? 20
+                            : undefined
+                        }
+                        value={formData[input.label] ?? ""}
+                        onChange={(e) => {
+                          const value =
+                            e.target.value === ""
+                              ? 0
+                              : parseInt(e.target.value);
+                          handleInputChange(input.label, value);
+                        }}
+                      />
+
+                      {input.label === "Jumlah" &&
+                        typeof formData[input.label] === "number" &&
+                        (formData[input.label] as number) < 100 && (
+                          <p className="text-red-500 text-sm mt-1">
+                            Jumlah minimal pemesanan adalah 100 pcs
+                          </p>
+                        )}
+
+                      {input.label === "Jumlah Halaman" &&
+                        typeof formData[input.label] === "number" &&
+                        (formData[input.label] as number) < 20 && (
+                          <p className="text-red-500 text-sm mt-1">
+                            Jumlah halaman minimal adalah 20 halaman
+                          </p>
+                        )}
+                    </>
+                  )}
+
+                  {input.type === "readonly" && (
+                    <input
+                      type="text"
+                      className="border p-2 rounded"
+                      value={`Rp. ${input.value?.toLocaleString()}`}
+                      readOnly
                     />
+                  )}
+                </div>
+              ))}
 
-                    {input.label === "Jumlah" &&
-                      typeof formData[input.label] === "number" &&
-                      (formData[input.label] as number) < 100 && (
-                        <p className="text-red-500 text-sm mt-1">
-                          Jumlah minimal pemesanan adalah 100 pcs
-                        </p>
-                      )}
-
-                    {input.label === "Jumlah Halaman" &&
-                      typeof formData[input.label] === "number" &&
-                      (formData[input.label] as number) < 20 && (
-                        <p className="text-red-500 text-sm mt-1">
-                          Jumlah halaman minimal adalah 20 halaman
-                        </p>
-                      )}
-                  </>
-                )}
-
-                {input.type === "textarea" && (
+            {/* Menambahkan textarea di bagian bawah */}
+            {produk.form
+              .filter((input) => input.type === "textarea")
+              .map((input, index) => (
+                <div key={index} className="flex flex-col col-span-2">
+                  <label className="font-medium mb-1">{input.label}</label>
                   <textarea
                     className="border p-2 rounded"
                     rows={3}
@@ -122,18 +142,8 @@ export default function FormPemesanan({ produk }: Props) {
                       handleInputChange(input.label, e.target.value)
                     }
                   ></textarea>
-                )}
-
-                {input.type === "readonly" && (
-                  <input
-                    type="text"
-                    className="border p-2 rounded"
-                    value={`Rp. ${input.value?.toLocaleString()}`}
-                    readOnly
-                  />
-                )}
-              </div>
-            ))}{" "}
+                </div>
+              ))}
           </form>
         </div>
 

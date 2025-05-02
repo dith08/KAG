@@ -27,6 +27,7 @@ export const produkDummy: Produk[] = [
     image: "/images/paperbag3.png",
     form: [
       { label: "Bahan", type: "select", options: ["Art Carton", "Ivory"] },
+      { label: "Finishing", type: "select", options: ["Doff", "Glossy"] },
       { label: "Jumlah", type: "number" },
       { label: "Harga Satuan", type: "readonly", value: 5000 },
       { label: "Catatan", type: "textarea" },
@@ -38,7 +39,7 @@ export const produkDummy: Produk[] = [
     deskripsi: [
       "Tersedia dalam beberapa pilihan bahan",
       "Ukuran bervariasi",
-      "Jumlah isi terdapat 4 pilihian yaitu 1 lembar - 4 lembar - 7 lembar - 13 lembar",
+      "Jumlah isi terdapat 4 pilihan yaitu 1 lembar - 4 lembar - 7 lembar - 13 lembar",
       "Finishing bisa menggunakan spiral dan hanger bisa juga dengan klem kaleng",
       "Estimasi produksi mengacu pada jumlah pesanan anda",
     ],
