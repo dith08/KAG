@@ -1,132 +1,74 @@
-import React, { useState } from "react";
-import { Eye } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Icon } from "@iconify/react";
 
-type OrderCardProps = {
-  id: number;
-  image: string;
-  title: string;
-  variant: string;
-  quantity: string;
-  price: string;
-  design: string;
-  buyer: string;
-  address: string;
+interface Order {
+  id: string;
+  user_id: string;
+  total_harga: number;
   status: string;
-  note: string;
-  payment: string;
-  onView: () => void;
-  onStatusChange: (newStatus: string) => void;
-  onPaymentChange: (newPayment: string) => void;
-  onSave: () => void;
-  isActive?: boolean; // Tambahan: card ini sedang aktif
-};
+  metode_pembayaran: string;
+  metode_pengiriman: string;
+  alamat_pengiriman: string;
+  nomor_resi: string;
+  catatan: string;
+}
 
-const OrderCard: React.FC<OrderCardProps> = ({
-  id,
-  image,
-  title,
-  variant,
-  quantity,
-  price,
-  design,
-  buyer,
-  address,
-  status,
-  note,
-  payment,
-  onView,
-  onStatusChange,
-  onPaymentChange,
-  onSave,
-  isActive = false, // default false
-}) => {
-  const [isPaymentConfirmed, setIsPaymentConfirmed] = useState(payment === "Lunas");
-  const [currentStatus, setCurrentStatus] = useState(status);
-  const [currentPayment, setCurrentPayment] = useState(payment);
+const OrderCardAdmin = ({ order }: { order: Order }) => {
+  const navigate = useNavigate();
 
-  const handlePaymentChange = (newPayment: string) => {
-    setCurrentPayment(newPayment);
-    onPaymentChange(newPayment);
-    if (newPayment === "Lunas") {
-      setIsPaymentConfirmed(true);
-    }
-  };
-
-  const handleStatusChange = (newStatus: string) => {
-    setCurrentStatus(newStatus);
-    onStatusChange(newStatus);
+  const handleEditClick = () => {
+    navigate(`/admin/pesanan/${order.id}`, { state: order });
   };
 
   return (
-    <div className="rounded-xl overflow-hidden shadow border relative">
-      {/* Bagian atas */}
-      <div className="bg-[#FDD47D] px-6 py-4 flex flex-col sm:flex-row gap-4 items-start">
-        <img src={image} alt={title} className="w-20 h-20 object-cover rounded" />
-        <div className="flex-1 grid grid-cols-2 sm:grid-cols-5 gap-2 text-sm">
-          <div className="col-span-1 sm:col-span-2">
-            <h2 className="text-base font-semibold underline">{title}</h2>
-            <p className="text-gray-800">Variasi</p>
-            <p className="text-gray-700">{variant}</p>
+    <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition p-6 border border-gray-200 mb-6">
+      <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center">
+        <div className="space-y-2 text-gray-700">
+          <div className="flex items-center gap-2">
+            <Icon icon="mdi:identifier" className="text-green-600" />
+            <span className="font-semibold">ID Pesanan:</span> {order.id}
           </div>
-          <p className="col-span-1 self-center">{quantity}</p>
-          <p className="col-span-1 self-center">{price}</p>
-          <div className="col-span-1 self-center">
-            <p className="text-sm">Desain</p>
-            <button className="bg-gray-200 px-2 py-1 rounded text-sm font-medium">{design}</button>
+          <div className="flex items-center gap-2">
+            <Icon icon="mdi:account" className="text-green-600" />
+            <span className="font-semibold">User ID:</span> {order.user_id}
+          </div>
+          <div className="flex items-center gap-2">
+            <Icon icon="mdi:cash" className="text-green-600" />
+            <span className="font-semibold">Total:</span> Rp{" "}
+            {order.total_harga.toLocaleString()}
+          </div>
+          <div className="flex items-center gap-2">
+            <Icon icon="mdi:progress-check" className="text-green-600" />
+            <span className="font-semibold">Status:</span> {order.status}
+          </div>
+          <div className="flex items-center gap-2">
+            <Icon icon="mdi:credit-card" className="text-green-600" />
+            <span className="font-semibold">Pembayaran:</span>{" "}
+            {order.metode_pembayaran}
+          </div>
+          <div className="flex items-center gap-2">
+            <Icon icon="mdi:truck-delivery" className="text-green-600" />
+            <span className="font-semibold">Pengiriman:</span>{" "}
+            {order.metode_pengiriman}
           </div>
         </div>
-      </div>
 
-      {/* Bagian bawah */}
-      <div className="bg-[#FDC264] px-6 py-3 grid grid-cols-2 sm:grid-cols-6 gap-2 text-sm items-center">
-        <div>
-          <p className="font-medium">Pembeli</p>
-          <p>{buyer}</p>
-        </div>
-        <div>
-          <p className="font-medium">Alamat</p>
-          <p>{address}</p>
-        </div>
-        <div>
-          <p className="font-medium">Status</p>
-          <select
-            value={currentStatus}
-            onChange={(e) => handleStatusChange(e.target.value)}
-            className="bg-[#EADFB4] rounded px-2 py-1 text-sm"
-            disabled={isPaymentConfirmed && currentStatus !== "Selesai"}
+        <div className="mt-4 lg:mt-0 flex flex-col items-end gap-2">
+          <button
+            onClick={handleEditClick}
+            className="flex items-center gap-2 bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md shadow transition"
           >
-            <option>Belum Diproses</option>
-            <option>Diproses</option>
-            <option>Dikirim</option>
-            <option>Selesai</option>
-          </select>
-        </div>
-        <div>
-          <p className="font-medium">Catatan</p>
-          <p>{note}</p>
-        </div>
-        <div>
-          <p className="font-medium">Pembayaran</p>
-          <p>{currentPayment}</p>
-        </div>
-        <div className="flex justify-end items-center">
-          <button onClick={onView} className="text-black">
-            <Eye size={20} />
+            <Icon icon="mdi:pencil" />
+            Edit Status
           </button>
+          <div className="text-sm text-gray-500 italic">
+            <Icon icon="mdi:barcode" className="inline mr-1" />
+            Resi: {order.nomor_resi || "-"}
+          </div>
         </div>
       </div>
-
-      {/* Tombol Save mengambang hanya saat isActive true */}
-      <div className="fixed bottom-10 right-10 z-50">
-        <button
-          onClick={() => console.log("Saved all")}
-          className="bg-green-600 text-white px-5 py-3 rounded-full shadow-lg hover:bg-green-700 transition">
-           Save Change
-        </button>
-      </div>
-
     </div>
   );
 };
 
-export default OrderCard;
+export default OrderCardAdmin;

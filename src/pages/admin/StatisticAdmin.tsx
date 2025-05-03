@@ -34,7 +34,7 @@ const StatistikPage: React.FC = () => {
       <div className="flex-1 w-full lg:ml-64">
         <NavbarAdmin />
 
-        <div className="p-4 space-y-10 mt-20">
+        <div className="p-4 space-y-5 mt-24">
           <h1 className="text-2xl font-bold text-center lg:text-left">Laporan & Statistik</h1>
 
           {/* Laporan Penjualan */}
