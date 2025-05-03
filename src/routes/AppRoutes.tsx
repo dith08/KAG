@@ -12,7 +12,6 @@ import NotificationPage from "../pages/customer/NotificationPage";
 import ProfilePage from "../pages/customer/ProfilePage";
 import ProductPage from "../pages/admin/ProductAdmin";
 import CheckoutPage from "../pages/customer/CheckoutPage";
-import PesananPage from "../pages/admin/PesananAdmin";
 import ProdukDetailPage from "../pages/customer/ProductDetailPage";
 import AdminSettings from "../pages/admin/SettingsAdmin";
 import StatistikPage from "../pages/admin/StatisticAdmin";
@@ -21,6 +20,8 @@ import ForgotPasswordPage from "../pages/ForgotPasswordPage";
 import ResetPasswordPage from "../pages/ResetPasswordPage";
 import VerifyCodePage from "../pages/VerifyCodePage";
 import AuthCallback from "../components/AuthCallback";
+import PesananAdmin from "../pages/admin/PesananAdmin";
+import DetailPesananAdmin from "../pages/admin/DetailPesananAdmin";
 
 const AppRoutes: React.FC = () => {
   return (
@@ -56,7 +57,10 @@ const AppRoutes: React.FC = () => {
         >
           <Route index element={<DashboardAdmin />} />
           <Route path="produk" element={<ProductPage />} />
-          <Route path="pesanan" element={<PesananPage />} />
+          <Route path="pesanan">
+            <Route index element={<PesananAdmin />} />
+            <Route path=":id" element={<DetailPesananAdmin />} />
+          </Route>
           <Route path="pengaturan" element={<AdminSettings />} />
           <Route path="statistik" element={<StatistikPage />} />
         </Route>
