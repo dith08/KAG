@@ -3,13 +3,13 @@ import Navbar from "../../components/customer/Navbar";
 import InputField from "../../components/InputField";
 import { Icon } from "@iconify/react";
 import Footer from "../../components/customer/Footer";
-import MapPicker from "../../components/customer/profile_page/MapPicker";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
 import { useToast } from "../../components/toast/useToast";
 import Button from "../../components/Button";
 import ConfirmPopup from "../../components/ConfirmPopup";
+import MapPicker from "../../components/MapPicker";
 
 const ProfilePage = () => {
   const [username, setUsername] = useState("");
