@@ -22,6 +22,7 @@ import VerifyCodePage from "../pages/VerifyCodePage";
 import AuthCallback from "../components/AuthCallback";
 import PesananAdmin from "../pages/admin/PesananAdmin";
 import DetailPesananAdmin from "../pages/admin/DetailPesananAdmin";
+import EditProductPage from "../pages/admin/EditProductAdmin";
 
 const AppRoutes: React.FC = () => {
   return (
@@ -57,6 +58,7 @@ const AppRoutes: React.FC = () => {
         >
           <Route index element={<DashboardAdmin />} />
           <Route path="produk" element={<ProductPage />} />
+          <Route path="/admin/products/:id/edit" element={<EditProductPage />} />
           <Route path="pesanan">
             <Route index element={<PesananAdmin />} />
             <Route path=":id" element={<DetailPesananAdmin />} />
