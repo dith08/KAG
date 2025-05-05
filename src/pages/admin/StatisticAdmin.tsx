@@ -1,7 +1,7 @@
 import React from "react";
 import SidebarAdmin from "../../components/admin/SidebarAdmin";
 import NavbarAdmin from "../../components/admin/NavbarAdmin";
-import { FaFilePdf, FaFileExcel } from "react-icons/fa";
+import { Icon } from "@iconify/react";
 import {
   BarChart,
   Bar,
@@ -27,55 +27,72 @@ const dataTren = [
   { bulan: "Apr", total: 2500 },
 ];
 
-const StatistikPage: React.FC = () => {
+const StatisticAdminPage: React.FC = () => {
   return (
-    <div className="flex flex-col lg:flex-row min-h-screen">
+    <div className="flex flex-col lg:flex-row min-h-screen bg-gray-50">
       <SidebarAdmin />
       <div className="flex-1 w-full lg:ml-64">
         <NavbarAdmin />
 
-        <div className="p-4 space-y-5 mt-24">
-          <h1 className="text-2xl font-bold text-center lg:text-left">Laporan & Statistik</h1>
+        <div className="p-4 lg:p-6 space-y-8 mt-18 lg:mt-24">
+          <h1 className="text-2xl font-bold text-center lg:text-left text-green-700 flex items-center gap-2 mb-6">
+            <Icon icon="mdi:chart-bar" className="text-green-700" /> Laporan &
+            Statistik
+          </h1>
 
           {/* Laporan Penjualan */}
-          <section className="bg-white rounded-xl shadow p-6">
-            <h2 className="text-2xl font-semibold mb-4 text-orange-600">Laporan Penjualan</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="bg-gray-100 p-4 rounded-lg">
-                <h3 className="text-center font-semibold mb-2">Grafik Produk Terlaris</h3>
+          <section className="bg-white rounded-2xl shadow p-4 sm:p-6">
+            <h2 className="text-xl sm:text-2xl font-semibold mb-4 text-yellow-500">
+              Laporan Penjualan
+            </h2>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div className="bg-gray-100 p-4 rounded-xl">
+                <h3 className="text-center font-semibold mb-2 text-green-700">
+                  Grafik Produk Terlaris
+                </h3>
                 <ResponsiveContainer width="100%" height={200}>
                   <BarChart data={dataProduk}>
                     <XAxis dataKey="name" />
                     <YAxis />
                     <Tooltip />
-                    <Bar dataKey="terjual" fill="#f97316" />
+                    <Bar dataKey="terjual" fill="#facc15" /> {/* yellow-500 */}
                   </BarChart>
                 </ResponsiveContainer>
               </div>
-              <div className="bg-gray-100 p-4 rounded-lg">
-                <h3 className="text-center font-semibold mb-2">Grafik Tren Penjualan</h3>
+              <div className="bg-gray-100 p-4 rounded-xl">
+                <h3 className="text-center font-semibold mb-2 text-green-700">
+                  Grafik Tren Penjualan
+                </h3>
                 <ResponsiveContainer width="100%" height={200}>
                   <LineChart data={dataTren}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="bulan" />
                     <YAxis />
                     <Tooltip />
-                    <Line type="monotone" dataKey="total" stroke="#10b981" strokeWidth={2} />
+                    <Line
+                      type="monotone"
+                      dataKey="total"
+                      stroke="#15803d" // green-700
+                      strokeWidth={2}
+                    />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
             </div>
-            <p className="mt-6 font-semibold text-center sm:text-left text-lg">
-              Total Pendapatan: <span className="text-green-700">Rp 25.000.000</span>
+            <p className="mt-6 font-semibold text-center sm:text-left text-lg text-green-700">
+              Total Pendapatan:{" "}
+              <span className="text-yellow-500">Rp 25.000.000</span>
             </p>
           </section>
 
           {/* Laporan Customer */}
-          <section className="bg-white rounded-xl shadow p-6">
-            <h2 className="text-2xl font-semibold mb-4 text-orange-600">Laporan Customer</h2>
+          <section className="bg-white rounded-2xl shadow p-4 sm:p-6">
+            <h2 className="text-xl sm:text-2xl font-semibold mb-4 text-yellow-500">
+              Laporan Customer
+            </h2>
             <div className="overflow-x-auto">
               <table className="w-full text-left border rounded-xl overflow-hidden">
-                <thead className="bg-orange-400 text-white">
+                <thead className="bg-yellow-500 text-white">
                   <tr>
                     <th className="p-3">Nama Customer</th>
                     <th className="p-3">Total Transaksi</th>
@@ -94,11 +111,13 @@ const StatistikPage: React.FC = () => {
           </section>
 
           {/* Laporan Stok Bahan */}
-          <section className="bg-white rounded-xl shadow p-6">
-            <h2 className="text-2xl font-semibold mb-4 text-orange-600">Laporan Stok Bahan</h2>
+          <section className="bg-white rounded-2xl shadow p-4 sm:p-6">
+            <h2 className="text-xl sm:text-2xl font-semibold mb-4 text-yellow-500">
+              Laporan Stok Bahan
+            </h2>
             <div className="overflow-x-auto">
               <table className="w-full text-left border rounded-xl overflow-hidden">
-                <thead className="bg-orange-400 text-white">
+                <thead className="bg-yellow-500 text-white">
                   <tr>
                     <th className="p-3">Nama Bahan</th>
                     <th className="p-3">Stok Tersedia</th>
@@ -117,11 +136,13 @@ const StatistikPage: React.FC = () => {
           </section>
 
           {/* Laporan Transaksi */}
-          <section className="bg-white rounded-xl shadow p-6">
-            <h2 className="text-2xl font-semibold mb-4 text-orange-600">Laporan Transaksi</h2>
+          <section className="bg-white rounded-2xl shadow p-4 sm:p-6">
+            <h2 className="text-xl sm:text-2xl font-semibold mb-4 text-yellow-500">
+              Laporan Transaksi
+            </h2>
             <div className="overflow-x-auto">
               <table className="w-full text-left border rounded-xl overflow-hidden">
-                <thead className="bg-orange-400 text-white">
+                <thead className="bg-yellow-500 text-white">
                   <tr>
                     <th className="p-3">ID</th>
                     <th className="p-3">Nama</th>
@@ -143,11 +164,12 @@ const StatistikPage: React.FC = () => {
 
           {/* Tombol Unduh */}
           <div className="flex flex-wrap justify-center sm:justify-end gap-4 pt-6">
-            <button className="bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 shadow">
-              <FaFilePdf /> Unduh PDF
+            <button className="bg-green-700 hover:bg-green-800 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 shadow">
+              <Icon icon="mdi:file-pdf-box" className="text-xl" /> Unduh PDF
             </button>
-            <button className="bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 shadow">
-              <FaFileExcel /> Unduh Excel
+            <button className="bg-yellow-500 hover:bg-yellow-600 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 shadow">
+              <Icon icon="mdi:microsoft-excel" className="text-xl" /> Unduh
+              Excel
             </button>
           </div>
         </div>
@@ -156,4 +178,4 @@ const StatistikPage: React.FC = () => {
   );
 };
 
-export default StatistikPage;
+export default StatisticAdminPage;
