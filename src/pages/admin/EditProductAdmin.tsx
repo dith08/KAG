@@ -11,7 +11,7 @@ interface Finishing {
   keterangan: string;
 }
 
-const EditProductPage: React.FC = () => {
+const EditProductAdminPage: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -200,4 +200,4 @@ const EditProductPage: React.FC = () => {
   );
 };
 
-export default EditProductPage;
+export default EditProductAdminPage;

@@ -6,6 +6,7 @@ import "leaflet/dist/leaflet.css";
 import MapPicker from "../../components/MapPicker";
 
 const SettingsAdminPage: React.FC = () => {
+  const [namaToko, setNamaToko] = useState("Karya Adi Grafika");
   const [username, setUsername] = useState("");
   const [address, setAddress] = useState("");
   const [phone, setPhone] = useState("");
@@ -50,8 +51,8 @@ const SettingsAdminPage: React.FC = () => {
         <NavbarAdmin />
 
         <div className="p-4 lg:p-6 space-y-8 mt-18 lg:mt-24">
-          <h1 className="text-2xl font-bold text-center lg:text-left text-green-700 flex items-center gap-2 mb-6">
-            <Icon icon="mdi:cog" className="text-green-700" /> Pengaturan Toko
+          <h1 className="text-xl md:text-2xl font-bold text-center lg:text-left text-green-700 flex items-center gap-2 mb-6">
+            <Icon icon="mdi:cog" className="text-green-700 w-8 h-8" /> PENGATURAN TOKO
           </h1>
 
           <section className="bg-white rounded-2xl shadow-xl p-4 lg:p-8 grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
@@ -61,7 +62,7 @@ const SettingsAdminPage: React.FC = () => {
                 <Icon icon="mdi:storefront" className="text-green-700" />
                 PROFILE TOKO
               </h2>
-              <div className="flex justify-center">
+              <div className="flex gap-4 items-center">
                 <div className="relative">
                   <img
                     src={profilePicture || "/images/user.png"}
@@ -81,6 +82,17 @@ const SettingsAdminPage: React.FC = () => {
                     />
                   </label>
                 </div>
+                <div className="flex-1">
+                  <label className="text-sm font-semibold block mb-1 text-green-700">
+                    USERNAME PEMILIK
+                  </label>
+                  <input
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    className="w-full border rounded-lg px-3 py-2 focus:outline-green-700"
+                  />
+                </div>
               </div>
 
               <div className="space-y-3">
@@ -90,8 +102,8 @@ const SettingsAdminPage: React.FC = () => {
                   </label>
                   <input
                     type="text"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    value={namaToko}
+                    onChange={(e) => setNamaToko(e.target.value)}
                     className="w-full border rounded-lg px-3 py-2 focus:outline-green-700"
                   />
                 </div>

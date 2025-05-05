@@ -1,37 +1,51 @@
 import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import {
-  FaHome,
-  FaBox,
-  FaMoneyBill,
-  FaCog,
-  FaChartBar,
-  FaBars,
-  FaTimes,
-  FaSearch,
-  FaUserCircle,
-} from "react-icons/fa";
+import { Icon } from "@iconify/react";
 
 const NavbarAdmin: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const location = useLocation();
-  const navigate = useNavigate(); // ✅ Tambahkan ini
+  const navigate = useNavigate();
 
   const menuItems = [
-    { path: "/admin", label: "Home", icon: <FaHome className="mr-2" /> },
-    { path: "/admin/produk", label: "Kelola Produk", icon: <FaBox className="mr-2" /> },
-    { path: "/admin/pesanan", label: "Kelola Pesanan", icon: <FaMoneyBill className="mr-2" /> },
-    { path: "/admin/statistik", label: "Statistik", icon: <FaChartBar className="mr-2" /> },
-    { path: "/admin/pengaturan", label: "Kelola Pengaturan", icon: <FaCog className="mr-2" /> },
+    {
+      path: "/admin",
+      label: "Dashboard",
+      iconOutline: "mdi:home-outline",
+      iconFilled: "mdi:home",
+    },
+    {
+      path: "/admin/produk",
+      label: "Kelola Produk",
+      iconOutline: "mdi:archive-outline",
+      iconFilled: "mdi:archive",
+    },
+    {
+      path: "/admin/pesanan",
+      label: "Kelola Pesanan",
+      iconOutline: "mdi:cash",
+      iconFilled: "mdi:cash-multiple",
+    },
+    {
+      path: "/admin/statistik",
+      label: "Statistik",
+      iconOutline: "mdi:chart-box-outline",
+      iconFilled: "mdi:chart-box",
+    },
+    {
+      path: "/admin/pengaturan",
+      label: "Kelola Pengaturan",
+      iconOutline: "mdi:cog-outline",
+      iconFilled: "mdi:cog",
+    },
   ];
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
 
   const handleLogout = () => {
-    // Tambahkan logika untuk menghapus token/session jika ada
-    navigate("/login"); // ✅ Navigasi ke halaman login
+    navigate("/login");
   };
 
   return (
@@ -48,17 +62,20 @@ const NavbarAdmin: React.FC = () => {
             placeholder="Search"
             className="px-5 py-2 w-full rounded-md text-black pl-12 bg-white/50 shadow-md"
           />
-          <FaSearch className="absolute left-4 top-2.5 text-gray-500" />
+          <Icon
+            icon="mdi:magnify"
+            className="absolute left-4 top-2.5 text-gray-500 text-xl"
+          />
         </div>
 
         {/* Profile Desktop */}
         <div className="relative ml-auto mr-10">
           <div
-            className="flex items-center bg-[#F9A825]/75 p-2 px-5 rounded-lg cursor-pointer"
+            className="flex items-center bg-yellow-600 p-2 px-5 rounded-lg cursor-pointer"
             onClick={toggleDropdown}
           >
             <span className="mr-3 font-semibold">Radith</span>
-            <FaUserCircle className="text-xl" />
+            <Icon icon="mdi:account-circle" className="text-xl" />
           </div>
 
           {isDropdownOpen && (
@@ -77,24 +94,27 @@ const NavbarAdmin: React.FC = () => {
       {/* Navbar Mobile */}
       <div className="flex md:hidden fixed top-0 left-0 right-0 z-50 bg-white text-black items-center h-16 shadow-md px-4">
         <button onClick={toggleSidebar}>
-          <FaBars className="text-2xl" />
+          <Icon icon="mdi:menu" className="text-2xl" />
         </button>
         <div className="relative flex-1 mx-4">
           <input
             type="text"
-            placeholder="search"
+            placeholder="Search"
             className="pl-10 pr-4 py-2 w-full rounded-full bg-gray-100 text-black"
           />
-          <FaSearch className="absolute left-3 top-2.5 text-gray-400" />
+          <Icon
+            icon="mdi:magnify"
+            className="absolute left-3 top-2.5 text-gray-400 text-lg"
+          />
         </div>
 
         {/* Profile Mobile */}
         <div className="relative ml-auto">
           <div
-            className="flex items-center bg-[#F9A825]/75 p-2 px-5 rounded-lg cursor-pointer"
+            className="flex items-center bg-yellow-500 p-2 px-5 rounded-lg cursor-pointer"
             onClick={toggleDropdown}
           >
-            <FaUserCircle className="text-xl" />
+            <Icon icon="mdi:account-circle" className="text-xl" />
           </div>
 
           {isDropdownOpen && (
@@ -114,30 +134,39 @@ const NavbarAdmin: React.FC = () => {
       <div
         className={`fixed top-0 left-0 h-full w-64 bg-green-700 text-white transform ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } transition-transform duration-300 ease-in-out z-40`}
+        } transition-transform duration-300 ease-in-out z-40 mt-16 shadow-lg`}
       >
-        <div className="flex justify-end p-4">
-          <button onClick={toggleSidebar}>
-            <FaTimes className="text-2xl" />
-          </button>
-        </div>
+        <h1 className="text-xl font-bold leading-tight break-words px-6 pt-6">
+          KARYA ADI GRAFIKA
+        </h1>
 
-        <div className="flex flex-col p-4 space-y-4">
-          {menuItems.map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={`flex items-center p-3 rounded hover:bg-green-600 ${
-                location.pathname === item.path ? "bg-white/20" : ""
-              }`}
-            >
-              {item.icon}
-              {item.label}
-            </Link>
-          ))}
-        </div>
+        <ul className="space-y-2 p-4">
+          {menuItems.map((item) => {
+            const isActive = location.pathname === item.path;
+            return (
+              <li key={item.path}>
+                <Link
+                  to={item.path}
+                  className={`flex items-center p-3 rounded-lg transition-all duration-200 font-medium ${
+                    isActive
+                      ? "bg-white/20 text-white translate-x-1"
+                      : "hover:bg-white/10 hover:translate-x-1"
+                  }`}
+                  onClick={toggleSidebar}
+                >
+                  <Icon
+                    icon={isActive ? item.iconFilled : item.iconOutline}
+                    className="mr-3 w-6 h-6"
+                  />
+                  <span className="text-sm">{item.label}</span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
       </div>
 
+      {/* Overlay */}
       {isSidebarOpen && (
         <div
           onClick={toggleSidebar}

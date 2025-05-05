@@ -4,10 +4,10 @@ import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import NavbarAdmin from "../../components/admin/NavbarAdmin";
 import SidebarAdmin from "../../components/admin/SidebarAdmin";
-import { Icon as IconifyIcon } from "@iconify/react";
+import { Icon } from "@iconify/react";
 import StatusDropdown from "../../components/admin/StatusDropdown";
 
-const DetailPesananAdmin: React.FC = () => {
+const DetailPesananAdminPage: React.FC = () => {
   const location = useLocation();
   const order = location.state;
 
@@ -33,14 +33,14 @@ const DetailPesananAdmin: React.FC = () => {
       <div className="md:ml-64 pt-30 px-4 md:px-8 pb-8">
         <div className="bg-white rounded-xl shadow-lg p-6 md:p-8">
           <h1 className="text-2xl md:text-3xl font-bold text-green-700 mb-8 flex items-center gap-3">
-            <IconifyIcon icon="mdi:clipboard-list" className="text-3xl" />
+            <Icon icon="mdi:clipboard-list" className="text-3xl" />
             Detail Pesanan #{order.id}
           </h1>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="space-y-4">
               <h2 className="text-xl font-semibold text-yellow-600 mb-4 flex items-center gap-2">
-                <IconifyIcon icon="mdi:map" className="text-2xl" />
+                <Icon icon="mdi:map" className="text-2xl" />
                 Lokasi Pengiriman
               </h2>
               <div className="h-[400px] rounded-xl overflow-hidden shadow-md relative z-[5]">
@@ -131,7 +131,7 @@ const DetailPesananAdmin: React.FC = () => {
 
           <div className="mt-12">
             <h2 className="text-xl font-semibold text-green-600 flex items-center gap-2 mb-6">
-              <IconifyIcon icon="mdi:package-variant" className="text-2xl" />
+              <Icon icon="mdi:package-variant" className="text-2xl" />
               Detail Produk
             </h2>
 
@@ -189,7 +189,7 @@ const Info = ({
   icon: string;
 }) => (
   <div className="flex items-center gap-3">
-    <IconifyIcon icon={icon} className="text-green-600 text-xl flex-shrink-0" />
+    <Icon icon={icon} className="text-green-600 text-xl flex-shrink-0" />
     <div className="flex-1">
       <strong className="text-gray-700">{label}:</strong>{" "}
       <span className="text-gray-600">{value}</span>
@@ -204,4 +204,4 @@ const DetailItem = ({ label, value }: { label: string; value: string }) => (
   </div>
 );
 
-export default DetailPesananAdmin;
+export default DetailPesananAdminPage;

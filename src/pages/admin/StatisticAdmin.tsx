@@ -35,15 +35,14 @@ const StatisticAdminPage: React.FC = () => {
         <NavbarAdmin />
 
         <div className="p-4 lg:p-6 space-y-8 mt-18 lg:mt-24">
-          <h1 className="text-2xl font-bold text-center lg:text-left text-green-700 flex items-center gap-2 mb-6">
-            <Icon icon="mdi:chart-bar" className="text-green-700" /> Laporan &
-            Statistik
+          <h1 className="text-xl md:text-2xl font-bold text-center lg:text-left text-green-700 flex items-center gap-2 mb-6">
+            <Icon icon="mdi:chart-box" className="text-green-700 w-8 h-8" /> LAPORAN & STATISTIK
           </h1>
 
           {/* Laporan Penjualan */}
           <section className="bg-white rounded-2xl shadow p-4 sm:p-6">
             <h2 className="text-xl sm:text-2xl font-semibold mb-4 text-yellow-500">
-              Laporan Penjualan
+              LAPORAN PENJUALAN
             </h2>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <div className="bg-gray-100 p-4 rounded-xl">
@@ -80,15 +79,15 @@ const StatisticAdminPage: React.FC = () => {
               </div>
             </div>
             <p className="mt-6 font-semibold text-center sm:text-left text-lg text-green-700">
-              Total Pendapatan:{" "}
-              <span className="text-yellow-500">Rp 25.000.000</span>
+              TOTAL PENDAPATAN:{" "}
+              <span className="text-yellow-500">RP 25.000.000</span>
             </p>
           </section>
 
           {/* Laporan Customer */}
           <section className="bg-white rounded-2xl shadow p-4 sm:p-6">
             <h2 className="text-xl sm:text-2xl font-semibold mb-4 text-yellow-500">
-              Laporan Customer
+              LAPORAN CUSTOMER
             </h2>
             <div className="overflow-x-auto">
               <table className="w-full text-left border rounded-xl overflow-hidden">
@@ -113,7 +112,7 @@ const StatisticAdminPage: React.FC = () => {
           {/* Laporan Stok Bahan */}
           <section className="bg-white rounded-2xl shadow p-4 sm:p-6">
             <h2 className="text-xl sm:text-2xl font-semibold mb-4 text-yellow-500">
-              Laporan Stok Bahan
+              LAPORAN STOK BAHAN
             </h2>
             <div className="overflow-x-auto">
               <table className="w-full text-left border rounded-xl overflow-hidden">
@@ -138,7 +137,7 @@ const StatisticAdminPage: React.FC = () => {
           {/* Laporan Transaksi */}
           <section className="bg-white rounded-2xl shadow p-4 sm:p-6">
             <h2 className="text-xl sm:text-2xl font-semibold mb-4 text-yellow-500">
-              Laporan Transaksi
+              LAPORAN TRANSAKSI
             </h2>
             <div className="overflow-x-auto">
               <table className="w-full text-left border rounded-xl overflow-hidden">

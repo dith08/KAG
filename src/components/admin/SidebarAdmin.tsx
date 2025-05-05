@@ -1,26 +1,45 @@
+import { Icon } from "@iconify/react";
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import {
-  FaHome,
-  FaBox,
-  FaMoneyBill,
-  FaCog,
-  FaChartBar,
-} from "react-icons/fa";
 
 const SidebarAdmin: React.FC = () => {
   const location = useLocation();
 
   const menuItems = [
-    { path: "/admin", label: "Home", icon: <FaHome className="mr-3" /> },
-    { path: "/admin/produk", label: "Kelola Produk", icon: <FaBox className="mr-3" /> },
-    { path: "/admin/pesanan", label: "Kelola Pesanan", icon: <FaMoneyBill className="mr-3" /> },
-    { path: "/admin/statistik", label: "Statistik", icon: <FaChartBar className="mr-3" /> },
-    { path: "/admin/pengaturan", label: "Kelola Pengaturan", icon: <FaCog className="mr-3" /> },
+    {
+      path: "/admin",
+      label: "Dashboard",
+      iconOutline: "mdi:home-outline",
+      iconFilled: "mdi:home",
+    },
+    {
+      path: "/admin/produk",
+      label: "Kelola Produk",
+      iconOutline: "mdi:archive-outline",
+      iconFilled: "mdi:archive",
+    },
+    {
+      path: "/admin/pesanan",
+      label: "Kelola Pesanan",
+      iconOutline: "mdi:cash",
+      iconFilled: "mdi:cash-multiple",
+    },
+    {
+      path: "/admin/statistik",
+      label: "Statistik",
+      iconOutline: "mdi:chart-box-outline",
+      iconFilled: "mdi:chart-box",
+    },
+    {
+      path: "/admin/pengaturan",
+      label: "Kelola Pengaturan",
+      iconOutline: "mdi:cog-outline",
+      iconFilled: "mdi:cog",
+    },
   ];
 
   return (
-    <div className="w-64 bg-[#2E7D32]/90 text-white h-screen flex-col fixed top-0 left-0 z-40 mt-24 overflow-y-auto md:block hidden shadow-lg">
+    <div className="w-64 bg-green-700 text-white h-screen flex-col fixed top-0 left-0 z-40 mt-24 overflow-y-auto md:block hidden shadow-lg">
       <ul className="space-y-2 p-4">
         {menuItems.map((item) => {
           const isActive = location.pathname === item.path;
@@ -35,7 +54,10 @@ const SidebarAdmin: React.FC = () => {
                       : "hover:bg-white/10 hover:translate-x-1"
                   }`}
               >
-                {item.icon}
+                <Icon
+                  icon={isActive ? item.iconFilled : item.iconOutline}
+                  className="mr-3 w-6 h-6"
+                />
                 <span className="text-sm">{item.label}</span>
               </Link>
             </li>

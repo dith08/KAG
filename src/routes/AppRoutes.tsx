@@ -3,26 +3,26 @@ import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import LoginPage from "../pages/LoginPage";
 import RegisterPage from "../pages/RegisterPage";
 import HomePage from "../pages/customer/HomePage";
-import DashboardAdmin from "../pages/admin/DashboardAdmin";
 import NotFound from "../pages/NotFound";
 import ProdukPage from "../pages/customer/ProdukPage";
 import PesananSayaPage from "../pages/customer/PesananSayaPage";
 import KeranjangPage from "../pages/customer/KeranjangPage";
 import NotificationPage from "../pages/customer/NotificationPage";
 import ProfilePage from "../pages/customer/ProfilePage";
-import ProductPage from "../pages/admin/ProductAdmin";
 import CheckoutPage from "../pages/customer/CheckoutPage";
 import ProdukDetailPage from "../pages/customer/ProductDetailPage";
-import AdminSettings from "../pages/admin/SettingsAdmin";
-import StatistikPage from "../pages/admin/StatisticAdmin";
 import PrivateRoute from "../components/PrivateRoute";
 import ForgotPasswordPage from "../pages/ForgotPasswordPage";
 import ResetPasswordPage from "../pages/ResetPasswordPage";
 import VerifyCodePage from "../pages/VerifyCodePage";
 import AuthCallback from "../components/AuthCallback";
-import PesananAdmin from "../pages/admin/PesananAdmin";
-import DetailPesananAdmin from "../pages/admin/DetailPesananAdmin";
-import EditProductPage from "../pages/admin/EditProductAdmin";
+import StatisticAdminPage from "../pages/admin/StatisticAdmin";
+import SettingsAdminPage from "../pages/admin/SettingsAdmin";
+import PesananAdminPage from "../pages/admin/PesananAdmin";
+import DashboardAdminPage from "../pages/admin/DashboardAdmin";
+import ProductAdminPage from "../pages/admin/ProductAdmin";
+import EditProductAdminPage from "../pages/admin/EditProductAdmin";
+import DetailPesananAdminPage from "../pages/admin/DetailPesananAdmin";
 
 const AppRoutes: React.FC = () => {
   return (
@@ -56,15 +56,18 @@ const AppRoutes: React.FC = () => {
           path="/admin"
           element={<PrivateRoute role="admin" element={<Outlet />} />}
         >
-          <Route index element={<DashboardAdmin />} />
-          <Route path="produk" element={<ProductPage />} />
-          <Route path="/admin/products/:id/edit" element={<EditProductPage />} />
+          <Route index element={<DashboardAdminPage />} />
+          <Route path="produk" element={<ProductAdminPage />} />
+          <Route
+            path="/admin/products/:id/edit"
+            element={<EditProductAdminPage />}
+          />
           <Route path="pesanan">
-            <Route index element={<PesananAdmin />} />
-            <Route path=":id" element={<DetailPesananAdmin />} />
+            <Route index element={<PesananAdminPage />} />
+            <Route path=":id" element={<DetailPesananAdminPage />} />
           </Route>
-          <Route path="pengaturan" element={<AdminSettings />} />
-          <Route path="statistik" element={<StatistikPage />} />
+          <Route path="pengaturan" element={<SettingsAdminPage />} />
+          <Route path="statistik" element={<StatisticAdminPage />} />
         </Route>
 
         {/* Not Found */}
