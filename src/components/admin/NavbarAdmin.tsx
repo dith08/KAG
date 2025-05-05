@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   FaHome,
   FaBox,
@@ -16,6 +16,7 @@ const NavbarAdmin: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate(); // ✅ Tambahkan ini
 
   const menuItems = [
     { path: "/admin", label: "Home", icon: <FaHome className="mr-2" /> },
@@ -29,8 +30,8 @@ const NavbarAdmin: React.FC = () => {
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
 
   const handleLogout = () => {
-    // Tambahkan logika untuk logout di sini
-    console.log("Logout clicked");
+    // Tambahkan logika untuk menghapus token/session jika ada
+    navigate("/login"); // ✅ Navigasi ke halaman login
   };
 
   return (
@@ -60,7 +61,6 @@ const NavbarAdmin: React.FC = () => {
             <FaUserCircle className="text-xl" />
           </div>
 
-          {/* Dropdown Menu */}
           {isDropdownOpen && (
             <div className="absolute right-0 mt-2 w-40 bg-white text-black rounded-md shadow-lg overflow-hidden z-50">
               <button
@@ -97,7 +97,6 @@ const NavbarAdmin: React.FC = () => {
             <FaUserCircle className="text-xl" />
           </div>
 
-          {/* Dropdown Menu */}
           {isDropdownOpen && (
             <div className="absolute right-0 mt-2 w-40 bg-white text-black rounded-md shadow-lg overflow-hidden z-50">
               <button
@@ -117,14 +116,12 @@ const NavbarAdmin: React.FC = () => {
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         } transition-transform duration-300 ease-in-out z-40`}
       >
-        {/* Close Button */}
         <div className="flex justify-end p-4">
           <button onClick={toggleSidebar}>
             <FaTimes className="text-2xl" />
           </button>
         </div>
 
-        {/* Sidebar Content */}
         <div className="flex flex-col p-4 space-y-4">
           {menuItems.map((item) => (
             <Link
@@ -141,7 +138,6 @@ const NavbarAdmin: React.FC = () => {
         </div>
       </div>
 
-      {/* Background overlay ketika sidebar open */}
       {isSidebarOpen && (
         <div
           onClick={toggleSidebar}

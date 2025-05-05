@@ -8,6 +8,7 @@ const AdminSettings: React.FC = () => {
   const [alamat, setAlamat] = useState("");
   const [email, setEmail] = useState("");
   const [noHp, setNoHp] = useState("");
+  const [profilePicture, setProfilePicture] = useState<any>(null);
 
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [showShippingNotification, setShowShippingNotification] = useState(false);
@@ -20,8 +21,6 @@ const AdminSettings: React.FC = () => {
     { kecamatan: "Bae", biaya: "15.000" },
     { kecamatan: "Gebog", biaya: "20.000" },
   ]);
-
-  const [profilePicture, setProfilePicture] = useState<any>(null);
 
   const handleSaveChanges = () => {
     setShowSuccessPopup(true);
@@ -54,85 +53,86 @@ const AdminSettings: React.FC = () => {
       <SidebarAdmin />
       <div className="flex-1 w-full lg:ml-64">
         <NavbarAdmin />
-
-        <div className="p-4 space-y-10 mt-20">
+        <div className="p-4 mt-20 space-y-6">
           <h1 className="text-2xl font-bold text-center lg:text-left">Pengaturan Toko</h1>
 
-          {/* Profile Toko */}
-          <section className="bg-white rounded-xl shadow p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-1">
+          <div className="flex flex-col lg:flex-row gap-6">
+            {/* Deskripsi Toko - 70% */}
+            <div className="w-full lg:w-[70%] bg-white rounded-xl shadow p-6 space-y-4">
               <h2 className="text-green-700 font-bold text-xl mb-4">PROFILE TOKO</h2>
-              <div className="space-y-4">
-                <div className="flex items-center space-x-4 mb-4">
-                  <div className="relative">
-                    <img
-                      src={profilePicture || "/default-profile.jpg"}
-                      alt="Profile"
-                      className="w-20 h-20 rounded-full object-cover"
-                    />
-                    <label className="absolute bottom-0 right-0 p-2 bg-white rounded-full cursor-pointer">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleProfilePictureChange}
-                        className="hidden"
-                      />
-                      <Pencil size={16} className="text-gray-600" />
-                    </label>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-lg">{namaToko}</h3>
-                    <span className="text-sm text-gray-500">Toko Anda</span>
-                  </div>
-                </div>
 
-                <div>
-                  <label className="text-sm font-semibold block mb-1">NAMA TOKO</label>
-                  <input
-                    type="text"
-                    value={namaToko}
-                    onChange={(e) => setNamaToko(e.target.value)}
-                    className="w-full border rounded px-3 py-2"
+              <div className="flex items-center space-x-4 mb-4">
+                <div className="relative">
+                  <img
+                    src={profilePicture || "/default-profile.jpg"}
+                    alt="Profile"
+                    className="w-20 h-20 rounded-full object-cover"
                   />
+                  <label className="absolute bottom-0 right-0 p-2 bg-white rounded-full cursor-pointer">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleProfilePictureChange}
+                      className="hidden"
+                    />
+                    <Pencil size={16} className="text-gray-600" />
+                  </label>
                 </div>
                 <div>
-                  <label className="text-sm font-semibold block mb-1">ALAMAT</label>
-                  <input
-                    type="text"
-                    value={alamat}
-                    onChange={(e) => setAlamat(e.target.value)}
-                    className="w-full border rounded px-3 py-2"
-                  />
+                  <h3 className="font-semibold text-lg">{namaToko}</h3>
+                  <span className="text-sm text-gray-500">Toko Anda</span>
                 </div>
-                <div>
-                  <label className="text-sm font-semibold block mb-1">EMAIL</label>
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full border rounded px-3 py-2"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-semibold block mb-1">NO HP</label>
-                  <input
-                    type="text"
-                    value={noHp}
-                    onChange={(e) => setNoHp(e.target.value)}
-                    className="w-full border rounded px-3 py-2"
-                  />
-                </div>
-                <button
-                  onClick={handleSaveChanges}
-                  className="bg-yellow-400 text-white font-semibold px-4 py-2 rounded mt-4"
-                >
-                  Save Changes
-                </button>
               </div>
+
+              <div>
+                <label className="text-sm font-semibold block mb-1">NAMA TOKO</label>
+                <input
+                  type="text"
+                  value={namaToko}
+                  onChange={(e) => setNamaToko(e.target.value)}
+                  className="w-full border rounded px-3 py-2"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-semibold block mb-1">ALAMAT</label>
+                <input
+                  type="text"
+                  value={alamat}
+                  onChange={(e) => setAlamat(e.target.value)}
+                  className="w-full border rounded px-3 py-2"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-semibold block mb-1">EMAIL</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full border rounded px-3 py-2"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-semibold block mb-1">NO HP</label>
+                <input
+                  type="text"
+                  value={noHp}
+                  onChange={(e) => setNoHp(e.target.value)}
+                  className="w-full border rounded px-3 py-2"
+                />
+              </div>
+              <button
+                onClick={handleSaveChanges}
+                className="bg-yellow-400 text-white font-semibold px-4 py-2 rounded mt-4"
+              >
+                Simpan Perubahan
+              </button>
             </div>
 
-            <div className="lg:col-span-2 space-y-6">
-              <div className="bg-[#FFA000] rounded-xl p-4 text-white font-semibold">Biaya Pengiriman</div>
+            {/* Tabel Biaya - 30% */}
+            <div className="w-full lg:w-[30%] space-y-4">
+              <div className="bg-[#FFA000] rounded-xl p-4 text-white font-semibold">
+                Biaya Pengiriman
+              </div>
               <div className="bg-[#FFE082] rounded-xl p-4 space-y-3">
                 {biayaPengiriman.map((item, index) => (
                   <div key={index} className="bg-gray-200 p-2 flex justify-between rounded items-center">
@@ -145,11 +145,11 @@ const AdminSettings: React.FC = () => {
                   onClick={handleTambahLokasi}
                   className="w-full bg-orange-400 text-white mt-4 py-2 rounded"
                 >
-                  TAMBAH LOKASI PENGIRIMAN
+                  TAMBAH LOKASI
                 </button>
               </div>
             </div>
-          </section>
+          </div>
 
           {/* Notifikasi */}
           {showSuccessPopup && (
@@ -157,7 +157,6 @@ const AdminSettings: React.FC = () => {
               Perubahan berhasil disimpan!
             </div>
           )}
-
           {showShippingNotification && (
             <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded shadow z-50">
               Lokasi pengiriman berhasil ditambahkan!
