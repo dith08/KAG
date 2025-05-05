@@ -20,7 +20,7 @@ const SidebarAdmin: React.FC = () => {
   ];
 
   return (
-    <div className="w-64 bg-[#2E7D32]/90 text-white h-screen flex flex-col fixed top-0 left-0 z-40 mt-24 overflow-y-auto md:block hidden shadow-lg">
+    <div className="w-64 bg-[#2E7D32]/90 text-white h-screen flex-col fixed top-0 left-0 z-40 mt-24 overflow-y-auto md:block hidden shadow-lg">
       <ul className="space-y-2 p-4">
         {menuItems.map((item) => {
           const isActive = location.pathname === item.path;

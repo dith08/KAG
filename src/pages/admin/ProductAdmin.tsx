@@ -49,7 +49,7 @@ const ProductPage: React.FC = () => {
   ]);
 
   const handleEditClick = (productId: number) => {
-    navigate(`/admin/products/${productId}/edit`);
+    navigate("/admin/products/${productId}/edit");
   };
 
   const handleAddBahanClick = () => {
