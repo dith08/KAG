@@ -31,7 +31,7 @@ L.Icon.Default.mergeOptions({
 interface MapPickerProps {
   setAddress: (address: string) => void; // Menyimpan alamat yang ditampilkan
   setCoordinates: (lat: number, lng: number) => void; // Menyimpan lat/lng untuk dikirim ke backend
-  searchLocation: string;
+  searchLocation?: string;
   onSearchResult?: (lat: number, lng: number) => void;
 }
 

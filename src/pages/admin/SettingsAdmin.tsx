@@ -1,208 +1,236 @@
 import React, { useState } from "react";
 import SidebarAdmin from "../../components/admin/SidebarAdmin";
 import NavbarAdmin from "../../components/admin/NavbarAdmin";
-import { Pencil, X } from "lucide-react";
+import { Icon } from "@iconify/react";
+import "leaflet/dist/leaflet.css";
+import MapPicker from "../../components/MapPicker";
 
-const AdminSettings: React.FC = () => {
-  const [namaToko, setNamaToko] = useState("KARYA ADI GRAFIKA");
-  const [alamat, setAlamat] = useState("");
+const SettingsAdminPage: React.FC = () => {
+  const [username, setUsername] = useState("");
+  const [address, setAddress] = useState("");
+  const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
-  const [noHp, setNoHp] = useState("");
-  const [profilePicture, setProfilePicture] = useState<any>(null);
-
-  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
-  const [showShippingNotification, setShowShippingNotification] = useState(false);
-  const [showBiayaPopup, setShowBiayaPopup] = useState(false);
-
-  const [newKecamatan, setNewKecamatan] = useState("");
-  const [newBiaya, setNewBiaya] = useState("");
-
-  const [biayaPengiriman, setBiayaPengiriman] = useState([
-    { kecamatan: "Bae", biaya: "15.000" },
-    { kecamatan: "Gebog", biaya: "20.000" },
+  const [profilePicture, setProfilePicture] = useState<string | null>(null);
+  const [storeLocation, setStoreLocation] = useState<[number, number]>([
+    -6.2, 106.816666,
   ]);
 
-  const handleSaveChanges = () => {
-    setShowSuccessPopup(true);
-    setTimeout(() => setShowSuccessPopup(false), 3000);
-  };
+  const [shippingRules, setShippingRules] = useState<
+    { maxDistance: number; cost: number }[]
+  >([{ maxDistance: 10, cost: 15000 }]);
 
-  const handleTambahLokasi = () => {
-    setShowBiayaPopup(true);
-  };
-
-  const handleSubmitBiaya = () => {
-    if (newKecamatan && newBiaya) {
-      setBiayaPengiriman([...biayaPengiriman, { kecamatan: newKecamatan, biaya: newBiaya }]);
-      setNewKecamatan("");
-      setNewBiaya("");
-      setShowBiayaPopup(false);
-      setShowShippingNotification(true);
-      setTimeout(() => setShowShippingNotification(false), 3000);
-    }
-  };
-
-  const handleProfilePictureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleProfilePictureChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     if (e.target.files && e.target.files[0]) {
       setProfilePicture(URL.createObjectURL(e.target.files[0]));
     }
   };
 
+  const handleAddRule = () => {
+    setShippingRules([...shippingRules, { maxDistance: 0, cost: 0 }]);
+  };
+
+  const handleRuleChange = (index: number, field: string, value: number) => {
+    const newRules = [...shippingRules];
+    newRules[index] = { ...newRules[index], [field]: value };
+    setShippingRules(newRules);
+  };
+
+  const handleDeleteRule = (index: number) => {
+    const newRules = [...shippingRules];
+    newRules.splice(index, 1);
+    setShippingRules(newRules);
+  };
+
   return (
-    <div className="flex flex-col lg:flex-row min-h-screen">
+    <div className="flex flex-col lg:flex-row min-h-screen bg-gray-50">
       <SidebarAdmin />
       <div className="flex-1 w-full lg:ml-64">
         <NavbarAdmin />
-        <div className="p-4 mt-20 space-y-6">
-          <h1 className="text-2xl font-bold text-center lg:text-left">Pengaturan Toko</h1>
 
-          <div className="flex flex-col lg:flex-row gap-6">
-            {/* Deskripsi Toko - 70% */}
-            <div className="w-full lg:w-[70%] bg-white rounded-xl shadow p-6 space-y-4">
-              <h2 className="text-green-700 font-bold text-xl mb-4">PROFILE TOKO</h2>
+        <div className="p-4 lg:p-6 space-y-8 mt-18 lg:mt-24">
+          <h1 className="text-2xl font-bold text-center lg:text-left text-green-700 flex items-center gap-2 mb-6">
+            <Icon icon="mdi:cog" className="text-green-700" /> Pengaturan Toko
+          </h1>
 
-              <div className="flex items-center space-x-4 mb-4">
+          <section className="bg-white rounded-2xl shadow-xl p-4 lg:p-8 grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+            {/* Profile Toko */}
+            <div className="lg:col-span-1 space-y-4 lg:space-y-6">
+              <h2 className="text-green-700 font-bold text-xl flex items-center gap-2">
+                <Icon icon="mdi:storefront" className="text-green-700" />
+                PROFILE TOKO
+              </h2>
+              <div className="flex justify-center">
                 <div className="relative">
                   <img
-                    src={profilePicture || "/default-profile.jpg"}
+                    src={profilePicture || "/images/user.png"}
                     alt="Profile"
-                    className="w-20 h-20 rounded-full object-cover"
+                    className="w-20 h-20 lg:w-24 lg:h-24 rounded-full object-cover border-4 border-green-700"
                   />
-                  <label className="absolute bottom-0 right-0 p-2 bg-white rounded-full cursor-pointer">
+                  <label className="absolute bottom-0 right-0 p-2 bg-white rounded-full cursor-pointer shadow">
                     <input
                       type="file"
                       accept="image/*"
                       onChange={handleProfilePictureChange}
                       className="hidden"
                     />
-                    <Pencil size={16} className="text-gray-600" />
+                    <Icon
+                      icon="mdi:image-edit"
+                      className="text-lg text-gray-500"
+                    />
                   </label>
                 </div>
-                <div>
-                  <h3 className="font-semibold text-lg">{namaToko}</h3>
-                  <span className="text-sm text-gray-500">Toko Anda</span>
-                </div>
               </div>
 
-              <div>
-                <label className="text-sm font-semibold block mb-1">NAMA TOKO</label>
-                <input
-                  type="text"
-                  value={namaToko}
-                  onChange={(e) => setNamaToko(e.target.value)}
-                  className="w-full border rounded px-3 py-2"
-                />
+              <div className="space-y-3">
+                <div>
+                  <label className="text-sm font-semibold block mb-1 text-green-700">
+                    NAMA TOKO
+                  </label>
+                  <input
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    className="w-full border rounded-lg px-3 py-2 focus:outline-green-700"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-semibold block mb-1 text-green-700">
+                    ALAMAT (berdasarkan pinpoint)
+                  </label>
+                  <textarea
+                    value={address}
+                    readOnly
+                    className="w-full border rounded-lg px-3 py-2 text-gray-600"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-semibold block mb-1 text-green-700">
+                    EMAIL
+                  </label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full border rounded-lg px-3 py-2 focus:outline-green-700"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-semibold block mb-1 text-green-700">
+                    NO HP
+                  </label>
+                  <input
+                    type="text"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className="w-full border rounded-lg px-3 py-2 focus:outline-green-700"
+                  />
+                </div>
+                <button className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-4 py-2 rounded-lg w-full flex items-center justify-center gap-2 cursor-pointer mt-4">
+                  <Icon icon="mdi:content-save" />
+                  Simpan Perubahan
+                </button>
               </div>
-              <div>
-                <label className="text-sm font-semibold block mb-1">ALAMAT</label>
-                <input
-                  type="text"
-                  value={alamat}
-                  onChange={(e) => setAlamat(e.target.value)}
-                  className="w-full border rounded px-3 py-2"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-semibold block mb-1">EMAIL</label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full border rounded px-3 py-2"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-semibold block mb-1">NO HP</label>
-                <input
-                  type="text"
-                  value={noHp}
-                  onChange={(e) => setNoHp(e.target.value)}
-                  className="w-full border rounded px-3 py-2"
-                />
-              </div>
-              <button
-                onClick={handleSaveChanges}
-                className="bg-yellow-400 text-white font-semibold px-4 py-2 rounded mt-4"
-              >
-                Simpan Perubahan
-              </button>
             </div>
 
-            {/* Tabel Biaya - 30% */}
-            <div className="w-full lg:w-[30%] space-y-4">
-              <div className="bg-[#FFA000] rounded-xl p-4 text-white font-semibold">
-                Biaya Pengiriman
+            {/* Map Picker & Biaya Kirim */}
+            <div className="lg:col-span-2 space-y-4 lg:space-y-6">
+              <h2 className="text-green-700 font-bold text-xl flex items-center gap-2">
+                <Icon icon="mdi:map-marker-radius" className="text-green-700" />
+                PILIH LOKASI TOKO DI PETA
+              </h2>
+              <MapPicker
+                setAddress={setAddress}
+                setCoordinates={(lat, lng) => setStoreLocation([lat, lng])}
+              />  
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-semibold block mb-1 text-green-700">
+                    KOORDINAT TOKO
+                  </label>
+                  <input
+                    type="text"
+                    value={`${storeLocation[0].toFixed(
+                      6
+                    )}, ${storeLocation[1].toFixed(6)}`}
+                    readOnly
+                    className="w-full border rounded-lg px-3 py-2 bg-gray-100 text-gray-600"
+                  />
+                </div>
               </div>
-              <div className="bg-[#FFE082] rounded-xl p-4 space-y-3">
-                {biayaPengiriman.map((item, index) => (
-                  <div key={index} className="bg-gray-200 p-2 flex justify-between rounded items-center">
-                    <span>{item.kecamatan}</span>
-                    <span>{item.biaya}</span>
-                    <Pencil size={16} />
+              {/* Aturan biaya kirim */}
+              <h2 className="text-green-700 font-bold text-xl flex items-center gap-2 mt-6">
+                <Icon
+                  icon="mdi:truck-delivery-outline"
+                  className="text-green-700"
+                />
+                ATURAN BIAYA PENGIRIMAN
+              </h2>
+              <div className="space-y-3">
+                {shippingRules.map((rule, index) => (
+                  <div
+                    key={index}
+                    className="flex flex-col md:flex-row gap-3 items-center bg-gray-50 p-3 lg:p-4 rounded-lg shadow-sm"
+                  >
+                    <div className="flex-1 w-full">
+                      <label className="text-sm font-semibold block mb-1 text-green-700">
+                        Maks. Jarak (km)
+                      </label>
+                      <input
+                        type="number"
+                        value={rule.maxDistance}
+                        onChange={(e) =>
+                          handleRuleChange(
+                            index,
+                            "maxDistance",
+                            parseFloat(e.target.value)
+                          )
+                        }
+                        className="w-full border rounded-lg px-3 py-2 focus:outline-green-700"
+                      />
+                    </div>
+                    <div className="flex-1 w-full">
+                      <label className="text-sm font-semibold block mb-1 text-green-700">
+                        Biaya Pengiriman (Rp)
+                      </label>
+                      <input
+                        type="number"
+                        value={rule.cost}
+                        onChange={(e) =>
+                          handleRuleChange(
+                            index,
+                            "cost",
+                            parseFloat(e.target.value)
+                          )
+                        }
+                        className="w-full border rounded-lg px-3 py-2 focus:outline-green-700"
+                      />
+                    </div>
+                    <div className="flex items-center mt-4 md:mt-6">
+                      <button
+                        onClick={() => handleDeleteRule(index)}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        <Icon icon="mdi:delete" width={24} />
+                      </button>
+                    </div>
                   </div>
                 ))}
                 <button
-                  onClick={handleTambahLokasi}
-                  className="w-full bg-orange-400 text-white mt-4 py-2 rounded"
+                  onClick={handleAddRule}
+                  className="bg-green-500 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded-lg flex items-center gap-2 cursor-pointer mt-4"
                 >
-                  TAMBAH LOKASI
+                  <Icon icon="mdi:plus" />
+                  Tambah Aturan
                 </button>
               </div>
             </div>
-          </div>
-
-          {/* Notifikasi */}
-          {showSuccessPopup && (
-            <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded shadow z-50">
-              Perubahan berhasil disimpan!
-            </div>
-          )}
-          {showShippingNotification && (
-            <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded shadow z-50">
-              Lokasi pengiriman berhasil ditambahkan!
-            </div>
-          )}
-
-          {/* Popup Tambah Biaya */}
-          {showBiayaPopup && (
-            <div className="absolute inset-0 bg-black/50 z-40">
-              <div className="absolute inset-0 bg-white p-6 overflow-auto">
-                <button
-                  onClick={() => setShowBiayaPopup(false)}
-                  className="absolute top-4 right-4 text-gray-500"
-                >
-                  <X />
-                </button>
-                <div className="max-w-md mx-auto mt-20">
-                  <h2 className="text-2xl font-bold mb-6">Tambah Biaya Pengiriman</h2>
-                  <input
-                    type="text"
-                    placeholder="Nama Kecamatan"
-                    value={newKecamatan}
-                    onChange={(e) => setNewKecamatan(e.target.value)}
-                    className="w-full border rounded px-3 py-2 mb-4"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Biaya Pengiriman"
-                    value={newBiaya}
-                    onChange={(e) => setNewBiaya(e.target.value)}
-                    className="w-full border rounded px-3 py-2 mb-6"
-                  />
-                  <button
-                    onClick={handleSubmitBiaya}
-                    className="w-full bg-green-600 text-white py-2 rounded font-semibold"
-                  >
-                    Tambah
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
+          </section>
         </div>
       </div>
     </div>
   );
 };
 
-export default AdminSettings;
+export default SettingsAdminPage;
