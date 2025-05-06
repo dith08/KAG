@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import SidebarAdmin from "../../components/admin/SidebarAdmin";
 import NavbarAdmin from "../../components/admin/NavbarAdmin";
 import { Icon } from "@iconify/react";
 import "leaflet/dist/leaflet.css";
 import MapPicker from "../../components/MapPicker";
+import api from "../../services/api";
+import { useToast } from "../../components/toast/useToast";
 
 const SettingsAdminPage: React.FC = () => {
   const [namaToko, setNamaToko] = useState("Karya Adi Grafika");
@@ -12,19 +14,109 @@ const SettingsAdminPage: React.FC = () => {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [profilePicture, setProfilePicture] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [storeLocation, setStoreLocation] = useState<[number, number]>([
     -6.2, 106.816666,
   ]);
+  const [isLoading, setIsLoading] = useState(false);
+  const { showToast } = useToast();
 
   const [shippingRules, setShippingRules] = useState<
     { maxDistance: number; cost: number }[]
   >([{ maxDistance: 10, cost: 15000 }]);
 
+  const fetchAdminProfile = useCallback(() => {
+    api
+      .get("/api/profile", {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      })
+      .then((res) => {
+        const data = res.data;
+        console.log("Data profil admin:", data);
+
+        const alamatOnly = data.alamat?.split("| lat:")[0].trim() || "";
+        const latMatch = data.alamat?.match(/lat:\s*(-?\d+\.?\d*)/);
+        const lngMatch = data.alamat?.match(/lng:\s*(-?\d+\.?\d*)/);
+
+        setUsername(data.name);
+        setAddress(alamatOnly);
+        setPhone(data.phone);
+        setEmail(data.email);
+        setStoreLocation([
+          latMatch ? parseFloat(latMatch[1]) : -6.2,
+          lngMatch ? parseFloat(lngMatch[1]) : 106.816666,
+        ]);
+
+        if (!selectedFile) {
+          setProfilePicture(
+            data.avatar && data.avatar !== "" ? data.avatar : "/images/user.png"
+          );
+        }
+      })
+      .catch((err) => {
+        console.error("Gagal ambil data profil admin:", err);
+        showToast("Gagal mengambil data profil admin", "error");
+      });
+  }, [selectedFile, showToast]);
+
+  useEffect(() => {
+    fetchAdminProfile();
+  }, [fetchAdminProfile]);
+
+  // === HANDLE SAVE ===
+  const handleSaveChanges = async () => {
+    setIsLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append("name", username);
+      formData.append(
+        "alamat",
+        `${address} | lat: ${storeLocation[0]}, lng: ${storeLocation[1]}`
+      );
+      formData.append("phone", phone);
+      formData.append("email", email);
+
+      if (selectedFile) {
+        formData.append("avatar", selectedFile);
+      }
+
+      const response = await api.post("/api/profile?_method=PUT", formData, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      console.log("Profil admin berhasil diperbarui:", response.data);
+      showToast("Profil admin berhasil diperbarui", "success");
+      setSelectedFile(null);
+      fetchAdminProfile(); // refresh data setelah update
+    } catch (error) {
+      console.error("Gagal update profil admin:", error);
+      showToast("Gagal memperbarui profil admin", "error");
+    } finally {
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 1000);
+    }
+  };
+
+  // === HANDLE SELECT FILE ===
   const handleProfilePictureChange = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
-    if (e.target.files && e.target.files[0]) {
-      setProfilePicture(URL.createObjectURL(e.target.files[0]));
+    const file = e.target.files?.[0];
+    if (file) {
+      if (!file.type.startsWith("image/")) {
+        showToast("Hanya file gambar yang diperbolehkan", "error");
+        return;
+      }
+      if (file.size > 2 * 1024 * 1024) {
+        showToast("Ukuran gambar maksimal 2MB", "error");
+        return;
+      }
+      setSelectedFile(file);
+      setProfilePicture(URL.createObjectURL(file));
     }
   };
 
@@ -52,7 +144,8 @@ const SettingsAdminPage: React.FC = () => {
 
         <div className="p-4 lg:p-6 space-y-8 mt-18 lg:mt-24">
           <h1 className="text-xl md:text-2xl font-bold text-center lg:text-left text-green-700 flex items-center gap-2 mb-6">
-            <Icon icon="mdi:cog" className="text-green-700 w-8 h-8" /> PENGATURAN TOKO
+            <Icon icon="mdi:cog" className="text-green-700 w-8 h-8" />{" "}
+            PENGATURAN TOKO
           </h1>
 
           <section className="bg-white rounded-2xl shadow-xl p-4 lg:p-8 grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
@@ -103,6 +196,7 @@ const SettingsAdminPage: React.FC = () => {
                   <input
                     type="text"
                     value={namaToko}
+                    readOnly
                     onChange={(e) => setNamaToko(e.target.value)}
                     className="w-full border rounded-lg px-3 py-2 focus:outline-green-700"
                   />
@@ -124,6 +218,7 @@ const SettingsAdminPage: React.FC = () => {
                   <input
                     type="email"
                     value={email}
+                    readOnly
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full border rounded-lg px-3 py-2 focus:outline-green-700"
                   />
@@ -139,9 +234,22 @@ const SettingsAdminPage: React.FC = () => {
                     className="w-full border rounded-lg px-3 py-2 focus:outline-green-700"
                   />
                 </div>
-                <button className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-4 py-2 rounded-lg w-full flex items-center justify-center gap-2 cursor-pointer mt-4">
-                  <Icon icon="mdi:content-save" />
-                  Simpan Perubahan
+                <button
+                  onClick={handleSaveChanges}
+                  disabled={isLoading}
+                  className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-4 py-2 rounded-lg w-full flex items-center justify-center gap-2 cursor-pointer mt-4"
+                >
+                  {isLoading ? (
+                    <>
+                      <Icon icon="mdi:loading" className="animate-spin" />
+                      Menyimpan...
+                    </>
+                  ) : (
+                    <>
+                      <Icon icon="mdi:content-save" />
+                      Simpan Perubahan
+                    </>
+                  )}
                 </button>
               </div>
             </div>
