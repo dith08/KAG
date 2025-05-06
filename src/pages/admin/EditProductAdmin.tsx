@@ -180,6 +180,44 @@ const EditProductAdminPage: React.FC = () => {
             </ul>
           </div>
 
+          {/* DETAIL PRODUK YANG SUDAH DITAMBAHKAN */}
+          <div className="border-t pt-6 mt-6">
+            <h2 className="text-lg font-semibold text-gray-700 mb-4">
+              Detail Produk yang Sudah Ditambahkan
+            </h2>
+
+            <div className="space-y-4 text-sm text-gray-800">
+              <div>
+                <span className="font-medium text-gray-600">Template Desain:</span>
+                <ul className="list-disc list-inside">
+                  {product.template
+                    .split(",")
+                    .map((tpl, idx) => <li key={idx}>{tpl.trim()}</li>)}
+                </ul>
+              </div>
+
+              <div>
+                <span className="font-medium text-gray-600">Ukuran:</span>
+                <ul className="list-disc list-inside">
+                  {product.ukuran
+                    .split(",")
+                    .map((ukr, idx) => <li key={idx}>{ukr.trim()}</li>)}
+                </ul>
+              </div>
+
+              <div>
+                <span className="font-medium text-gray-600">Finishing:</span>
+                <ul className="list-disc list-inside">
+                  {product.finishing.map((f) => (
+                    <li key={f.id}>
+                      {f.jenis} - {f.keterangan}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+
           <div className="flex justify-end space-x-2">
             <button
               className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
