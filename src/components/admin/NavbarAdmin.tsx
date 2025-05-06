@@ -1,12 +1,28 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Icon } from "@iconify/react";
+import api from "../../services/api";
 
 const NavbarAdmin: React.FC = () => {
+  const [username, setUsername] = useState("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    api
+      .get("/api/profile", {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      })
+      .then((res) => {
+        const data = res.data;
+        setUsername(data.name);
+      })
+      .catch((err) => {
+        console.error("Gagal mengambil data profil admin:", err);
+      });
+  }, []);
 
   const menuItems = [
     {
@@ -74,7 +90,9 @@ const NavbarAdmin: React.FC = () => {
             className="flex items-center bg-yellow-500 p-2 px-5 rounded-lg cursor-pointer"
             onClick={toggleDropdown}
           >
-            <span className="mr-3 font-semibold">Radith</span>
+            <span className="mr-3 font-semibold">
+              {username || "Memuat..."}
+            </span>
             <Icon icon="mdi:account-circle" className="text-xl" />
           </div>
 

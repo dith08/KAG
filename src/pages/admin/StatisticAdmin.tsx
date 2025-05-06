@@ -128,7 +128,7 @@ const StatisticAdminPage: React.FC = () => {
                     <XAxis dataKey="name" />
                     <YAxis />
                     <Tooltip />
-                    <Bar dataKey="terjual" fill="#facc15" />
+                    <Bar dataKey="terjual" fill="#F9A825" />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -145,7 +145,7 @@ const StatisticAdminPage: React.FC = () => {
                     <Line
                       type="monotone"
                       dataKey="total"
-                      stroke="#15803d"
+                      stroke="#F9A825"
                       strokeWidth={2}
                     />
                   </LineChart>
