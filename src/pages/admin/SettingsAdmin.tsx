@@ -114,7 +114,7 @@ const SettingsAdminPage: React.FC = () => {
                   <textarea
                     value={address}
                     readOnly
-                    className="w-full border rounded-lg px-3 py-2 text-gray-600"
+                    className="w-full border rounded-lg px-3 py-2"
                   />
                 </div>
                 <div>
@@ -231,7 +231,7 @@ const SettingsAdminPage: React.FC = () => {
                 ))}
                 <button
                   onClick={handleAddRule}
-                  className="bg-green-500 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded-lg flex items-center gap-2 cursor-pointer mt-4"
+                  className="bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded-lg flex items-center gap-2 cursor-pointer mt-4"
                 >
                   <Icon icon="mdi:plus" />
                   Tambah Aturan

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import NavbarAdmin from "../../components/admin/NavbarAdmin";
@@ -9,9 +9,11 @@ import StatusDropdown from "../../components/admin/StatusDropdown";
 
 const DetailPesananAdminPage: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const order = location.state;
 
   const [statusPesanan, setStatusPesanan] = useState(order.status);
+  const [detailStatusPesanan, setDetailStatusPesanan] = useState("");
   const [statusDesain, setStatusDesain] = useState(
     order.status_desain || "Sedang Diverifikasi"
   );
@@ -23,7 +25,9 @@ const DetailPesananAdminPage: React.FC = () => {
   });
 
   const handleUpdateStatus = () => {
-    alert(`Status pesanan: ${statusPesanan}\nStatus desain: ${statusDesain}`);
+    alert(
+      `Status pesanan: ${statusPesanan}\nDetail status: ${detailStatusPesanan}\nStatus desain: ${statusDesain}`
+    );
   };
 
   return (
@@ -32,14 +36,24 @@ const DetailPesananAdminPage: React.FC = () => {
       <SidebarAdmin />
       <div className="md:ml-64 pt-30 px-4 md:px-8 pb-8">
         <div className="bg-white rounded-xl shadow-lg p-6 md:p-8">
-          <h1 className="text-2xl md:text-3xl font-bold text-green-700 mb-8 flex items-center gap-3">
-            <Icon icon="mdi:clipboard-list" className="text-3xl" />
-            Detail Pesanan #{order.id}
-          </h1>
+          {/* Header */}
+          <div className="flex items-center gap-4 mb-8">
+            <button
+              onClick={() => navigate("/admin/pesanan")}
+              className="flex items-center gap-2 bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg transition cursor-pointer"
+            >
+              <Icon icon="mdi:arrow-left" className="text-xl" />
+            </button>
+            <h1 className="text-2xl md:text-3xl font-bold text-green-700 flex items-center gap-3">
+              <Icon icon="mdi:clipboard-list" className="text-3xl" />
+              Detail Pesanan #{order.id}
+            </h1>
+          </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Map */}
             <div className="space-y-4">
-              <h2 className="text-xl font-semibold text-yellow-600 mb-4 flex items-center gap-2">
+              <h2 className="text-xl font-semibold text-yellow-500 mb-4 flex items-center gap-2">
                 <Icon icon="mdi:map" className="text-2xl" />
                 Lokasi Pengiriman
               </h2>
@@ -60,6 +74,7 @@ const DetailPesananAdminPage: React.FC = () => {
               </div>
             </div>
 
+            {/* Info & Status */}
             <div className="space-y-6">
               <div className="bg-gray-50 rounded-xl p-6 space-y-4">
                 <Info
@@ -99,38 +114,38 @@ const DetailPesananAdminPage: React.FC = () => {
                 />
               </div>
 
+              {/* Status Pesanan */}
               <div className="bg-gray-50 rounded-xl p-6">
                 <label className="font-semibold block mb-3">
                   Status Pesanan:
                 </label>
                 <StatusDropdown
                   initialStatus={statusPesanan}
-                  onStatusChange={(status: string) => setStatusPesanan(status)}
-                  onDetailStatusChange={(detail: string) =>
-                    setStatusDesain(detail)
+                  options={[
+                    "Menunggu Pembayaran",
+                    "Sedang Diproses",
+                    "Dikirim",
+                    "Selesai",
+                  ]}
+                  onStatusChange={(status) => setStatusPesanan(status)}
+                  onDetailStatusChange={(detail) =>
+                    setDetailStatusPesanan(detail)
                   }
                 />
 
-                {/* Menampilkan Detail Status hanya ketika statusPesanan adalah "Sedang Diproses" */}
                 {statusPesanan === "Sedang Diproses" && (
                   <div className="mt-3 text-gray-700">
                     <span className="font-medium">Detail Status:</span>{" "}
-                    {statusDesain}
+                    {detailStatusPesanan || "-"}
                   </div>
                 )}
-
-                <button
-                  onClick={handleUpdateStatus}
-                  className="mt-4 w-full bg-green-600 hover:bg-green-700 text-white px-6 py-2.5 rounded-lg shadow transition duration-200"
-                >
-                  Update Status
-                </button>
               </div>
             </div>
           </div>
 
-          <div className="mt-12">
-            <h2 className="text-xl font-semibold text-green-600 flex items-center gap-2 mb-6">
+          {/* Detail Produk + Status Desain + File Desain */}
+          <div className="mt-12 space-y-6">
+            <h2 className="text-xl font-semibold text-green-600 flex items-center gap-2">
               <Icon icon="mdi:package-variant" className="text-2xl" />
               Detail Produk
             </h2>
@@ -146,18 +161,15 @@ const DetailPesananAdminPage: React.FC = () => {
                 <DetailItem label="Finishing" value={order.finishing} />
               </div>
 
+              {/* Status Desain & File Desain */}
               <div className="pt-4 space-y-4">
                 <div className="flex items-center gap-3">
                   <span className="font-semibold">Status Desain:</span>
-                  <select
-                    className="border rounded-lg px-3 py-2 bg-white"
-                    value={statusDesain}
-                    onChange={(e) => setStatusDesain(e.target.value)}
-                  >
-                    <option>Sedang Diverifikasi</option>
-                    <option>Diterima</option>
-                    <option>Ditolak</option>
-                  </select>
+                  <StatusDropdown
+                    initialStatus={statusDesain}
+                    options={["Sedang Diverifikasi", "Diterima", "Ditolak"]}
+                    onStatusChange={(status) => setStatusDesain(status)}
+                  />
                 </div>
                 <div className="flex items-center gap-3">
                   <span className="font-semibold">File Desain:</span>
@@ -165,12 +177,20 @@ const DetailPesananAdminPage: React.FC = () => {
                     href={order.file_desain}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-600 hover:text-blue-800 underline"
+                    className="text-blue-600 hover:text-blue-800 underline cursor-pointer"
                   >
                     Download
                   </a>
                 </div>
               </div>
+
+              {/* BUTTON UPDATE STATUS (dipindahkan ke bawah semua) */}
+              <button
+                onClick={handleUpdateStatus}
+                className="mt-6 w-full bg-green-600 hover:bg-green-700 text-white px-6 py-2.5 rounded-lg shadow transition cursor-pointer"
+              >
+                Update Status
+              </button>
             </div>
           </div>
         </div>
