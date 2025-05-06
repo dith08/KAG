@@ -71,7 +71,7 @@ const NavbarAdmin: React.FC = () => {
         {/* Profile Desktop */}
         <div className="relative ml-auto mr-10">
           <div
-            className="flex items-center bg-yellow-600 p-2 px-5 rounded-lg cursor-pointer"
+            className="flex items-center bg-yellow-500 p-2 px-5 rounded-lg cursor-pointer"
             onClick={toggleDropdown}
           >
             <span className="mr-3 font-semibold">Radith</span>

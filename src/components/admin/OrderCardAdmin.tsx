@@ -56,7 +56,7 @@ const OrderCardAdmin = ({ order }: { order: Order }) => {
         <div className="mt-4 lg:mt-0 flex flex-col items-end gap-2">
           <button
             onClick={handleEditClick}
-            className="flex items-center gap-2 bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md shadow transition"
+            className="flex items-center gap-2 bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md shadow transition cursor-pointer"
           >
             <Icon icon="mdi:pencil" />
             Edit Status
