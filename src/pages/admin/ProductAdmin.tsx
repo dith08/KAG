@@ -28,6 +28,9 @@ export type Product = {
   ukuran: string;
   bahanBakuId: number;
   finishing: Finishing[];
+  available: boolean;
+  imageUrl: string;
+  harga: number; // Tambahan untuk harga
 };
 
 const Prod: React.FC = () => {
@@ -48,34 +51,31 @@ const Prod: React.FC = () => {
       finishing: [
         { id: 1, productId: 1, jenis: "Laminasi", keterangan: "Doff" },
       ],
+      available: true,
+      imageUrl: "https://i.pinimg.com/736x/36/94/59/3694591363764be875b716e96c25dbb1.jpg",
+      harga: 5000, // Tambahkan harga
+    },
+    {
+      id: 2,
+      name: "Brosur B",
+      template: "Template 2",
+      ukuran: "A5",
+      bahanBakuId: 2,
+      finishing: [],
+      available: false,
+      imageUrl: "https://i.pinimg.com/736x/36/94/59/3694591363764be875b716e96c25dbb1.jpg",
+      harga: 6000, // Tambahkan harga
     },
   ]);
 
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [editData, setEditData] = useState<BahanBaku | null>(null);
-
-  const handleEditBahanClick = (bahan: BahanBaku) => {
-    setEditData(bahan);
-    setShowEditModal(true);
-  };
-
-  const handleEditChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (editData) {
-      setEditData({ ...editData, [e.target.name]: e.target.value });
-    }
-  };
-
-  const handleSaveEdit = () => {
-    if (editData) {
-      setBahanBakuList((prev) =>
-        prev.map((item) => (item.id === editData.id ? editData : item))
-      );
-      setShowEditModal(false);
-    }
-  };
+  const [filter, setFilter] = useState<"all" | "tersedia" | "tidak">("all");
 
   const handleAddBahanClick = () => {
     navigate("/admin/bahan-baku/add");
+  };
+
+  const handleEditBahanClick = (bahan: BahanBaku) => {
+    navigate(`/admin/bahan-baku/${bahan.id}/edit`);
   };
 
   const handleAddProductClick = () => {
@@ -151,103 +151,93 @@ const Prod: React.FC = () => {
             <div className="bg-white p-5 rounded-xl shadow">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-lg font-semibold text-orange-600">Produk</h2>
-                <button
-                  onClick={handleAddProductClick}
-                  className="bg-orange-500 hover:bg-orange-600 text-white text-sm px-3 py-1 rounded-md shadow"
-                >
-                  + Tambah
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handleAddProductClick}
+                    className="bg-orange-500 hover:bg-orange-600 text-white text-sm px-3 py-1 rounded-md shadow"
+                  >
+                    + Tambah
+                  </button>
+                  <button
+                    onClick={() => setFilter("all")}
+                    className={`text-sm px-3 py-1 rounded-md border ${filter === "all" ? "bg-gray-200" : ""}`}
+                  >
+                    Semua
+                  </button>
+                  <button
+                    onClick={() => setFilter("tersedia")}
+                    className={`text-sm px-3 py-1 rounded-md border ${filter === "tersedia" ? "bg-green-100" : ""}`}
+                  >
+                    Tersedia
+                  </button>
+                  <button
+                    onClick={() => setFilter("tidak")}
+                    className={`text-sm px-3 py-1 rounded-md border ${filter === "tidak" ? "bg-red-100" : ""}`}
+                  >
+                    Tidak Tersedia
+                  </button>
+                </div>
               </div>
               <table className="w-full text-sm">
                 <thead>
                   <tr className="text-left text-gray-600 bg-orange-100">
+                    <th className="p-2">Gambar</th>
                     <th className="p-2">Nama Produk</th>
-                    <th className="p-2">Template</th>
                     <th className="p-2">Ukuran</th>
+                    <th className="p-2">Harga</th> {/* Tambahkan kolom harga */}
+                    <th className="p-2">Status</th>
                     <th className="p-2 text-center">Aksi</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {products.map((p) => (
-                    <tr
-                      key={p.id}
-                      className="border-b hover:bg-orange-50 transition"
-                    >
-                      <td className="p-2">{p.name}</td>
-                      <td className="p-2">{p.template}</td>
-                      <td className="p-2">{p.ukuran}</td>
-                      <td className="p-2 text-center space-x-2">
-                        <button
-                          onClick={() => handleEditProductClick(p.id)}
-                          className="bg-blue-100 p-2 rounded-full hover:bg-blue-200 text-blue-600"
-                        >
-                          <FaEdit />
-                        </button>
-                        <button className="bg-red-100 p-2 rounded-full hover:bg-red-200 text-red-600">
-                          <FaTrash />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
+                  {products
+                    .filter((p) =>
+                      filter === "all"
+                        ? true
+                        : filter === "tersedia"
+                        ? p.available
+                        : !p.available
+                    )
+                    .map((p) => (
+                      <tr key={p.id} className="border-b hover:bg-orange-50 transition">
+                        <td className="p-2">
+                          <img
+                            src={p.imageUrl}
+                            alt={p.name}
+                            className="w-12 h-12 object-cover rounded-md border"
+                          />
+                        </td>
+                        <td className="p-2">{p.name}</td>
+                        <td className="p-2">{p.ukuran}</td>
+                        <td className="p-2">{p.harga.toLocaleString()}</td> {/* Tampilkan harga */}
+                        <td className="p-2">
+                          <span
+                            className={`text-xs font-medium px-2 py-1 rounded ${
+                              p.available
+                                ? "bg-green-100 text-green-700"
+                                : "bg-red-100 text-red-700"
+                            }`}
+                          >
+                            {p.available ? "Tersedia" : "Tidak Tersedia"}
+                          </span>
+                        </td>
+                        <td className="p-2 text-center space-x-2">
+                          <button
+                            onClick={() => handleEditProductClick(p.id)}
+                            className="bg-blue-100 p-2 rounded-full hover:bg-blue-200 text-blue-600"
+                          >
+                            <FaEdit />
+                          </button>
+                          <button className="bg-red-100 p-2 rounded-full hover:bg-red-200 text-red-600">
+                            <FaTrash />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
                 </tbody>
               </table>
             </div>
           </div>
-
-          {/* MODAL EDIT BAHAN */}
-          {showEditModal && editData && (
-            <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
-              <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md space-y-4">
-                <h3 className="text-lg font-bold text-orange-600">Edit Bahan Baku</h3>
-                <input
-                  type="text"
-                  name="nama"
-                  value={editData.nama}
-                  onChange={handleEditChange}
-                  placeholder="Nama"
-                  className="w-full border p-2 rounded"
-                />
-                <input
-                  type="text"
-                  name="jenis"
-                  value={editData.jenis}
-                  onChange={handleEditChange}
-                  placeholder="Jenis"
-                  className="w-full border p-2 rounded"
-                />
-                <input
-                  type="number"
-                  name="stok"
-                  value={editData.stok}
-                  onChange={handleEditChange}
-                  placeholder="Stok"
-                  className="w-full border p-2 rounded"
-                />
-                <input
-                  type="text"
-                  name="satuan"
-                  value={editData.satuan}
-                  onChange={handleEditChange}
-                  placeholder="Satuan"
-                  className="w-full border p-2 rounded"
-                />
-                <div className="flex justify-end gap-2 mt-4">
-                  <button
-                    onClick={() => setShowEditModal(false)}
-                    className="px-4 py-2 text-sm bg-gray-300 hover:bg-gray-400 rounded"
-                  >
-                    Batal
-                  </button>
-                  <button
-                    onClick={handleSaveEdit}
-                    className="px-4 py-2 text-sm bg-green-600 text-white hover:bg-green-700 rounded"
-                  >
-                    Simpan
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>

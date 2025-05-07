@@ -25,6 +25,7 @@ import EditProductAdminPage from "../pages/admin/EditProductAdmin";
 import DetailPesananAdminPage from "../pages/admin/DetailPesananAdmin";
 import AddProduct from "../pages/admin/AddProductAdmin";
 import AddBahanBaku from "../pages/admin/AddBahanBakuAdmin";
+import EditBahanBakuPage from "../pages/admin/EditBahanBakuAdmin";
 
 const AppRoutes: React.FC = () => {
   return (
@@ -63,6 +64,7 @@ const AppRoutes: React.FC = () => {
           <Route path="/admin/products/:id/edit" element={<EditProductAdminPage />} />
           <Route path="/admin/products/add" element={<AddProduct />} />
           <Route path="/admin/bahan-baku/add" element={<AddBahanBaku />} />
+          <Route path="/admin/bahan-baku/:id/edit" element={<EditBahanBakuPage />} />
           <Route path="pesanan">
             <Route index element={<PesananAdminPage />} />
             <Route path=":id" element={<DetailPesananAdminPage />} />

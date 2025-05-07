@@ -21,62 +21,79 @@ const AddBahanBaku: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50">
+      <NavbarAdmin />
       <SidebarAdmin />
-      <div className="flex-1 w-full lg:ml-64">
-        <NavbarAdmin />
-        <div className="p-6 mt-24">
-          <h2 className="text-2xl font-bold text-orange-600 mb-6">Tambah Bahan Baku</h2>
-          <form onSubmit={handleSubmit} className="bg-white p-6 rounded-xl shadow space-y-4 max-w-lg">
+      <div className="md:ml-64 pt-28 px-4 md:px-8 pb-10">
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white rounded-xl shadow-lg p-6 md:p-8 max-w-3xl mx-auto space-y-6"
+        >
+          <h1 className="text-2xl md:text-3xl font-bold text-orange-600 mb-4">
+            Tambah Bahan Baku
+          </h1>
+
+          <div>
+            <label className="block mb-1 font-medium">Nama Bahan</label>
             <input
               type="text"
+              className="w-full border p-2 rounded"
               value={nama}
               onChange={(e) => setNama(e.target.value)}
-              placeholder="Nama Bahan"
-              className="w-full p-2 border rounded"
               required
             />
+          </div>
+
+          <div>
+            <label className="block mb-1 font-medium">Jenis</label>
             <input
               type="text"
+              className="w-full border p-2 rounded"
               value={jenis}
               onChange={(e) => setJenis(e.target.value)}
-              placeholder="Jenis"
-              className="w-full p-2 border rounded"
               required
             />
+          </div>
+
+          <div>
+            <label className="block mb-1 font-medium">Stok</label>
             <input
               type="number"
+              className="w-full border p-2 rounded"
               value={stok}
               onChange={(e) => setStok(Number(e.target.value))}
-              placeholder="Stok"
-              className="w-full p-2 border rounded"
               required
             />
+          </div>
+
+          <div>
+            <label className="block mb-1 font-medium">Satuan</label>
             <input
               type="text"
+              className="w-full border p-2 rounded"
               value={satuan}
               onChange={(e) => setSatuan(e.target.value)}
-              placeholder="Satuan (contoh: lembar, ml)"
-              className="w-full p-2 border rounded"
+              placeholder="Contoh: lembar, ml"
               required
             />
-            <div className="flex justify-end gap-3">
-              <button
-                type="button"
-                onClick={() => navigate("/admin/produk")}
-                className="bg-gray-300 hover:bg-gray-400 text-sm px-4 py-2 rounded"
-              >
-                Batal
-              </button>
-              <button
-                type="submit"
-                className="bg-orange-500 hover:bg-orange-600 text-white text-sm px-4 py-2 rounded"
-              >
-                Simpan
-              </button>
-            </div>
-          </form>
-        </div>
+          </div>
+
+          <div className="flex justify-end space-x-2">
+            <button
+              type="button"
+              className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
+              onClick={() => navigate("/admin/produk")}
+            >
+              Batal
+            </button>
+            <button
+              type="submit"
+              className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600"
+            >
+              Simpan
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
