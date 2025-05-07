@@ -16,7 +16,6 @@ const EditProductAdminPage: React.FC = () => {
   const navigate = useNavigate();
 
   const [product, setProduct] = useState<Product | null>(null);
-
   const [newTemplate, setNewTemplate] = useState("");
   const [newUkuran, setNewUkuran] = useState("");
   const [newFinishingJenis, setNewFinishingJenis] = useState("");
@@ -38,6 +37,7 @@ const EditProductAdminPage: React.FC = () => {
             keterangan: "Doff",
           },
         ],
+        available: true, // ✅ tambahkan ini
       };
       setProduct(dummyProduct);
     }
@@ -107,6 +107,20 @@ const EditProductAdminPage: React.FC = () => {
                 setProduct({ ...product, name: e.target.value })
               }
             />
+          </div>
+
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="available"
+              checked={product.available}
+              onChange={(e) =>
+                setProduct({ ...product, available: e.target.checked })
+              }
+            />
+            <label htmlFor="available" className="font-medium">
+              Tersedia untuk dijual
+            </label>
           </div>
 
           <div>
@@ -180,7 +194,6 @@ const EditProductAdminPage: React.FC = () => {
             </ul>
           </div>
 
-          {/* DETAIL PRODUK YANG SUDAH DITAMBAHKAN */}
           <div className="border-t pt-6 mt-6">
             <h2 className="text-lg font-semibold text-gray-700 mb-4">
               Detail Produk yang Sudah Ditambahkan
@@ -214,6 +227,11 @@ const EditProductAdminPage: React.FC = () => {
                     </li>
                   ))}
                 </ul>
+              </div>
+
+              <div>
+                <span className="font-medium text-gray-600">Ketersediaan:</span>
+                <p>{product.available ? "Tersedia" : "Tidak tersedia"}</p>
               </div>
             </div>
           </div>
