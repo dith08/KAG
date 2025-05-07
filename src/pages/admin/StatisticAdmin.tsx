@@ -109,14 +109,15 @@ const StatisticAdminPage: React.FC = () => {
 
         <div className="p-4 lg:p-6 space-y-10 mt-18 lg:mt-24">
           <h1 className="text-2xl font-bold text-center lg:text-left text-green-700 flex items-center gap-3 mb-8">
-            <Icon icon="mdi:chart-box" className="text-green-700 w-9 h-9" />{" "}
-            LAPORAN & STATISTIK
+            <Icon icon="mdi:chart-box" className="w-9 h-9" /> LAPORAN &
+            STATISTIK
           </h1>
 
           {/* Laporan Penjualan */}
           <section className="bg-white rounded-2xl shadow-md p-6">
-            <h2 className="text-xl sm:text-2xl font-semibold mb-6 text-green-700">
-              LAPORAN PENJUALAN
+            <h2 className="text-xl flex items-center gap-3 font-semibold mb-6 text-green-700">
+              <Icon icon="mdi:chart-areaspline" className="w-6 h-6" /> LAPORAN
+              PENJUALAN
             </h2>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="bg-gray-50 p-4 rounded-xl shadow-sm">
@@ -160,8 +161,8 @@ const StatisticAdminPage: React.FC = () => {
 
           {/* Laporan Customer */}
           <section className="bg-white rounded-2xl shadow-md p-6 space-y-4">
-            <h2 className="text-xl sm:text-2xl font-semibold text-green-700">
-              LAPORAN CUSTOMER
+            <h2 className="text-xl flex items-center gap-3 font-semibold mb-6 text-green-700">
+              <Icon icon="mdi:account" className="w-6 h-6" /> LAPORAN CUSTOMER
             </h2>
             <Table
               headers={[
@@ -179,8 +180,9 @@ const StatisticAdminPage: React.FC = () => {
 
           {/* Laporan Stok Bahan */}
           <section className="bg-white rounded-2xl shadow-md p-6 space-y-4">
-            <h2 className="text-xl sm:text-2xl font-semibold text-green-700">
-              LAPORAN STOK BAHAN
+            <h2 className="text-xl flex items-center gap-3 font-semibold mb-6 text-green-700">
+              <Icon icon="mdi:store-check" className="w-6 h-6" /> LAPORAN STOK
+              BAHAN
             </h2>
             <Table
               headers={["Nama Bahan", "Stok Tersedia", "Keterangan"]}
@@ -194,8 +196,8 @@ const StatisticAdminPage: React.FC = () => {
 
           {/* Laporan Transaksi */}
           <section className="bg-white rounded-2xl shadow-md p-6 space-y-4">
-            <h2 className="text-xl sm:text-2xl font-semibold text-green-700">
-              LAPORAN TRANSAKSI
+            <h2 className="text-xl flex items-center gap-3 font-semibold mb-6 text-green-700">
+              <Icon icon="mdi:wallet" className="w-6 h-6" /> LAPORAN TRANSAKSI
             </h2>
             <Table
               headers={["ID", "Nama", "Total", "Tanggal"]}
@@ -208,16 +210,9 @@ const StatisticAdminPage: React.FC = () => {
             />
           </section>
 
-          {/* Tombol Unduh */}
-          <div className="flex flex-wrap justify-center sm:justify-end gap-4 pt-8">
-            <button className="bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 shadow cursor-pointer">
-              <Icon icon="mdi:file-pdf-box" className="text-xl" /> Unduh PDF
-            </button>
-            <button className="bg-yellow-500 hover:bg-yellow-600 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 shadow cursor-pointer">
-              <Icon icon="mdi:microsoft-excel" className="text-xl" /> Unduh
-              Excel
-            </button>
-          </div>
+          <button className="bg-yellow-500 hover:bg-yellow-600 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 shadow cursor-pointer ml-auto">
+            <Icon icon="mdi:microsoft-excel" className="text-xl" /> Unduh Excel
+          </button>
         </div>
       </div>
     </div>
