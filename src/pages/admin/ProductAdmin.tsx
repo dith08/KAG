@@ -29,6 +29,8 @@ export type Product = {
   bahanBakuId: number;
   finishing: Finishing[];
   available: boolean;
+  imageUrl: string;
+  harga: number; // Tambahan untuk harga
 };
 
 const Prod: React.FC = () => {
@@ -50,6 +52,8 @@ const Prod: React.FC = () => {
         { id: 1, productId: 1, jenis: "Laminasi", keterangan: "Doff" },
       ],
       available: true,
+      imageUrl: "https://i.pinimg.com/736x/36/94/59/3694591363764be875b716e96c25dbb1.jpg",
+      harga: 5000, // Tambahkan harga
     },
     {
       id: 2,
@@ -59,6 +63,8 @@ const Prod: React.FC = () => {
       bahanBakuId: 2,
       finishing: [],
       available: false,
+      imageUrl: "https://i.pinimg.com/736x/36/94/59/3694591363764be875b716e96c25dbb1.jpg",
+      harga: 6000, // Tambahkan harga
     },
   ]);
 
@@ -175,8 +181,10 @@ const Prod: React.FC = () => {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="text-left text-gray-600 bg-orange-100">
+                    <th className="p-2">Gambar</th>
                     <th className="p-2">Nama Produk</th>
                     <th className="p-2">Ukuran</th>
+                    <th className="p-2">Harga</th> {/* Tambahkan kolom harga */}
                     <th className="p-2">Status</th>
                     <th className="p-2 text-center">Aksi</th>
                   </tr>
@@ -192,8 +200,16 @@ const Prod: React.FC = () => {
                     )
                     .map((p) => (
                       <tr key={p.id} className="border-b hover:bg-orange-50 transition">
+                        <td className="p-2">
+                          <img
+                            src={p.imageUrl}
+                            alt={p.name}
+                            className="w-12 h-12 object-cover rounded-md border"
+                          />
+                        </td>
                         <td className="p-2">{p.name}</td>
                         <td className="p-2">{p.ukuran}</td>
+                        <td className="p-2">{p.harga.toLocaleString()}</td> {/* Tampilkan harga */}
                         <td className="p-2">
                           <span
                             className={`text-xs font-medium px-2 py-1 rounded ${

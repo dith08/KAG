@@ -20,6 +20,8 @@ const EditProductAdminPage: React.FC = () => {
   const [newUkuran, setNewUkuran] = useState("");
   const [newFinishingJenis, setNewFinishingJenis] = useState("");
   const [newFinishingKeterangan, setNewFinishingKeterangan] = useState("");
+  const [newImage, setNewImage] = useState<File | null>(null); // State untuk gambar
+  const [newHarga, setNewHarga] = useState<number>(0); // State untuk harga produk
 
   useEffect(() => {
     if (id) {
@@ -37,9 +39,13 @@ const EditProductAdminPage: React.FC = () => {
             keterangan: "Doff",
           },
         ],
-        available: true, // ✅ tambahkan ini
+        available: true,
+        imageUrl:
+          "https://i.pinimg.com/736x/36/94/59/3694591363764be875b716e96c25dbb1.jpg", // Placeholder image
+        harga: 50000, // Dummy harga
       };
       setProduct(dummyProduct);
+      setNewHarga(dummyProduct.harga); // Set harga awal dari product
     }
   }, [id]);
 
@@ -81,9 +87,21 @@ const EditProductAdminPage: React.FC = () => {
   };
 
   const handleSave = () => {
-    console.log("Disimpan:", product);
+    const updatedProduct = {
+      ...product,
+      harga: newHarga, // Simpan harga baru
+    };
+    console.log("Disimpan:", updatedProduct);
     navigate("/admin/produk");
   };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setNewImage(e.target.files[0]);
+    }
+  };
+
+  const imagePreview = newImage ? URL.createObjectURL(newImage) : product?.imageUrl;
 
   if (!product) return <div>Loading...</div>;
 
@@ -121,6 +139,36 @@ const EditProductAdminPage: React.FC = () => {
             <label htmlFor="available" className="font-medium">
               Tersedia untuk dijual
             </label>
+          </div>
+
+          {/* Gambar Produk */}
+          <div>
+            <label className="block mb-1 font-medium">Gambar Produk</label>
+            <input
+              type="file"
+              accept="image/*"
+              className="w-full border p-2 rounded"
+              onChange={handleImageChange}
+            />
+            {imagePreview && (
+              <div className="mt-4">
+                <img
+                  src={imagePreview}
+                  alt="Preview"
+                  className="w-40 h-40 object-cover rounded-lg"
+                />
+              </div>
+            )}
+          </div>
+
+          <div>
+            <label className="block mb-1 font-medium">Harga Produk</label>
+            <input
+              type="number"
+              className="w-full border p-2 rounded"
+              value={newHarga}
+              onChange={(e) => setNewHarga(Number(e.target.value))}
+            />
           </div>
 
           <div>
@@ -232,6 +280,11 @@ const EditProductAdminPage: React.FC = () => {
               <div>
                 <span className="font-medium text-gray-600">Ketersediaan:</span>
                 <p>{product.available ? "Tersedia" : "Tidak tersedia"}</p>
+              </div>
+
+              <div>
+                <span className="font-medium text-gray-600">Harga:</span>
+                <p>{newHarga.toLocaleString()}</p> {/* Format harga */}
               </div>
             </div>
           </div>

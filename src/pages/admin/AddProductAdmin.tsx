@@ -25,6 +25,8 @@ const AddProduct: React.FC = () => {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
+  const [price, setPrice] = useState<number | string>(""); // State untuk harga per pcs
+
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -71,6 +73,7 @@ const AddProduct: React.FC = () => {
       ukuran: ukuranList.join(", "),
       finishing: finishingList,
       image: imageFile,
+      price: price, // Menambahkan harga per pcs
     };
 
     console.log("Produk Ditambahkan:", newProduct);
@@ -198,6 +201,17 @@ const AddProduct: React.FC = () => {
                 </li>
               ))}
             </ul>
+          </div>
+
+          <div>
+            <label className="block mb-1 font-medium">Harga per PCS</label>
+            <input
+              type="number"
+              className="w-full border p-2 rounded"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              required
+            />
           </div>
 
           <div className="flex justify-end space-x-2">
