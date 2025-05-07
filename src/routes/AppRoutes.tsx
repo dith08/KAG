@@ -23,9 +23,9 @@ import DashboardAdminPage from "../pages/admin/DashboardAdmin";
 import ProductAdminPage from "../pages/admin/ProductAdmin";
 import EditProductAdminPage from "../pages/admin/EditProductAdmin";
 import DetailPesananAdminPage from "../pages/admin/DetailPesananAdmin";
-import AddProduct from "../pages/admin/AddProductAdmin";
-import AddBahanBaku from "../pages/admin/AddBahanBakuAdmin";
-import EditBahanBakuPage from "../pages/admin/EditBahanBakuAdmin";
+import EditBahanBakuAdminPage from "../pages/admin/EditBahanBakuAdmin";
+import AddProductAdminPage from "../pages/admin/AddProductAdmin";
+import AddBahanBakuAdminPage from "../pages/admin/AddBahanBakuAdmin";
 
 const AppRoutes: React.FC = () => {
   return (
@@ -62,9 +62,9 @@ const AppRoutes: React.FC = () => {
           <Route index element={<DashboardAdminPage />} />
           <Route path="produk" element={<ProductAdminPage />} />
           <Route path="/admin/products/:id/edit" element={<EditProductAdminPage />} />
-          <Route path="/admin/products/add" element={<AddProduct />} />
-          <Route path="/admin/bahan-baku/add" element={<AddBahanBaku />} />
-          <Route path="/admin/bahan-baku/:id/edit" element={<EditBahanBakuPage />} />
+          <Route path="/admin/products/add" element={<AddProductAdminPage />} />
+          <Route path="/admin/bahan-baku/add" element={<AddBahanBakuAdminPage />} />
+          <Route path="/admin/bahan-baku/:id/edit" element={<EditBahanBakuAdminPage />} />
           <Route path="pesanan">
             <Route index element={<PesananAdminPage />} />
             <Route path=":id" element={<DetailPesananAdminPage />} />
