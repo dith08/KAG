@@ -51,31 +51,12 @@ const Prod: React.FC = () => {
     },
   ]);
 
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [editData, setEditData] = useState<BahanBaku | null>(null);
-
-  const handleEditBahanClick = (bahan: BahanBaku) => {
-    setEditData(bahan);
-    setShowEditModal(true);
-  };
-
-  const handleEditChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (editData) {
-      setEditData({ ...editData, [e.target.name]: e.target.value });
-    }
-  };
-
-  const handleSaveEdit = () => {
-    if (editData) {
-      setBahanBakuList((prev) =>
-        prev.map((item) => (item.id === editData.id ? editData : item))
-      );
-      setShowEditModal(false);
-    }
-  };
-
   const handleAddBahanClick = () => {
     navigate("/admin/bahan-baku/add");
+  };
+
+  const handleEditBahanClick = (bahan: BahanBaku) => {
+    navigate(`/admin/bahan-baku/${bahan.id}/edit`);
   };
 
   const handleAddProductClick = () => {
@@ -193,61 +174,6 @@ const Prod: React.FC = () => {
               </table>
             </div>
           </div>
-
-          {/* MODAL EDIT BAHAN */}
-          {showEditModal && editData && (
-            <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
-              <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md space-y-4">
-                <h3 className="text-lg font-bold text-orange-600">Edit Bahan Baku</h3>
-                <input
-                  type="text"
-                  name="nama"
-                  value={editData.nama}
-                  onChange={handleEditChange}
-                  placeholder="Nama"
-                  className="w-full border p-2 rounded"
-                />
-                <input
-                  type="text"
-                  name="jenis"
-                  value={editData.jenis}
-                  onChange={handleEditChange}
-                  placeholder="Jenis"
-                  className="w-full border p-2 rounded"
-                />
-                <input
-                  type="number"
-                  name="stok"
-                  value={editData.stok}
-                  onChange={handleEditChange}
-                  placeholder="Stok"
-                  className="w-full border p-2 rounded"
-                />
-                <input
-                  type="text"
-                  name="satuan"
-                  value={editData.satuan}
-                  onChange={handleEditChange}
-                  placeholder="Satuan"
-                  className="w-full border p-2 rounded"
-                />
-                <div className="flex justify-end gap-2 mt-4">
-                  <button
-                    onClick={() => setShowEditModal(false)}
-                    className="px-4 py-2 text-sm bg-gray-300 hover:bg-gray-400 rounded"
-                  >
-                    Batal
-                  </button>
-                  <button
-                    onClick={handleSaveEdit}
-                    className="px-4 py-2 text-sm bg-green-600 text-white hover:bg-green-700 rounded"
-                  >
-                    Simpan
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>
