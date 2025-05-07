@@ -22,6 +22,17 @@ const AddProduct: React.FC = () => {
   const [newFinishingJenis, setNewFinishingJenis] = useState("");
   const [newFinishingKeterangan, setNewFinishingKeterangan] = useState("");
 
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
+
   const handleAddTemplate = () => {
     if (newTemplate.trim()) {
       setTemplateList([...templateList, newTemplate.trim()]);
@@ -59,6 +70,7 @@ const AddProduct: React.FC = () => {
       template: templateList.join(", "),
       ukuran: ukuranList.join(", "),
       finishing: finishingList,
+      image: imageFile,
     };
 
     console.log("Produk Ditambahkan:", newProduct);
@@ -87,6 +99,23 @@ const AddProduct: React.FC = () => {
               onChange={(e) => setName(e.target.value)}
               required
             />
+          </div>
+
+          <div>
+            <label className="block mb-1 font-medium">Gambar Produk</label>
+            <input
+              type="file"
+              accept="image/*"
+              className="w-full border p-2 rounded"
+              onChange={handleImageChange}
+            />
+            {imagePreview && (
+              <img
+                src={imagePreview}
+                alt="Preview"
+                className="mt-3 max-h-48 object-contain border rounded"
+              />
+            )}
           </div>
 
           <div>

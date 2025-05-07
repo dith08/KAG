@@ -143,7 +143,6 @@ const Prod: React.FC = () => {
                 <thead>
                   <tr className="text-left text-gray-600 bg-orange-100">
                     <th className="p-2">Nama Produk</th>
-                    <th className="p-2">Template</th>
                     <th className="p-2">Ukuran</th>
                     <th className="p-2 text-center">Aksi</th>
                   </tr>
@@ -155,7 +154,6 @@ const Prod: React.FC = () => {
                       className="border-b hover:bg-orange-50 transition"
                     >
                       <td className="p-2">{p.name}</td>
-                      <td className="p-2">{p.template}</td>
                       <td className="p-2">{p.ukuran}</td>
                       <td className="p-2 text-center space-x-2">
                         <button
