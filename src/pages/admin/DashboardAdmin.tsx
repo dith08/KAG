@@ -14,9 +14,9 @@ import { Icon } from "@iconify/react";
 
 const DashboardAdminPage: React.FC = () => {
   const notifications = [
-    { icon: "📦", label: "Order Baru", count: 3 },
-    { icon: "💰", label: "Pembayaran Masuk", count: 1 },
-    { icon: "⚠", label: "Stok Habis", count: 2 },
+    { icon: <Icon icon="mdi:package-down" className="text-yellow-500"/>, label: "Order Baru", count: 3 },
+    { icon: <Icon icon="mdi:cash-usd" className="text-green-700"/>, label: "Pembayaran Masuk", count: 1 },
+    { icon: <Icon icon="mdi:alert" className="text-red-500"/>, label: "Stok Habis", count: 2 },
   ];
 
   const recentOrders = [
@@ -110,7 +110,7 @@ const DashboardAdminPage: React.FC = () => {
                         <td className="py-2">{order.name}</td>
                         <td>{order.product}</td>
                         <td>{order.quantity}</td>
-                        <td>{order.status}</td>
+                        <td>{order.status}</td> 
                       </tr>
                     ))}
                   </tbody>

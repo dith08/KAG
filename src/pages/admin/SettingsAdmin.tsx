@@ -151,8 +151,8 @@ const SettingsAdminPage: React.FC = () => {
           <section className="bg-white rounded-2xl shadow-xl p-4 lg:p-8 grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
             {/* Profile Toko */}
             <div className="lg:col-span-1 space-y-4 lg:space-y-6">
-              <h2 className="text-green-700 font-bold text-xl flex items-center gap-2">
-                <Icon icon="mdi:storefront" className="text-green-700" />
+              <h2 className="text-green-700 font-semibold text-xl flex items-center gap-2">
+                <Icon icon="mdi:storefront" className="w-6 h-6" />
                 PROFILE TOKO
               </h2>
               <div className="flex gap-4 items-center">
@@ -256,8 +256,8 @@ const SettingsAdminPage: React.FC = () => {
 
             {/* Map Picker & Biaya Kirim */}
             <div className="lg:col-span-2 space-y-4 lg:space-y-6">
-              <h2 className="text-green-700 font-bold text-xl flex items-center gap-2">
-                <Icon icon="mdi:map-marker-radius" className="text-green-700" />
+              <h2 className="text-green-700 font-semibold text-xl flex items-center gap-2">
+                <Icon icon="mdi:map-marker-radius" className="w-6 h-6" />
                 PILIH LOKASI TOKO DI PETA
               </h2>
               <MapPicker
@@ -280,10 +280,10 @@ const SettingsAdminPage: React.FC = () => {
                 </div>
               </div>
               {/* Aturan biaya kirim */}
-              <h2 className="text-green-700 font-bold text-xl flex items-center gap-2 mt-6">
+              <h2 className="text-green-700 font-semibold text-xl flex items-center gap-2 mt-6">
                 <Icon
                   icon="mdi:truck-delivery-outline"
-                  className="text-green-700"
+                  className="w-6 h-6"
                 />
                 ATURAN BIAYA PENGIRIMAN
               </h2>
