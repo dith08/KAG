@@ -67,52 +67,50 @@ const NavbarAdmin: React.FC = () => {
   return (
     <div>
       {/* Navbar Desktop */}
-      <div className="hidden md:flex fixed top-0 left-0 right-0 z-50 bg-green-700 text-white items-center h-24 shadow-md">
-        <div className="h-24 flex flex-col items-center justify-center ml-15 mr-[28px]">
-          <h2 className="text-2xl font-bold leading-tight">KARYA ADI</h2>
-          <h2 className="text-2xl font-bold">GRAFIKA</h2>
+      <div className="hidden md:flex fixed top-0 left-0 right-0 z-50 bg-green-700 text-white items-center h-20 shadow-lg px-6">
+        <div className="flex items-center">
+          <h2 className="text-xl font-bold tracking-wide">KARYA ADI GRAFIKA</h2>
         </div>
         <div className="relative w-1/3 ml-10">
           <input
             type="text"
             placeholder="Search"
-            className="px-5 py-2 w-full rounded-md text-black pl-12 bg-white/50 shadow-md"
+            className="pl-10 pr-4 py-2 w-full rounded-full bg-green-600 placeholder-white text-white focus:outline-none focus:ring-2 focus:ring-white/50"
           />
           <Icon
             icon="mdi:magnify"
-            className="absolute left-4 top-2.5 text-gray-500 text-xl"
+            className="absolute left-4 top-2.5 text-white text-lg"
           />
         </div>
 
-        {/* Profile Desktop */}
-        <div className="relative ml-auto mr-10">
-          <div
-            className="flex items-center bg-yellow-500 p-2 px-5 rounded-lg cursor-pointer"
-            onClick={toggleDropdown}
-          >
-            <span className="mr-3 font-semibold">
-              {username || "Memuat..."}
-            </span>
-            <Icon icon="mdi:account-circle" className="text-xl" />
+        <div className="relative ml-auto flex items-center space-x-4">
+          <span className="text-sm font-medium">{username || "Memuat..."}</span>
+          <div className="relative cursor-pointer" onClick={toggleDropdown}>
+            <Icon icon="mdi:account-circle" className="text-3xl" />
+            {isDropdownOpen && (
+              <div className="fixed inset-0" onClick={toggleDropdown}>
+                <div
+                  className="absolute top-15 right-5 mt-2 w-44 bg-white text-gray-700 rounded-lg shadow-lg py-2 z-50"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center w-full px-4 py-2 text-sm hover:bg-gray-100"
+                  >
+                    <Icon icon="mdi:logout" className="mr-2" />
+                    Logout
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
-
-          {isDropdownOpen && (
-            <div className="absolute right-0 mt-2 w-40 bg-white text-black rounded-md shadow-lg overflow-hidden z-50">
-              <button
-                onClick={handleLogout}
-                className="block w-full text-left px-4 py-2 hover:bg-gray-100"
-              >
-                Logout
-              </button>
-            </div>
-          )}
         </div>
       </div>
 
       {/* Navbar Mobile */}
-      <div className="flex md:hidden fixed top-0 left-0 right-0 z-50 bg-white text-black items-center h-16 shadow-md px-4">
+      <div className="flex md:hidden fixed top-0 left-0 right-0 z-50 bg-green-700 text-black items-center h-16 shadow-md px-4">
         <button onClick={toggleSidebar}>
-          <Icon icon="mdi:menu" className="text-2xl" />
+          <Icon icon="mdi:menu" className="text-2xl text-white" />
         </button>
         <div className="relative flex-1 mx-4">
           <input
@@ -127,22 +125,25 @@ const NavbarAdmin: React.FC = () => {
         </div>
 
         {/* Profile Mobile */}
-        <div className="relative ml-auto">
-          <div
-            className="flex items-center bg-yellow-500 p-2 px-5 rounded-lg cursor-pointer"
-            onClick={toggleDropdown}
-          >
-            <Icon icon="mdi:account-circle" className="text-xl" />
+        <div className="relative ml-auto cursor-pointer">
+          <div onClick={toggleDropdown}>
+            <Icon icon="mdi:account-circle" className="text-3xl text-white" />
           </div>
 
           {isDropdownOpen && (
-            <div className="absolute right-0 mt-2 w-40 bg-white text-black rounded-md shadow-lg overflow-hidden z-50">
-              <button
-                onClick={handleLogout}
-                className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+            <div className="fixed inset-0" onClick={toggleDropdown}>
+              <div
+                className="absolute top-12 right-5 mt-2 w-44 bg-white text-gray-700 rounded-lg shadow-lg py-2 z-50"
+                onClick={(e) => e.stopPropagation()}
               >
-                Logout
-              </button>
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center w-full px-4 py-2 text-sm hover:bg-gray-100"
+                >
+                  <Icon icon="mdi:logout" className="mr-2" />
+                  Logout
+                </button>
+              </div>
             </div>
           )}
         </div>

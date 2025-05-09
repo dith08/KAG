@@ -94,7 +94,7 @@ const ProductAdminPage: React.FC = () => {
         <NavbarAdmin />
         <div className="p-4 lg:p-6 space-y-8 mt-18 lg:mt-24">
           <h1 className="text-xl md:text-2xl font-bold text-center lg:text-left text-green-700 flex items-center gap-2 mb-6">
-            <Icon icon="mdi:archive-outline" className="w-8 h-8" />
+            <Icon icon="mdi:archive" className="w-8 h-8" />
             Kelola Produk & Bahan
           </h1>
 
@@ -156,9 +156,9 @@ const ProductAdminPage: React.FC = () => {
               </div>
 
               {/* Desktop View */}
-              <div className="hidden lg:block overflow-x-auto">
+              <div className="hidden lg:block overflow-x-auto rounded-xl shadow-md">
                 <table className="w-full text-sm text-left">
-                  <thead className="bg-green-100 text-green-700">
+                  <thead className="bg-green-700 text-white">
                     <tr>
                       <th className="p-3 whitespace-nowrap">Nama</th>
                       <th className="p-3 whitespace-nowrap">Jenis</th>
@@ -170,7 +170,7 @@ const ProductAdminPage: React.FC = () => {
                   </thead>
                   <tbody>
                     {bahanBakuList.map((bahan) => (
-                      <tr key={bahan.id} className="border-b hover:bg-green-50 transition">
+                      <tr key={bahan.id} className="border-b border-gray-200 hover:bg-green-50 transition">
                         <td className="p-3 whitespace-nowrap">{bahan.nama}</td>
                         <td className="p-3 whitespace-nowrap">{bahan.jenis}</td>
                         <td className="p-3 whitespace-nowrap">{bahan.stok}</td>
@@ -292,9 +292,9 @@ const ProductAdminPage: React.FC = () => {
               </div>
 
               {/* Desktop View */}
-              <div className="hidden lg:block overflow-x-auto">
+              <div className="hidden lg:block overflow-x-auto rounded-xl shadow">
                 <table className="w-full text-sm text-left">
-                  <thead className="bg-green-100 text-green-700">
+                  <thead className="bg-green-700 text-white">
                     <tr>
                       <th className="p-3 whitespace-nowrap">Gambar</th>
                       <th className="p-3 whitespace-nowrap">Nama</th>
@@ -314,7 +314,7 @@ const ProductAdminPage: React.FC = () => {
                           : !p.available
                       )
                       .map((p) => (
-                        <tr key={p.id} className="border-b hover:bg-green-50 transition">
+                        <tr key={p.id} className="border-b border-gray-200 hover:bg-green-50 transition">
                           <td className="p-3 whitespace-nowrap">
                             <img
                               src={p.imageUrl}
