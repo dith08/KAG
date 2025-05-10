@@ -219,7 +219,7 @@ const EditProductAdminPage: React.FC = () => {
               />
               <button
                 type="button"
-                className="bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-1 hover:bg-green-600"
+                className="bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-1 hover:bg-green-600 cursor-pointer"
                 onClick={handleAddUkuran}
               >
                 <Icon icon="mdi:plus" />
@@ -253,7 +253,7 @@ const EditProductAdminPage: React.FC = () => {
             </div>
             <button
               type="button"
-              className="bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-1 hover:bg-green-600"
+              className="bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-1 hover:bg-green-600 cursor-pointer"
               onClick={handleAddFinishing}
             >
               <Icon icon="mdi:plus" />

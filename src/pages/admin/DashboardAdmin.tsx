@@ -14,9 +14,21 @@ import { Icon } from "@iconify/react";
 
 const DashboardAdminPage: React.FC = () => {
   const notifications = [
-    { icon: <Icon icon="mdi:package-down" className="text-yellow-500"/>, label: "Order Baru", count: 3 },
-    { icon: <Icon icon="mdi:cash-usd" className="text-green-700"/>, label: "Pembayaran Masuk", count: 1 },
-    { icon: <Icon icon="mdi:alert" className="text-red-500"/>, label: "Stok Habis", count: 2 },
+    {
+      icon: <Icon icon="mdi:package-down" className="text-yellow-500" />,
+      label: "Order Baru",
+      count: 3,
+    },
+    {
+      icon: <Icon icon="mdi:cash-usd" className="text-green-700" />,
+      label: "Pembayaran Masuk",
+      count: 1,
+    },
+    {
+      icon: <Icon icon="mdi:alert" className="text-red-500" />,
+      label: "Stok Habis",
+      count: 2,
+    },
   ];
 
   const recentOrders = [
@@ -92,34 +104,85 @@ const DashboardAdminPage: React.FC = () => {
                 </div>
               </div>
 
+              {/* Total Pendapatan (Mobile) */}
+              <div className="lg:hidden bg-white p-6 rounded-xl shadow">
+                <h2 className="text-xl font-semibold mb-1">
+                  Total Pendapatan Bulan Ini
+                </h2>
+                <p className="text-2xl font-bold text-gray-800">
+                  Rp 12.000.000{" "}
+                  <span className="text-green-500 text-sm ml-2">🔺 +10%</span>
+                </p>
+              </div>
+
+              {/* Notifikasi (Mobile) */}
+              <div className="lg:hidden bg-white p-6 rounded-xl shadow">
+                <h2 className="text-xl font-semibold mb-4">Notifikasi</h2>
+                <ul className="space-y-3">
+                  {notifications.map((notif, index) => (
+                    <li
+                      key={index}
+                      className="flex items-center justify-between"
+                    >
+                      <div className="flex items-center gap-2 text-gray-700">
+                        <span className="text-xl">{notif.icon}</span>
+                        <span>{notif.label}</span>
+                      </div>
+                      <span className="font-bold bg-gray-200 px-2 py-0.5 rounded-md text-sm">
+                        {notif.count}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
               {/* Tabel Pesanan Terbaru */}
               <div className="bg-white p-6 rounded-xl shadow">
                 <h2 className="text-xl font-semibold mb-4">Pesanan Terbaru</h2>
-                <table className="w-full text-left">
-                  <thead>
-                    <tr>
-                      <th className="py-2">Customer</th>
-                      <th>Produk</th>
-                      <th>Jumlah</th>
-                      <th>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {recentOrders.map((order) => (
-                      <tr key={order.id} className="border-t text-sm">
-                        <td className="py-2">{order.name}</td>
-                        <td>{order.product}</td>
-                        <td>{order.quantity}</td>
-                        <td>{order.status}</td> 
+                <div className="overflow-x-auto rounded-2xl shadow">
+                  <table className="w-full divide-y divide-gray-200">
+                    <thead className="bg-green-700 text-white">
+                      <tr>
+                        <th className="py-2 px-5 text-left text-sm font-semibold uppercase tracking-wider">
+                          Customer
+                        </th>
+                        <th className="px-5 text-left text-sm font-semibold uppercase tracking-wider">
+                          Produk
+                        </th>
+                        <th className="px-5 text-left text-sm font-semibold uppercase tracking-wider">
+                          Jumlah
+                        </th>
+                        <th className="px-5 text-left text-sm font-semibold uppercase tracking-wider">
+                          Status
+                        </th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {recentOrders.map((order) => (
+                        <tr
+                          key={order.id}
+                          className="hover:bg-green-50 transition-colors duration-200 text-sm"
+                        >
+                          <td className="py-2 px-5 text-gray-700">
+                            {order.name}
+                          </td>
+                          <td className="px-5 text-gray-700">
+                            {order.product}
+                          </td>
+                          <td className="px-5 text-gray-700">
+                            {order.quantity}
+                          </td>
+                          <td className="px-5 text-gray-700">{order.status}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
 
-            {/* Kanan (Sidebar) */}
-            <div className="w-full lg:w-3/10 space-y-8">
+            {/* Kanan (Sidebar) - Desktop Only */}
+            <div className="hidden lg:block w-full lg:w-3/10 space-y-8">
               {/* Notifikasi */}
               <div className="bg-white p-6 rounded-xl shadow">
                 <h2 className="text-xl font-semibold mb-4">Notifikasi</h2>
