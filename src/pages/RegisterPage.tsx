@@ -11,7 +11,9 @@ const RegisterPage: React.FC = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [phone, setPhone] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -23,8 +25,14 @@ const RegisterPage: React.FC = () => {
     setError("");
     setIsLoading(true);
 
-    if (!name || !email || !password || !phone) {
+    if (!name || !email || !password || !phone || !confirmPassword) {
       setError("Harap isi semua kolom!");
+      setIsLoading(false);
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError("Password dan konfirmasi password tidak sama!");
       setIsLoading(false);
       return;
     }
@@ -99,6 +107,20 @@ const RegisterPage: React.FC = () => {
               onChange={(e) => setPassword(e.target.value)}
               showPassword={showPassword}
               togglePasswordVisibility={() => setShowPassword(!showPassword)}
+            />
+          </div>
+
+          <div className="mb-4">
+            <InputField
+              type={showConfirmPassword ? "text" : "password"}
+              placeholder="Konfirmasi password"
+              icon="mdi:lock-check"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              showPassword={showConfirmPassword}
+              togglePasswordVisibility={() =>
+                setShowConfirmPassword(!showConfirmPassword)
+              }
             />
           </div>
 

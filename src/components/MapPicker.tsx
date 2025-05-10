@@ -10,7 +10,7 @@ import { LatLngExpression } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
-// Fix agar marker icon bisa muncul dengan benar
+// Fix agar marker icon muncul
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -29,10 +29,11 @@ L.Icon.Default.mergeOptions({
 });
 
 interface MapPickerProps {
-  setAddress: (address: string) => void; // Menyimpan alamat yang ditampilkan
-  setCoordinates: (lat: number, lng: number) => void; // Menyimpan lat/lng untuk dikirim ke backend
-  searchLocation?: string; // dijadikan opsional
+  setAddress: (address: string) => void;
+  setCoordinates: (lat: number, lng: number) => void;
+  searchLocation?: string;
   onSearchResult?: (lat: number, lng: number) => void;
+  initialCoordinates?: [number, number]; // ⬅ tambahan prop baru
 }
 
 interface MarkerPosition {
@@ -45,15 +46,15 @@ const MapPicker: React.FC<MapPickerProps> = ({
   setCoordinates,
   searchLocation,
   onSearchResult,
+  initialCoordinates,
 }) => {
   const [marker, setMarker] = useState<MarkerPosition>({
-    lat: -6.8059,
-    lng: 110.8417,
+    lat: initialCoordinates?.[0] || -6.8059,
+    lng: initialCoordinates?.[1] || 110.8417,
   });
-
+  const [hasInitialized, setHasInitialized] = useState(false);
   const map = useMap();
 
-  // Fungsi untuk mendapatkan alamat berdasarkan lat/lng
   const reverseGeocode = useCallback(
     (lat: number, lng: number) => {
       fetch(
@@ -62,23 +63,31 @@ const MapPicker: React.FC<MapPickerProps> = ({
         .then((res) => res.json())
         .then((data) => {
           const displayName = data.display_name || "Alamat tidak ditemukan";
-          setAddress(displayName); // Menampilkan alamat di textarea
-          setCoordinates(lat, lng); // Menyimpan lat/lng
+          setAddress(displayName);
+          setCoordinates(lat, lng);
         });
     },
     [setAddress, setCoordinates]
   );
 
-  // Ketika peta di-klik
+  useEffect(() => {
+    if (initialCoordinates && !hasInitialized) {
+      const [lat, lng] = initialCoordinates;
+      setMarker({ lat, lng });
+      reverseGeocode(lat, lng);
+      if (map) map.setView([lat, lng], 15);
+      setHasInitialized(true);
+    }
+  }, [initialCoordinates, map, reverseGeocode, hasInitialized]);
+
   useMapEvents({
     click(e) {
       const { lat, lng } = e.latlng;
       setMarker({ lat, lng });
-      reverseGeocode(lat, lng); // Menampilkan alamat dan menyimpan lat/lng saat klik
+      reverseGeocode(lat, lng);
     },
   });
 
-  // Untuk menangani pencarian lokasi
   useEffect(() => {
     if (!searchLocation) return;
 
@@ -94,9 +103,9 @@ const MapPicker: React.FC<MapPickerProps> = ({
           const lat = parseFloat(result.lat);
           const lng = parseFloat(result.lon);
           setMarker({ lat, lng });
-          setCoordinates(lat, lng); // Menyimpan lat/lng
+          setCoordinates(lat, lng);
           if (map) map.setView([lat, lng], 15);
-          reverseGeocode(lat, lng); // Mendapatkan alamat berdasarkan lat/lng
+          reverseGeocode(lat, lng);
           onSearchResult?.(lat, lng);
         }
       });
@@ -110,9 +119,10 @@ const MapPicker: React.FC<MapPickerProps> = ({
 export default function LeafletWrapper(props: MapPickerProps) {
   return (
     <MapContainer
-      center={[-6.8059, 110.8417]} // Default ke Kudus
+      center={props.initialCoordinates || [-6.8059, 110.8417]}
       zoom={13}
       className="h-64 lg:h-96 w-full rounded-lg z-0"
+      key={props.initialCoordinates?.join(",")} // ⬅ penting untuk re-mount
     >
       <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
       <MapPicker {...props} />

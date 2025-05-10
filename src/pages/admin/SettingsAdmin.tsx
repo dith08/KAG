@@ -8,16 +8,15 @@ import api from "../../services/api";
 import { useToast } from "../../components/toast/useToast";
 
 const SettingsAdminPage: React.FC = () => {
-  const [namaToko, setNamaToko] = useState("Karya Adi Grafika");
-  const [username, setUsername] = useState("");
-  const [address, setAddress] = useState("");
-  const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
-  const [profilePicture, setProfilePicture] = useState<string | null>(null);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [namaToko, setNamaToko] = useState("");
+  const [alamat, setAlamat] = useState("");
+  const [kontak, setKontak] = useState("");
+  const [jamOperasional, setJamOperasional] = useState("");
   const [storeLocation, setStoreLocation] = useState<[number, number]>([
     -6.2, 106.816666,
   ]);
+  const [, setCurrentLocation] = useState<[number, number] | null>(null);
+
   const [isLoading, setIsLoading] = useState(false);
   const { showToast } = useToast();
 
@@ -25,98 +24,65 @@ const SettingsAdminPage: React.FC = () => {
     { maxDistance: number; cost: number }[]
   >([{ maxDistance: 10, cost: 15000 }]);
 
-  const fetchAdminProfile = useCallback(() => {
+  const fetchWebsiteSettings = useCallback(() => {
     api
-      .get("/api/profile", {
+      .get("/api/website-settings/5", {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       })
       .then((res) => {
         const data = res.data;
-        console.log("Data profil admin:", data);
+        console.log("Data pengaturan website:", data);
 
-        const alamatOnly = data.alamat?.split("| lat:")[0].trim() || "";
-        const latMatch = data.alamat?.match(/lat:\s*(-?\d+\.?\d*)/);
-        const lngMatch = data.alamat?.match(/lng:\s*(-?\d+\.?\d*)/);
+        setNamaToko(data.nama_toko);
+        setAlamat(data.alamat);
+        setKontak(data.kontak);
+        setJamOperasional(data.jam_operasional);
 
-        setUsername(data.name);
-        setAddress(alamatOnly);
-        setPhone(data.phone);
-        setEmail(data.email);
-        setStoreLocation([
-          latMatch ? parseFloat(latMatch[1]) : -6.2,
-          lngMatch ? parseFloat(lngMatch[1]) : 106.816666,
-        ]);
-
-        if (!selectedFile) {
-          setProfilePicture(
-            data.avatar && data.avatar !== "" ? data.avatar : "/images/user.png"
-          );
+        // Set coordinates if available
+        if (data.lat && data.lng) {
+          setStoreLocation([parseFloat(data.lat), parseFloat(data.lng)]);
         }
       })
       .catch((err) => {
-        console.error("Gagal ambil data profil admin:", err);
-        showToast("Gagal mengambil data profil admin", "error");
+        console.error("Gagal ambil pengaturan website:", err);
+        showToast("Gagal mengambil pengaturan website", "error");
       });
-  }, [selectedFile, showToast]);
+  }, [showToast]);
 
   useEffect(() => {
-    fetchAdminProfile();
-  }, [fetchAdminProfile]);
+    fetchWebsiteSettings();
+  }, [fetchWebsiteSettings]);
 
-  // === HANDLE SAVE ===
   const handleSaveChanges = async () => {
     setIsLoading(true);
     try {
-      const formData = new FormData();
-      formData.append("name", username);
-      formData.append(
-        "alamat",
-        `${address} | lat: ${storeLocation[0]}, lng: ${storeLocation[1]}`
-      );
-      formData.append("phone", phone);
-      formData.append("email", email);
+      const websiteSettings = {
+        nama_toko: namaToko,
+        alamat: alamat,
+        kontak: kontak,
+        jam_operasional: jamOperasional,
+        lat: storeLocation[0].toString(),
+        lng: storeLocation[1].toString(),
+      };
 
-      if (selectedFile) {
-        formData.append("avatar", selectedFile);
-      }
-
-      const response = await api.post("/api/profile?_method=PUT", formData, {
+      await api.put("/api/website-settings/5", websiteSettings, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
-          "Content-Type": "multipart/form-data",
+          "Content-Type": "application/json",
         },
       });
 
-      console.log("Profil admin berhasil diperbarui:", response.data);
-      showToast("Profil admin berhasil diperbarui", "success");
-      setSelectedFile(null);
-      fetchAdminProfile(); // refresh data setelah update
+      console.log("Pengaturan toko berhasil diperbarui");
+      showToast("Pengaturan toko berhasil diperbarui", "success");
+
+      fetchWebsiteSettings();
     } catch (error) {
-      console.error("Gagal update profil admin:", error);
-      showToast("Gagal memperbarui profil admin", "error");
+      console.error("Gagal update pengaturan toko:", error);
+      showToast("Gagal memperbarui pengaturan toko", "error");
     } finally {
       setTimeout(() => {
         setIsLoading(false);
       }, 1000);
-    }
-  };
-
-  // === HANDLE SELECT FILE ===
-  const handleProfilePictureChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (!file.type.startsWith("image/")) {
-        showToast("Hanya file gambar yang diperbolehkan", "error");
-        return;
-      }
-      if (file.size > 2 * 1024 * 1024) {
-        showToast("Ukuran gambar maksimal 2MB", "error");
-        return;
-      }
-      setSelectedFile(file);
-      setProfilePicture(URL.createObjectURL(file));
     }
   };
 
@@ -155,38 +121,6 @@ const SettingsAdminPage: React.FC = () => {
                 <Icon icon="mdi:storefront" className="w-6 h-6" />
                 PROFILE TOKO
               </h2>
-              <div className="flex gap-4 items-center">
-                <div className="relative">
-                  <img
-                    src={profilePicture || "/images/user.png"}
-                    alt="Profile"
-                    className="w-20 h-20 lg:w-24 lg:h-24 rounded-full object-cover border-4 border-green-700"
-                  />
-                  <label className="absolute bottom-0 right-0 p-2 bg-white rounded-full cursor-pointer shadow">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleProfilePictureChange}
-                      className="hidden"
-                    />
-                    <Icon
-                      icon="mdi:image-edit"
-                      className="text-lg text-gray-500"
-                    />
-                  </label>
-                </div>
-                <div className="flex-1">
-                  <label className="text-sm font-semibold block mb-1 text-green-700">
-                    USERNAME PEMILIK
-                  </label>
-                  <input
-                    type="text"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    className="w-full border rounded-lg px-3 py-2 focus:outline-green-700"
-                  />
-                </div>
-              </div>
 
               <div className="space-y-3">
                 <div>
@@ -196,7 +130,6 @@ const SettingsAdminPage: React.FC = () => {
                   <input
                     type="text"
                     value={namaToko}
-                    readOnly
                     onChange={(e) => setNamaToko(e.target.value)}
                     className="w-full border rounded-lg px-3 py-2 focus:outline-green-700"
                   />
@@ -206,31 +139,31 @@ const SettingsAdminPage: React.FC = () => {
                     ALAMAT (berdasarkan pinpoint)
                   </label>
                   <textarea
-                    value={address}
+                    value={alamat}
+                    onChange={(e) => setAlamat(e.target.value)}
                     readOnly
-                    className="w-full border rounded-lg px-3 py-2"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-semibold block mb-1 text-green-700">
-                    EMAIL
-                  </label>
-                  <input
-                    type="email"
-                    value={email}
-                    readOnly
-                    onChange={(e) => setEmail(e.target.value)}
                     className="w-full border rounded-lg px-3 py-2 focus:outline-green-700"
                   />
                 </div>
                 <div>
                   <label className="text-sm font-semibold block mb-1 text-green-700">
-                    NO HP
+                    KONTAK
                   </label>
                   <input
                     type="text"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
+                    value={kontak}
+                    onChange={(e) => setKontak(e.target.value)}
+                    className="w-full border rounded-lg px-3 py-2 focus:outline-green-700"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-semibold block mb-1 text-green-700">
+                    JAM OPERASIONAL
+                  </label>
+                  <input
+                    type="text"
+                    value={jamOperasional}
+                    onChange={(e) => setJamOperasional(e.target.value)}
                     className="w-full border rounded-lg px-3 py-2 focus:outline-green-700"
                   />
                 </div>
@@ -261,8 +194,9 @@ const SettingsAdminPage: React.FC = () => {
                 PILIH LOKASI TOKO DI PETA
               </h2>
               <MapPicker
-                setAddress={setAddress}
-                setCoordinates={(lat, lng) => setStoreLocation([lat, lng])}
+                initialCoordinates={storeLocation}
+                setAddress={setAlamat}
+                setCoordinates={(lat, lng) => setCurrentLocation([lat, lng])}
               />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -281,10 +215,7 @@ const SettingsAdminPage: React.FC = () => {
               </div>
               {/* Aturan biaya kirim */}
               <h2 className="text-green-700 font-semibold text-xl flex items-center gap-2 mt-6">
-                <Icon
-                  icon="mdi:truck-delivery-outline"
-                  className="w-6 h-6"
-                />
+                <Icon icon="mdi:truck-delivery-outline" className="w-6 h-6" />
                 ATURAN BIAYA PENGIRIMAN
               </h2>
               <div className="space-y-3">
