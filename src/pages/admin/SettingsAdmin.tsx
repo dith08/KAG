@@ -15,7 +15,6 @@ const SettingsAdminPage: React.FC = () => {
   const [storeLocation, setStoreLocation] = useState<[number, number]>([
     -6.2, 106.816666,
   ]);
-  const [, setCurrentLocation] = useState<[number, number] | null>(null);
 
   const [isLoading, setIsLoading] = useState(false);
   const { showToast } = useToast();
@@ -194,9 +193,8 @@ const SettingsAdminPage: React.FC = () => {
                 PILIH LOKASI TOKO DI PETA
               </h2>
               <MapPicker
-                initialCoordinates={storeLocation}
                 setAddress={setAlamat}
-                setCoordinates={(lat, lng) => setCurrentLocation([lat, lng])}
+                setCoordinates={(lat, lng) => setStoreLocation([lat, lng])}
               />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>

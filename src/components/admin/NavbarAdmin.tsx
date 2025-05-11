@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Icon } from "@iconify/react";
 import api from "../../services/api";
+import { useAuth } from "../../context/AuthContext";
 
 const NavbarAdmin: React.FC = () => {
   const [username, setUsername] = useState("");
@@ -9,6 +10,7 @@ const NavbarAdmin: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   useEffect(() => {
     api
@@ -61,6 +63,7 @@ const NavbarAdmin: React.FC = () => {
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
 
   const handleLogout = () => {
+    logout();
     navigate("/login");
   };
 

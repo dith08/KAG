@@ -33,7 +33,6 @@ interface MapPickerProps {
   setCoordinates: (lat: number, lng: number) => void;
   searchLocation?: string;
   onSearchResult?: (lat: number, lng: number) => void;
-  initialCoordinates?: [number, number]; // ⬅ tambahan prop baru
 }
 
 interface MarkerPosition {
@@ -41,44 +40,43 @@ interface MarkerPosition {
   lng: number;
 }
 
-const MapPicker: React.FC<MapPickerProps> = ({
+const DEFAULT_POSITION: MarkerPosition = {
+  lat: -6.8059,
+  lng: 110.8417,
+};
+
+// Component untuk menangani event klik dan search
+const InteractiveMap: React.FC<
+  MapPickerProps & {
+    marker: MarkerPosition;
+    setMarker: (pos: MarkerPosition) => void;
+  }
+> = ({
   setAddress,
   setCoordinates,
   searchLocation,
   onSearchResult,
-  initialCoordinates,
+  marker,
+  setMarker,
 }) => {
-  const [marker, setMarker] = useState<MarkerPosition>({
-    lat: initialCoordinates?.[0] || -6.8059,
-    lng: initialCoordinates?.[1] || 110.8417,
-  });
-  const [hasInitialized, setHasInitialized] = useState(false);
   const map = useMap();
 
   const reverseGeocode = useCallback(
-    (lat: number, lng: number) => {
-      fetch(
-        `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
-      )
-        .then((res) => res.json())
-        .then((data) => {
-          const displayName = data.display_name || "Alamat tidak ditemukan";
-          setAddress(displayName);
-          setCoordinates(lat, lng);
-        });
+    async (lat: number, lng: number) => {
+      try {
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
+        );
+        const data = await res.json();
+        const displayName = data.display_name || "Alamat tidak ditemukan";
+        setAddress(displayName);
+        setCoordinates(lat, lng);
+      } catch (error) {
+        console.error("Reverse geocoding error:", error);
+      }
     },
     [setAddress, setCoordinates]
   );
-
-  useEffect(() => {
-    if (initialCoordinates && !hasInitialized) {
-      const [lat, lng] = initialCoordinates;
-      setMarker({ lat, lng });
-      reverseGeocode(lat, lng);
-      if (map) map.setView([lat, lng], 15);
-      setHasInitialized(true);
-    }
-  }, [initialCoordinates, map, reverseGeocode, hasInitialized]);
 
   useMapEvents({
     click(e) {
@@ -91,41 +89,51 @@ const MapPicker: React.FC<MapPickerProps> = ({
   useEffect(() => {
     if (!searchLocation) return;
 
-    fetch(
-      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
-        searchLocation
-      )}`
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        if (data && data.length > 0) {
-          const result = data[0];
-          const lat = parseFloat(result.lat);
-          const lng = parseFloat(result.lon);
-          setMarker({ lat, lng });
-          setCoordinates(lat, lng);
-          if (map) map.setView([lat, lng], 15);
-          reverseGeocode(lat, lng);
-          onSearchResult?.(lat, lng);
-        }
-      });
-  }, [searchLocation, map, reverseGeocode, onSearchResult, setCoordinates]);
+    const controller = new AbortController();
 
-  return marker ? (
-    <Marker position={[marker.lat, marker.lng] as LatLngExpression} />
-  ) : null;
+    const search = async () => {
+      try {
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+            searchLocation
+          )}`,
+          { signal: controller.signal }
+        );
+        const data = await res.json();
+        if (data?.length > 0) {
+          const { lat, lon } = data[0];
+          const newLat = parseFloat(lat);
+          const newLng = parseFloat(lon);
+          setMarker({ lat: newLat, lng: newLng });
+          map.setView([newLat, newLng], 15);
+          reverseGeocode(newLat, newLng);
+          onSearchResult?.(newLat, newLng);
+        }
+      } catch (error: unknown) {
+        if (error instanceof Error && error.name !== "AbortError") {
+          console.error("Search location error:", error);
+        }
+      }
+    };
+    search();
+    return () => controller.abort();
+  }, [searchLocation, reverseGeocode, map, setMarker, onSearchResult]);
+
+  return <Marker position={[marker.lat, marker.lng] as LatLngExpression} />;
 };
 
+// Wrapper utama
 export default function LeafletWrapper(props: MapPickerProps) {
+  const [marker, setMarker] = useState<MarkerPosition>(DEFAULT_POSITION);
+
   return (
     <MapContainer
-      center={props.initialCoordinates || [-6.8059, 110.8417]}
+      center={[DEFAULT_POSITION.lat, DEFAULT_POSITION.lng]}
       zoom={13}
       className="h-64 lg:h-96 w-full rounded-lg z-0"
-      key={props.initialCoordinates?.join(",")} // ⬅ penting untuk re-mount
     >
       <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-      <MapPicker {...props} />
+      <InteractiveMap {...props} marker={marker} setMarker={setMarker} />
     </MapContainer>
   );
 }
