@@ -240,14 +240,13 @@ const ProfilePage = () => {
                 <Icon icon="mdi:map-marker" />
               </span>
               <textarea
-                disabled
+                readOnly
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
-                className="w-full pl-10 p-3 border border-black/50 rounded-lg focus:outline-none focus:ring-1 focus:ring-green-700"
+                className="w-full pl-12 p-3 border border-black/50 rounded-lg focus:outline-none focus:ring-1 focus:ring-green-700"
                 rows={2}
               />
             </div>
-
             <div>
               <label className="block text-base font-medium pb-2">No HP</label>
               <InputField
