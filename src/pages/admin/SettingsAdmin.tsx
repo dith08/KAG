@@ -25,7 +25,7 @@ const SettingsAdminPage: React.FC = () => {
 
   const fetchWebsiteSettings = useCallback(() => {
     api
-      .get("/api/website-settings/5", {
+      .get("/api/website-settings/1", {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       })
       .then((res) => {
@@ -64,7 +64,7 @@ const SettingsAdminPage: React.FC = () => {
         lng: storeLocation[1].toString(),
       };
 
-      await api.put("/api/website-settings/5", websiteSettings, {
+      await api.put("/api/website-settings/1", websiteSettings, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
           "Content-Type": "application/json",
