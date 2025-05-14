@@ -11,6 +11,7 @@ export type BahanBaku = {
   stok: number;
   satuan: string;
   harga: string;
+  kategori: "cover" | "isi" | "umum"; // Tambahkan atribut kategori
 };
 
 export type Finishing = {
@@ -34,6 +35,7 @@ export type Product = {
 const ProductAdminPage: React.FC = () => {
   const navigate = useNavigate();
 
+  // Data bahan baku dengan kategori
   const [bahanBakuList] = useState<BahanBaku[]>([
     {
       id: 1,
@@ -42,6 +44,7 @@ const ProductAdminPage: React.FC = () => {
       stok: 1000,
       satuan: "lembar",
       harga: "Rp25.000/rim",
+      kategori: "umum", // Kategori: cover, isi, umum
     },
     {
       id: 2,
@@ -50,6 +53,7 @@ const ProductAdminPage: React.FC = () => {
       stok: 500,
       satuan: "ml",
       harga: "Rp50.000/botol",
+      kategori: "umum",
     },
   ]);
 
@@ -113,11 +117,14 @@ const ProductAdminPage: React.FC = () => {
                   + Tambah
                 </button>
               </div>
-              
+
               {/* Mobile View */}
               <div className="lg:hidden space-y-4">
                 {bahanBakuList.map((bahan) => (
-                  <div key={bahan.id} className="bg-white p-4 rounded-lg border shadow-sm">
+                  <div
+                    key={bahan.id}
+                    className="bg-white p-4 rounded-lg border shadow-sm"
+                  >
                     <div className="space-y-2">
                       <div className="flex justify-between">
                         <span className="font-medium">Nama:</span>
@@ -139,9 +146,16 @@ const ProductAdminPage: React.FC = () => {
                         <span className="font-medium">Harga:</span>
                         <span>{bahan.harga}</span>
                       </div>
+                      {/* Kolom Kategori */}
+                      <div className="flex justify-between">
+                        <span className="font-medium">Kategori:</span>
+                        <span>{bahan.kategori}</span>
+                      </div>
                       <div className="flex justify-end gap-2 mt-2">
                         <button
-                          onClick={() => navigate(`/admin/bahan-baku/${bahan.id}/edit`)}
+                          onClick={() =>
+                            navigate(`/admin/bahan-baku/${bahan.id}/edit`)
+                          }
                           className="text-green-700 hover:text-green-800"
                         >
                           <Icon icon="mdi:pencil-outline" width="20" height="20" />
@@ -165,20 +179,28 @@ const ProductAdminPage: React.FC = () => {
                       <th className="p-3 whitespace-nowrap">Stok</th>
                       <th className="p-3 whitespace-nowrap">Satuan</th>
                       <th className="p-3 whitespace-nowrap">Harga</th>
+                      <th className="p-3 whitespace-nowrap">Kategori</th>
                       <th className="p-3 text-center whitespace-nowrap">Aksi</th>
                     </tr>
                   </thead>
                   <tbody>
                     {bahanBakuList.map((bahan) => (
-                      <tr key={bahan.id} className="border-b border-gray-200 hover:bg-green-50 transition">
+                      <tr
+                        key={bahan.id}
+                        className="border-b border-gray-200 hover:bg-green-50 transition"
+                      >
                         <td className="p-3 whitespace-nowrap">{bahan.nama}</td>
                         <td className="p-3 whitespace-nowrap">{bahan.jenis}</td>
                         <td className="p-3 whitespace-nowrap">{bahan.stok}</td>
                         <td className="p-3 whitespace-nowrap">{bahan.satuan}</td>
                         <td className="p-3 whitespace-nowrap">{bahan.harga}</td>
+                        {/* Tampilkan kategori */}
+                        <td className="p-3 whitespace-nowrap">{bahan.kategori}</td>
                         <td className="p-3 text-center space-x-2 whitespace-nowrap">
                           <button
-                            onClick={() => navigate(`/admin/bahan-baku/${bahan.id}/edit`)}
+                            onClick={() =>
+                              navigate(`/admin/bahan-baku/${bahan.id}/edit`)
+                            }
                             className="text-green-700 hover:text-green-800"
                           >
                             <Icon icon="mdi:pencil-outline" width="20" height="20" />
@@ -195,6 +217,7 @@ const ProductAdminPage: React.FC = () => {
             </div>
 
             {/* Produk */}
+            {/* Kode produk tetap sama, tidak diubah */}
             <div className="bg-white p-4 lg:p-6 rounded-2xl shadow-lg">
               <div className="flex flex-col sm:flex-row justify-between items-center mb-5 gap-3">
                 <h2 className="text-lg font-semibold text-green-700 flex items-center gap-1">
@@ -211,19 +234,25 @@ const ProductAdminPage: React.FC = () => {
                   <div className="flex flex-wrap gap-2 justify-center w-full sm:w-auto">
                     <button
                       onClick={() => setFilter("all")}
-                      className={`px-3 py-1 text-sm rounded-lg border ${filter === "all" ? "bg-green-100" : "bg-white"}`}
+                      className={`px-3 py-1 text-sm rounded-lg border ${
+                        filter === "all" ? "bg-green-100" : "bg-white"
+                      }`}
                     >
                       Semua
                     </button>
                     <button
                       onClick={() => setFilter("tersedia")}
-                      className={`px-3 py-1 text-sm rounded-lg border ${filter === "tersedia" ? "bg-green-100" : "bg-white"}`}
+                      className={`px-3 py-1 text-sm rounded-lg border ${
+                        filter === "tersedia" ? "bg-green-100" : "bg-white"
+                      }`}
                     >
                       Tersedia
                     </button>
                     <button
                       onClick={() => setFilter("tidak")}
-                      className={`px-3 py-1 text-sm rounded-lg border ${filter === "tidak" ? "bg-green-100" : "bg-white"}`}
+                      className={`px-3 py-1 text-sm rounded-lg border ${
+                        filter === "tidak" ? "bg-green-100" : "bg-white"
+                      }`}
                     >
                       Tidak Tersedia
                     </button>
@@ -242,7 +271,10 @@ const ProductAdminPage: React.FC = () => {
                       : !p.available
                   )
                   .map((p) => (
-                    <div key={p.id} className="bg-white p-4 rounded-lg border shadow-sm">
+                    <div
+                      key={p.id}
+                      className="bg-white p-4 rounded-lg border shadow-sm"
+                    >
                       <div className="flex items-center gap-4">
                         <img
                           src={p.imageUrl}
@@ -301,7 +333,7 @@ const ProductAdminPage: React.FC = () => {
                       <th className="p-3 whitespace-nowrap">Ukuran</th>
                       <th className="p-3 whitespace-nowrap">Harga</th>
                       <th className="p-3 whitespace-nowrap">Status</th>
-                      <th className="p-3 text-center whitespace-nowrap">Aksi</th>
+                      <th className="p-3 whitespace-nowrap">Aksi</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -314,7 +346,10 @@ const ProductAdminPage: React.FC = () => {
                           : !p.available
                       )
                       .map((p) => (
-                        <tr key={p.id} className="border-b border-gray-200 hover:bg-green-50 transition">
+                        <tr
+                          key={p.id}
+                          className="border-b border-gray-200 hover:bg-green-50 transition"
+                        >
                           <td className="p-3 whitespace-nowrap">
                             <img
                               src={p.imageUrl}
