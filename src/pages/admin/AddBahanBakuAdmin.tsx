@@ -11,10 +11,11 @@ const AddBahanBakuAdminPage: React.FC = () => {
   const [stok, setStok] = useState("");
   const [satuan, setSatuan] = useState("");
   const [harga, setHarga] = useState("");
+  const [kategori, setKategori] = useState("umum"); // State kategori, default "umum"
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const newBahan = { nama, jenis, stok, satuan };
+    const newBahan = { nama, jenis, stok, satuan, kategori }; // Tambahkan kategori
     console.log("Bahan Baku Ditambahkan:", newBahan);
     navigate("/admin/produk");
   };
@@ -35,10 +36,9 @@ const AddBahanBakuAdminPage: React.FC = () => {
             </h1>
           </div>
 
+          {/* Nama Bahan */}
           <div>
-            <label className="block mb-2 font-semibold">
-              Nama Bahan
-            </label>
+            <label className="block mb-2 font-semibold">Nama Bahan</label>
             <input
               type="text"
               className="w-full border border-black/50 rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-green-700"
@@ -48,10 +48,9 @@ const AddBahanBakuAdminPage: React.FC = () => {
             />
           </div>
 
+          {/* Jenis */}
           <div>
-            <label className="block mb-2 font-semibold">
-              Jenis
-            </label>
+            <label className="block mb-2 font-semibold">Jenis</label>
             <input
               type="text"
               className="w-full border border-black/50 rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-green-700"
@@ -61,11 +60,10 @@ const AddBahanBakuAdminPage: React.FC = () => {
             />
           </div>
 
+          {/* Stok dan Satuan */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block mb-2 font-semibold">
-                Stok
-              </label>
+              <label className="block mb-2 font-semibold">Stok</label>
               <input
                 type="number"
                 min="0"
@@ -77,9 +75,7 @@ const AddBahanBakuAdminPage: React.FC = () => {
             </div>
 
             <div>
-              <label className="block mb-2 font-semibold">
-                Satuan
-              </label>
+              <label className="block mb-2 font-semibold">Satuan</label>
               <input
                 type="text"
                 className="w-full border border-black/50 rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-green-700"
@@ -91,10 +87,9 @@ const AddBahanBakuAdminPage: React.FC = () => {
             </div>
           </div>
 
+          {/* Harga */}
           <div>
-            <label className="block mb-2 font-semibold">
-              Harga
-            </label>
+            <label className="block mb-2 font-semibold">Harga</label>
             <input
               type="text"
               className="w-full border border-black/50 rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-green-700"
@@ -105,6 +100,22 @@ const AddBahanBakuAdminPage: React.FC = () => {
             />
           </div>
 
+          {/* Kategori */}
+          <div>
+            <label className="block mb-2 font-semibold">Kategori</label>
+            <select
+              className="w-full border border-black/50 rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-green-700"
+              value={kategori}
+              onChange={(e) => setKategori(e.target.value)}
+              required
+            >
+              <option value="cover">Cover</option>
+              <option value="isi">Isi</option>
+              <option value="umum">Umum</option>
+            </select>
+          </div>
+
+          {/* Tombol */}
           <div className="flex justify-end space-x-3 pt-4">
             <button
               type="button"

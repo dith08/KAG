@@ -13,6 +13,7 @@ const dummyData: BahanBaku[] = [
     stok: 1000,
     satuan: "lembar",
     harga: "Rp25.000/rim",
+    kategori: "umum",
   },
   {
     id: 2,
@@ -21,6 +22,7 @@ const dummyData: BahanBaku[] = [
     stok: 500,
     satuan: "ml",
     harga: "Rp.50.000/botol",
+    kategori: "umum",
   },
 ];
 
@@ -29,23 +31,36 @@ const EditBahanBakuAdminPage: React.FC = () => {
   const navigate = useNavigate();
 
   const [bahan, setBahan] = useState<BahanBaku | null>(null);
+  const [kategori, setKategori] = useState<string>("umum"); // State kategori
 
   useEffect(() => {
     const data = dummyData.find((b) => b.id === Number(id));
     if (data) {
       setBahan(data);
+      // Jika data ada, set kategori default atau dari data jika ada
+      // Jika data tidak memiliki kategori, default ke "umum"
+      if ((data as any).kategori) {
+        setKategori((data as any).kategori);
+      } else {
+        setKategori("umum");
+      }
     }
   }, [id]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     if (bahan) {
-      setBahan({ ...bahan, [e.target.name]: e.target.value });
+      const { name, value } = e.target;
+      setBahan({ ...bahan, [name]: value });
     }
   };
 
   const handleSubmit = () => {
-    console.log("Data disimpan:", bahan);
-    navigate("/admin/produk"); // kembali ke halaman utama
+    // Jangan lupa tambahkan kategori ke data yang disimpan
+    const dataToSave = { ...bahan, kategori };
+    console.log("Data disimpan:", dataToSave);
+    navigate("/admin/produk");
   };
 
   return (
@@ -54,7 +69,10 @@ const EditBahanBakuAdminPage: React.FC = () => {
       <SidebarAdmin />
       <div className="md:ml-64 pt-28 px-4 md:px-8 pb-10">
         <form
-          onSubmit={handleSubmit}
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSubmit();
+          }}
           className="bg-white rounded-2xl shadow-xl p-6 md:p-10 max-w-3xl mx-auto space-y-6"
         >
           <div className="flex items-center space-x-3 mb-6">
@@ -137,6 +155,22 @@ const EditBahanBakuAdminPage: React.FC = () => {
                 />
               </div>
 
+              {/* Input Kategori */}
+              <div>
+                <label className="block mb-2 font-semibold">Kategori</label>
+                <select
+                  className="w-full border border-black/50 rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-green-700"
+                  value={kategori}
+                  onChange={(e) => setKategori(e.target.value)}
+                  required
+                >
+                  <option value="cover">Cover</option>
+                  <option value="isi">Isi</option>
+                  <option value="umum">Umum</option>
+                </select>
+              </div>
+
+              {/* Tombol */}
               <div className="flex justify-end space-x-3 pt-4">
                 <button
                   type="button"
