@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import NavbarAdmin from "../../components/admin/NavbarAdmin";
 import SidebarAdmin from "../../components/admin/SidebarAdmin";
 import { Icon } from "@iconify/react";
+import api from "../../services/api";
+import { getBaseUrl } from "../../utils/getBaseUrl";
 
 export type BahanBaku = {
   id: number;
@@ -34,60 +36,89 @@ export type Product = {
 
 const ProductAdminPage: React.FC = () => {
   const navigate = useNavigate();
+  const [bahanBakuList, setBahanBakuList] = useState<BahanBaku[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  // Data bahan baku dengan kategori
-  const [bahanBakuList] = useState<BahanBaku[]>([
-    {
-      id: 1,
-      nama: "HVS 80gsm",
-      jenis: "Kertas",
-      stok: 1000,
-      satuan: "lembar",
-      harga: "Rp25.000/rim",
-      kategori: "umum", // Kategori: cover, isi, umum
-    },
-    {
-      id: 2,
-      nama: "Tinta Hitam",
-      jenis: "Tinta",
-      stok: 500,
-      satuan: "ml",
-      harga: "Rp50.000/botol",
-      kategori: "umum",
-    },
-  ]);
+  useEffect(() => {
+    const fetchBahanBaku = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await api.get("/api/materials", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-  const [products] = useState<Product[]>([
-    {
-      id: 1,
-      name: "Brosur A",
-      ukuran: "A4",
-      bahanBakuId: 1,
-      finishing: [
-        {
-          id: 1,
-          productId: 1,
-          jenis: "Laminasi Doff",
-          hargaTambahan: "Rp2.000",
+        setBahanBakuList(response.data); // sesuaikan struktur respons dari API kamu
+      } catch (error) {
+        console.error("Gagal mengambil data bahan baku:", error);
+      }
+    };
+
+    fetchBahanBaku();
+  }, []);
+
+  const handleDelete = async (id: number) => {
+    try {
+      const token = localStorage.getItem("token");
+      await api.delete(`/api/materials/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
-      ],
-      available: true,
-      imageUrl:
-        "https://i.pinimg.com/736x/36/94/59/3694591363764be875b716e96c25dbb1.jpg",
-      harga: "5000",
-    },
-    {
-      id: 2,
-      name: "Brosur B",
-      ukuran: "A5",
-      bahanBakuId: 2,
-      finishing: [],
-      available: false,
-      imageUrl:
-        "https://i.pinimg.com/736x/36/94/59/3694591363764be875b716e96c25dbb1.jpg",
-      harga: "6000",
-    },
-  ]);
+      });
+
+      // Hapus item dari state
+      setBahanBakuList((prev) => prev.filter((bahan) => bahan.id !== id));
+
+      alert("Bahan baku berhasil dihapus.");
+    } catch (error) {
+      console.error("Gagal menghapus bahan baku:", error);
+      alert("Terjadi kesalahan saat menghapus bahan.");
+    }
+  };
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await api.get("/api/products", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const fetched = res.data;
+
+        const formatted = fetched.map((item: {
+          id: any;
+          nama: any;
+          ukuran: any;
+          harga: any;
+          gambar: any;
+          status: string;
+        }) => ({
+          id: item.id,
+          name: item.nama || "Tanpa Nama",
+          harga: Number(item.harga) || 0,
+          imageUrl: item.gambar && item.gambar !== ""
+            ? item.gambar
+            : "/images/default-product.png",
+          available: item.status?.toLowerCase() === "tersedia",
+        }));
+
+        setProducts(formatted);
+      } catch (err) {
+        setError("Gagal memuat produk.");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   const [filter, setFilter] = useState<"all" | "tersedia" | "tidak">("all");
 
@@ -160,7 +191,7 @@ const ProductAdminPage: React.FC = () => {
                         >
                           <Icon icon="mdi:pencil-outline" width="20" height="20" />
                         </button>
-                        <button className="text-red-600 hover:text-red-700">
+                        <button onClick={() => handleDelete(bahan.id)} className="text-red-600 hover:text-red-700 cursor-pointer">
                           <Icon icon="mdi:trash-can-outline" width="20" height="20" />
                         </button>
                       </div>
@@ -205,7 +236,7 @@ const ProductAdminPage: React.FC = () => {
                           >
                             <Icon icon="mdi:pencil-outline" width="20" height="20" />
                           </button>
-                          <button className="text-red-600 hover:text-red-700">
+                          <button onClick={() => handleDelete(bahan.id)} className="text-red-600 hover:text-red-700 cursor-pointer">
                             <Icon icon="mdi:trash-can-outline" width="20" height="20" />
                           </button>
                         </td>
@@ -234,25 +265,22 @@ const ProductAdminPage: React.FC = () => {
                   <div className="flex flex-wrap gap-2 justify-center w-full sm:w-auto">
                     <button
                       onClick={() => setFilter("all")}
-                      className={`px-3 py-1 text-sm rounded-lg border ${
-                        filter === "all" ? "bg-green-100" : "bg-white"
-                      }`}
+                      className={`px-3 py-1 text-sm rounded-lg border ${filter === "all" ? "bg-green-100" : "bg-white"
+                        }`}
                     >
                       Semua
                     </button>
                     <button
                       onClick={() => setFilter("tersedia")}
-                      className={`px-3 py-1 text-sm rounded-lg border ${
-                        filter === "tersedia" ? "bg-green-100" : "bg-white"
-                      }`}
+                      className={`px-3 py-1 text-sm rounded-lg border ${filter === "tersedia" ? "bg-green-100" : "bg-white"
+                        }`}
                     >
                       Tersedia
                     </button>
                     <button
                       onClick={() => setFilter("tidak")}
-                      className={`px-3 py-1 text-sm rounded-lg border ${
-                        filter === "tidak" ? "bg-green-100" : "bg-white"
-                      }`}
+                      className={`px-3 py-1 text-sm rounded-lg border ${filter === "tidak" ? "bg-green-100" : "bg-white"
+                        }`}
                     >
                       Tidak Tersedia
                     </button>
@@ -267,8 +295,8 @@ const ProductAdminPage: React.FC = () => {
                     filter === "all"
                       ? true
                       : filter === "tersedia"
-                      ? p.available
-                      : !p.available
+                        ? p.available
+                        : !p.available
                   )
                   .map((p) => (
                     <div
@@ -287,21 +315,16 @@ const ProductAdminPage: React.FC = () => {
                             <span>{p.name}</span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="font-medium">Ukuran:</span>
-                            <span>{p.ukuran}</span>
-                          </div>
-                          <div className="flex justify-between">
                             <span className="font-medium">Harga:</span>
                             <span>Rp {Number(p.harga).toLocaleString()}</span>
                           </div>
                           <div className="flex justify-between items-center">
                             <span className="font-medium">Status:</span>
                             <span
-                              className={`px-2 py-1 rounded-lg text-xs ${
-                                p.available
-                                  ? "bg-green-100 text-green-700"
-                                  : "bg-red-100 text-red-700"
-                              }`}
+                              className={`px-2 py-1 rounded-lg text-xs ${p.available
+                                ? "bg-green-100 text-green-700"
+                                : "bg-red-100 text-red-700"
+                                }`}
                             >
                               {p.available ? "Tersedia" : "Tidak Tersedia"}
                             </span>
@@ -330,7 +353,6 @@ const ProductAdminPage: React.FC = () => {
                     <tr>
                       <th className="p-3 whitespace-nowrap">Gambar</th>
                       <th className="p-3 whitespace-nowrap">Nama</th>
-                      <th className="p-3 whitespace-nowrap">Ukuran</th>
                       <th className="p-3 whitespace-nowrap">Harga</th>
                       <th className="p-3 whitespace-nowrap">Status</th>
                       <th className="p-3 whitespace-nowrap">Aksi</th>
@@ -342,8 +364,8 @@ const ProductAdminPage: React.FC = () => {
                         filter === "all"
                           ? true
                           : filter === "tersedia"
-                          ? p.available
-                          : !p.available
+                            ? p.available
+                            : !p.available
                       )
                       .map((p) => (
                         <tr
@@ -353,22 +375,22 @@ const ProductAdminPage: React.FC = () => {
                           <td className="p-3 whitespace-nowrap">
                             <img
                               src={p.imageUrl}
+                              onError={(e) => (e.currentTarget.src = "/default.png")}
                               alt={p.name}
-                              className="w-12 h-12 object-cover rounded-lg border"
+                              className="w-20 h-20 object-cover rounded-lg border"
                             />
+
                           </td>
                           <td className="p-3 whitespace-nowrap">{p.name}</td>
-                          <td className="p-3 whitespace-nowrap">{p.ukuran}</td>
                           <td className="p-3 whitespace-nowrap">
                             Rp {Number(p.harga).toLocaleString()}
                           </td>
                           <td className="p-3 whitespace-nowrap">
                             <span
-                              className={`px-2 py-1 rounded-lg text-xs ${
-                                p.available
-                                  ? "bg-green-100 text-green-700"
-                                  : "bg-red-100 text-red-700"
-                              }`}
+                              className={`px-2 py-1 rounded-lg text-xs ${p.available
+                                ? "bg-green-100 text-green-700"
+                                : "bg-red-100 text-red-700"
+                                }`}
                             >
                               {p.available ? "Tersedia" : "Tidak Tersedia"}
                             </span>

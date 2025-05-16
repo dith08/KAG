@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import NavbarAdmin from "../../components/admin/NavbarAdmin";
 import SidebarAdmin from "../../components/admin/SidebarAdmin";
 import { Icon } from "@iconify/react";
+import api from "../../services/api";
 
 const AddBahanBakuAdminPage: React.FC = () => {
   const navigate = useNavigate();
@@ -11,14 +12,35 @@ const AddBahanBakuAdminPage: React.FC = () => {
   const [stok, setStok] = useState("");
   const [satuan, setSatuan] = useState("");
   const [harga, setHarga] = useState("");
-  const [kategori, setKategori] = useState("umum"); // State kategori, default "umum"
+  const [kategori, setKategori] = useState("umum");
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const newBahan = { nama, jenis, stok, satuan, kategori }; // Tambahkan kategori
-    console.log("Bahan Baku Ditambahkan:", newBahan);
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    alert("Tidak ada token. Silakan login kembali.");
+    return;
+  }
+
+  try {
+    const newBahan = { nama, jenis, stok, satuan, harga, kategori };
+
+    const response = await api.post("/api/materials", newBahan, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
+      },
+    });
+
+    console.log("Response:", response.data);
+    alert("Bahan Baku berhasil ditambahkan!");
     navigate("/admin/produk");
-  };
+  } catch (error: any) {
+    console.error("Error saat menambahkan bahan baku:", error.response || error.message);
+    alert("Gagal menambahkan bahan baku. Pastikan Anda sudah login dan token valid.");
+  }
+};
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -31,9 +53,7 @@ const AddBahanBakuAdminPage: React.FC = () => {
         >
           <div className="flex items-center space-x-3 mb-6">
             <Icon icon="mdi:invoice-text-plus" className="text-green-700 text-4xl" />
-            <h1 className="text-2xl md:text-3xl font-bold text-green-700">
-              Tambah Bahan Baku
-            </h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-green-700">Tambah Bahan Baku</h1>
           </div>
 
           {/* Nama Bahan */}
@@ -91,11 +111,12 @@ const AddBahanBakuAdminPage: React.FC = () => {
           <div>
             <label className="block mb-2 font-semibold">Harga</label>
             <input
-              type="text"
+              type="number"
+              min="0"
               className="w-full border border-black/50 rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-green-700"
               value={harga}
               onChange={(e) => setHarga(e.target.value)}
-              placeholder="Contoh: Rp.75.000/rim"
+              placeholder="Contoh: 75000"
               required
             />
           </div>
@@ -119,7 +140,7 @@ const AddBahanBakuAdminPage: React.FC = () => {
           <div className="flex justify-end space-x-3 pt-4">
             <button
               type="button"
-              className="flex items-center bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 transitio cursor-pointer"
+              className="flex items-center bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 cursor-pointer"
               onClick={() => navigate("/admin/produk")}
             >
               <Icon icon="mdi:arrow-left" className="mr-2" />
@@ -127,7 +148,7 @@ const AddBahanBakuAdminPage: React.FC = () => {
             </button>
             <button
               type="submit"
-              className="flex items-center bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition cursor-pointer"
+              className="flex items-center bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 cursor-pointer"
             >
               <Icon icon="mdi:content-save" className="mr-2" />
               Simpan

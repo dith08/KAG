@@ -1,49 +1,49 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { BahanBaku } from "./ProductAdmin";
 import NavbarAdmin from "../../components/admin/NavbarAdmin";
 import SidebarAdmin from "../../components/admin/SidebarAdmin";
 import { Icon } from "@iconify/react";
+import api from "../../services/api";
 
-const dummyData: BahanBaku[] = [
-  {
-    id: 1,
-    nama: "HVS 80gsm",
-    jenis: "Kertas",
-    stok: 1000,
-    satuan: "lembar",
-    harga: "Rp25.000/rim",
-    kategori: "umum",
-  },
-  {
-    id: 2,
-    nama: "Tinta Hitam",
-    jenis: "Tinta",
-    stok: 500,
-    satuan: "ml",
-    harga: "Rp.50.000/botol",
-    kategori: "umum",
-  },
-];
+export interface BahanBaku {
+  id: number;
+  nama: string;
+  jenis: string;
+  stok: number;
+  satuan: string;
+  harga: string;
+  kategori?: string;
+}
 
 const EditBahanBakuAdminPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
   const [bahan, setBahan] = useState<BahanBaku | null>(null);
-  const [kategori, setKategori] = useState<string>("umum"); // State kategori
+  const [kategori, setKategori] = useState<string>("umum");
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const data = dummyData.find((b) => b.id === Number(id));
-    if (data) {
-      setBahan(data);
-      // Jika data ada, set kategori default atau dari data jika ada
-      // Jika data tidak memiliki kategori, default ke "umum"
-      if ((data as any).kategori) {
-        setKategori((data as any).kategori);
-      } else {
-        setKategori("umum");
+    const fetchBahan = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await api.get(`/api/materials/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setBahan(response.data);
+        setKategori(response.data.kategori || "umum");
+      } catch (error) {
+        console.error("Gagal mengambil data bahan baku:", error);
+        alert("Gagal memuat data bahan baku.");
+      } finally {
+        setLoading(false);
       }
+    };
+
+    if (id) {
+      fetchBahan();
     }
   }, [id]);
 
@@ -56,11 +56,25 @@ const EditBahanBakuAdminPage: React.FC = () => {
     }
   };
 
-  const handleSubmit = () => {
-    // Jangan lupa tambahkan kategori ke data yang disimpan
-    const dataToSave = { ...bahan, kategori };
-    console.log("Data disimpan:", dataToSave);
-    navigate("/admin/produk");
+  const handleSubmit = async () => {
+    if (!bahan) return;
+
+    try {
+      const token = localStorage.getItem("token");
+      const dataToSave = { ...bahan, kategori };
+
+      await api.put(`/api/materials/${id}`, dataToSave, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      alert("Data berhasil diperbarui.");
+      navigate("/admin/produk");
+    } catch (error) {
+      console.error("Gagal menyimpan data bahan:", error);
+      alert("Terjadi kesalahan saat menyimpan data.");
+    }
   };
 
   return (
@@ -85,7 +99,9 @@ const EditBahanBakuAdminPage: React.FC = () => {
             </h1>
           </div>
 
-          {bahan ? (
+          {loading ? (
+            <p className="text-gray-500">Memuat data...</p>
+          ) : bahan ? (
             <>
               <div>
                 <label className="block mb-2 font-semibold">Nama Bahan</label>
@@ -155,7 +171,6 @@ const EditBahanBakuAdminPage: React.FC = () => {
                 />
               </div>
 
-              {/* Input Kategori */}
               <div>
                 <label className="block mb-2 font-semibold">Kategori</label>
                 <select
@@ -170,7 +185,6 @@ const EditBahanBakuAdminPage: React.FC = () => {
                 </select>
               </div>
 
-              {/* Tombol */}
               <div className="flex justify-end space-x-3 pt-4">
                 <button
                   type="button"
