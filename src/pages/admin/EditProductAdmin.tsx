@@ -3,31 +3,28 @@ import { useParams, useNavigate } from "react-router-dom";
 import NavbarAdmin from "../../components/admin/NavbarAdmin";
 import SidebarAdmin from "../../components/admin/SidebarAdmin";
 import { Icon } from "@iconify/react";
+import api from "../../services/api"; // sesuaikan path
 
-// Interface untuk finishing
+// Interface Finishing
 interface Finishing {
   id: number;
   productId: number;
   jenis: string;
   hargaTambahan: string;
   kategori: string;
-  isEditing?: boolean; // mode inline edit
+  isEditing?: boolean;
 }
 
-// Interface produk
+// Interface Produk
 interface Product {
   id: number;
   name: string;
-  description?: string;
-  material?: string;
+  deskripsi?: string;
+  materials?: string;
   imageUrl?: string;
   harga?: string;
-}
-
-// Extends dari Product, termasuk ukuran dan finishing
-interface ExtendedProduct extends Product {
-  ukuran?: string[];
-  finishing?: Finishing[];
+  sizes?: string[];
+  finishings?: Finishing[];
   available?: boolean;
 }
 
@@ -35,194 +32,197 @@ const EditProductAdminPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  const [product, setProduct] = useState<ExtendedProduct | null>(null);
-  const [newUkuran, setNewUkuran] = useState("");
-  const [newFinishingJenis, setNewFinishingJenis] = useState("");
-  const [newFinishingHargaTambahan, setNewFinishingHargaTambahan] = useState("");
-  const [newFinishingKategori, setNewFinishingKategori] = useState("Cover");
-  const [newImage, setNewImage] = useState<File | null>(null);
-  const [newHarga, setNewHarga] = useState("");
+  const [product, setProduct] = useState<Product | null>(null);
+  const [name, setName] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
+  const [material, setMaterial] = useState<string>("");
+  const [ukuran, setUkuran] = useState<string[]>([]);
+  const [finishing, setFinishing] = useState<Finishing[]>([]);
+  const [bahanBakuList, setBahanBakuList] = useState<any[]>([]);
+  const [ukuranList, setUkuranList] = useState<any[]>([]);
 
+  const [newUkuran, setNewUkuran] = useState<string>("");
+  const [newFinishing, setNewFinishing] = useState<string>("");
+  const [newFinishingHargaTambahan, setNewFinishingHargaTambahan] = useState<string>("");
+  const [newFinishingKategori, setNewFinishingKategori] = useState<string>("cover");
+  const [newHarga, setNewHarga] = useState<string>("");
+
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const imagePreviewRef = useRef<string | null>(null);
 
-  // Dummy fetch data di mount
+  // Fetch bahan, ukuran, finishing, produk
   useEffect(() => {
-    if (id) {
-      const dummyProduct: ExtendedProduct = {
-        id: parseInt(id),
-        name: "Brosur A",
-        ukuran: ["A4"],
-        finishing: [
-          {
-            id: 1,
-            productId: parseInt(id),
-            jenis: "Laminasi Doff",
-            hargaTambahan: "Rp.5.000",
-            kategori: "Cover",
-          },
-        ],
-        available: true,
-        imageUrl:
-          "https://i.pinimg.com/736x/36/94/59/3694591363764be875b716e96c25dbb1.jpg",
-        harga: "50000",
-        description: "",
-        material: "",
-      };
-      setProduct(dummyProduct);
-      setNewHarga(dummyProduct.harga || "");
-    }
-    // Cleanup URL
-    return () => {
-      if (imagePreviewRef.current) {
-        URL.revokeObjectURL(imagePreviewRef.current);
-        imagePreviewRef.current = null;
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        // bahan baku
+        const bahanRes = await api.get("/api/materials", {
+          headers: { Authorization: `Bearer ${token}` },
+        }); 
+        setBahanBakuList(bahanRes.data);
+
+        // ukuran
+        const ukuranRes = await api.get("/api/sizes", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setUkuranList(ukuranRes.data || []);
+
+        // finishing
+        const finishingRes = await api.get("/api/finishings", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setFinishing(Array.isArray(finishingRes.data?.data) ? finishingRes.data : []);
+
+        // produk
+        if (id) {
+          const prodRes = await api.get(`/api/products/${id}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          const data = prodRes.data;
+          console.log("Data produk:", data);
+          setProduct(data);
+          setName(data.nama);
+          setDescription(data.deskripsi || "");
+          setMaterial(data.materials || "");
+          setUkuran(data.sizes || []);
+          setFinishing(data.finishings || []);
+          setNewHarga(data.harga || "");
+          setImagePreview(data.gambar || null);
+        }
+      } catch (err) {
+        console.error("Gagal fetch data:", err);
       }
     };
+    fetchData();
   }, [id]);
 
-  // Handle add ukuran
-  const handleAddUkuran = () => {
-    if (newUkuran.trim() && product) {
-      setProduct({
-        ...product,
-        ukuran: [...(product.ukuran || []), newUkuran.trim()],
-      });
-      setNewUkuran("");
-    } else {
-      alert("Mohon isi ukuran terlebih dahulu");
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      if (imagePreviewRef.current) {
+        URL.revokeObjectURL(imagePreviewRef.current);
+      }
+      const url = URL.createObjectURL(file);
+      imagePreviewRef.current = url;
+      setImagePreview(url);
     }
   };
 
-  // Handle add finishing
+  const handleAddUkuran = () => {
+    if (newUkuran.trim() && !ukuran.includes(newUkuran.trim())) {
+      setUkuran([...ukuran, newUkuran.trim()]);
+      setNewUkuran("");
+    } else {
+      alert("Mohon isi ukuran terlebih dahulu dan pastikan tidak duplikat");
+    }
+  };
+
+  const handleRemoveUkuran = (index: number) => {
+    setUkuran(ukuran.filter((_, i) => i !== index));
+  };
+
   const handleAddFinishing = () => {
     if (
-      newFinishingJenis.trim() !== "" &&
+      newFinishing.trim() !== "" &&
       newFinishingHargaTambahan.trim() !== "" &&
-      newFinishingKategori.trim() !== "" &&
-      product
+      newFinishingKategori.trim() !== ""
     ) {
-      const newFinishing: Finishing = {
+      const newF: Finishing = {
         id: Date.now(),
-        productId: product.id,
-        jenis: newFinishingJenis.trim(),
+        productId: product?.id || 0,
+        jenis: newFinishing.trim(),
         hargaTambahan: newFinishingHargaTambahan.trim(),
         kategori: newFinishingKategori,
+        isEditing: false,
       };
-      setProduct({
-        ...product,
-        finishing: [...(product.finishing || []), newFinishing],
-      });
-      setNewFinishingJenis("");
+      setFinishing([...finishing, newF]);
+      setNewFinishing("");
       setNewFinishingHargaTambahan("");
-      setNewFinishingKategori("Cover");
+      setNewFinishingKategori("cover");
     } else {
       alert("Mohon isi semua field Finishing");
     }
   };
 
-  // Handle delete finishing
   const handleDeleteFinishing = (id: number) => {
-    if (product?.finishing) {
-      setProduct({
-        ...product,
-        finishing: product.finishing.filter((f) => f.id !== id),
-      });
-    }
+    setFinishing(finishing.filter((f) => f.id !== id));
   };
 
-  // Handle edit finishing
   const handleEditFinishing = (id: number) => {
-    if (product?.finishing) {
-      setProduct({
-        ...product,
-        finishing: product.finishing.map((f) =>
-          f.id === id ? { ...f, isEditing: true } : f
-        ),
-      });
-    }
+    setFinishing(
+      finishing.map((f) =>
+        f.id === id ? { ...f, isEditing: true } : { ...f, isEditing: false }
+      )
+    );
   };
 
-  // Handle save edit finishing
   const handleSaveEditFinishing = (
     id: number,
     jenis: string,
     hargaTambahan: string,
     kategori: string
   ) => {
-    if (product?.finishing) {
-      setProduct({
-        ...product,
-        finishing: product.finishing.map((f) =>
-          f.id === id
-            ? {
-                ...f,
-                jenis,
-                hargaTambahan,
-                kategori,
-                isEditing: false,
-              }
-            : f
-        ),
-      });
-    }
+    setFinishing(
+      finishing.map((f) =>
+        f.id === id ? { ...f, jenis, hargaTambahan, kategori, isEditing: false } : f
+      )
+    );
   };
 
-  // Handle cancel edit
   const handleCancelEdit = (id: number) => {
-    if (product?.finishing) {
-      setProduct({
-        ...product,
-        finishing: product.finishing.map((f) =>
-          f.id === id ? { ...f, isEditing: false } : f
-        ),
-      });
-    }
+    setFinishing(
+      finishing.map((f) => (f.id === id ? { ...f, isEditing: false } : f))
+    );
   };
 
-  // Handle save produk
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!product) return;
-    const updatedProduct = {
-      ...product,
-      harga: newHarga,
-    };
-    console.log("Disimpan:", updatedProduct);
-    // Panggil API disini jika perlu
-    navigate("/admin/produk");
-  };
 
-  // Handle image change
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
+    try {
+      // Membuat FormData
+      const formData = new FormData();
 
-      if (imagePreviewRef.current) {
-        URL.revokeObjectURL(imagePreviewRef.current);
+      // Tambahkan data produk
+      formData.append("nama", name);
+      formData.append("deskripsi", description);
+      formData.append("harga", String(newHarga));
+
+      if (imageFile) {
+        formData.append("gambar", imageFile);
       }
-      const url = URL.createObjectURL(file);
-      imagePreviewRef.current = url;
-      setNewImage(file);
+
+      // Tambahkan list ukuran
+      ukuran.forEach((size) => {
+        formData.append("ukuran[]", size);
+      });
+
+      // Tambahkan list finishing
+      finishing.forEach((f) => {
+        formData.append("finishing[]", JSON.stringify(f));
+      });
+
+      // Tambahkan data lainnya dari produk yang sudah di-fetch
+      // Pastikan data ini konsisten dengan backend
+      // Jika backend perlu data lain, tambahkan di sini
+
+      const token = localStorage.getItem("token");
+      
+      // Kirim data ke API
+      await api.put(`/api/products/${product.id}`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      alert("Produk berhasil disimpan");
+      navigate("/admin/produk");
+    } catch (err) {
+      console.error("Gagal update:", err);
+      alert("Gagal menyimpan produk");
     }
   };
-
-  const imagePreview =
-    newImage ? URL.createObjectURL(newImage) : product?.imageUrl;
-
-  // Revoke URL saat image berubah
-  useEffect(() => {
-    if (newImage) {
-      if (imagePreviewRef.current) {
-        URL.revokeObjectURL(imagePreviewRef.current);
-      }
-      imagePreviewRef.current = URL.createObjectURL(newImage);
-    }
-    return () => {
-      if (imagePreviewRef.current) {
-        URL.revokeObjectURL(imagePreviewRef.current);
-        imagePreviewRef.current = null;
-      }
-    };
-  }, [newImage]);
 
   if (!product) return <div>Loading...</div>;
 
@@ -231,7 +231,13 @@ const EditProductAdminPage: React.FC = () => {
       <NavbarAdmin />
       <SidebarAdmin />
       <div className="md:ml-64 pt-28 px-4 md:px-8 pb-10">
-        <form className="bg-white rounded-2xl shadow-xl p-8 max-w-3xl mx-auto space-y-6">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSave();
+          }}
+          className="bg-white rounded-2xl shadow-xl p-8 max-w-3xl mx-auto space-y-6"
+        >
           {/* Header */}
           <div className="flex flex-row items-center justify-between gap-4 mb-4">
             <h1 className="text-2xl md:text-3xl font-bold text-green-700 flex items-center gap-2">
@@ -261,9 +267,7 @@ const EditProductAdminPage: React.FC = () => {
                 {product.available ? "Produk Tersedia" : "Produk Tidak Tersedia"}
               </span>
               <Icon
-                icon={
-                  product.available ? "mdi:check-circle" : "mdi:close-circle"
-                }
+                icon={product.available ? "mdi:check-circle" : "mdi:close-circle"}
                 className={`ml-1 md:ml-2 w-4 md:w-5 h-4 md:h-5 ${
                   product.available ? "text-green-600" : "text-red-600"
                 }`}
@@ -277,8 +281,8 @@ const EditProductAdminPage: React.FC = () => {
             <input
               type="text"
               className="w-full border border-black/50 rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-green-700"
-              value={product.name}
-              onChange={(e) => setProduct({ ...product, name: e.target.value })}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
             />
           </div>
 
@@ -307,10 +311,8 @@ const EditProductAdminPage: React.FC = () => {
             <label className="block mb-1 font-semibold">Deskripsi Produk</label>
             <textarea
               className="w-full border border-black/50 rounded-lg min-h-[100px] p-2 focus:outline-none focus:ring-1 focus:ring-green-700"
-              value={product.description}
-              onChange={(e) =>
-                setProduct({ ...product, description: e.target.value })
-              }
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
               placeholder={`- Masukkan deskripsi produk dalam bentuk list\n- Gunakan tanda (-) untuk setiap poin`}
             />
           </div>
@@ -320,17 +322,15 @@ const EditProductAdminPage: React.FC = () => {
             <label className="block mb-1 font-semibold">Bahan</label>
             <select
               className="w-full border border-black/50 rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-green-700"
-              value={product.material}
-              onChange={(e) =>
-                setProduct({ ...product, material: e.target.value })
-              }
+              value={material}
+              onChange={(e) => setMaterial(e.target.value)}
             >
               <option value="">Pilih Bahan</option>
-              <option value="kayu">Kayu</option>
-              <option value="mdf">MDF</option>
-              <option value="multiplek">Multiplek</option>
-              <option value="hpl">HPL</option>
-              <option value="taco">Taco</option>
+              {bahanBakuList.map((bahan) => (
+                <option key={bahan.id} value={bahan.id}>
+                  {bahan.nama}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -346,153 +346,170 @@ const EditProductAdminPage: React.FC = () => {
               />
               <button
                 type="button"
-                className="bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-1 hover:bg-green-600 cursor-pointer"
+                className="bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-1 hover:bg-green-600"
                 onClick={handleAddUkuran}
               >
                 <Icon icon="mdi:plus" />
                 Tambah
               </button>
             </div>
-            <p className="mt-2 text-sm text-gray-700">
-              Ukuran: {product.ukuran?.join(", ")}
-            </p>
+            {/* Daftar Ukuran */}
+            <ul className="mt-2 list-disc list-inside text-sm text-gray-700">
+              {ukuran.map((size, index) => (
+                <li key={index} className="flex justify-between items-center">
+                  <span>{size}</span>
+                  <button
+                    type="button"
+                    className="text-red-600 hover:text-red-800"
+                    onClick={() => handleRemoveUkuran(index)}
+                  >
+                    <Icon icon="mdi:trash-can-outline" width={18} height={18} />
+                  </button>
+                </li>
+              ))}
+            </ul>
           </div>
 
           {/* Finishing */}
           <div>
             <label className="block mb-1 font-semibold">Finishing</label>
+            {/* Input Finishing Baru */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-2 items-center">
-              {/* Jenis Finishing */}
+              {/* Nama Finishing */}
               <input
                 type="text"
-                placeholder="Jenis Finishing"
+                placeholder="Nama Finishing"
                 className="border border-black/50 rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-green-700 col-span-1"
-                value={newFinishingJenis}
-                onChange={(e) => setNewFinishingJenis(e.target.value)}
+                value={newFinishing}
+                onChange={(e) => setNewFinishing(e.target.value)}
               />
               {/* Harga Tambahan */}
               <input
-                type="text"
+                type="number"
                 placeholder="Harga Tambahan"
                 className="border border-black/50 rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-green-700 col-span-1"
                 value={newFinishingHargaTambahan}
                 onChange={(e) => setNewFinishingHargaTambahan(e.target.value)}
               />
-              {/* Kategori Finishing */}
+              {/* Kategori */}
               <select
                 className="border border-black/50 rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-green-700 col-span-1"
                 value={newFinishingKategori}
                 onChange={(e) => setNewFinishingKategori(e.target.value)}
               >
-                <option value="">Pilih Kategori</option>
-                <option value="Cover">Cover</option>
-                <option value="Isi">Isi</option>
-                <option value="Umum">Umum</option>
+                <option value="cover">Cover</option>
+                <option value="isi">Isi</option>
+                <option value="umum">Umum</option>
               </select>
             </div>
             {/* Tombol Tambah Finishing */}
             <button
               type="button"
-              className="bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-1 hover:bg-green-600 cursor-pointer"
+              className="bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-1 hover:bg-green-600"
               onClick={handleAddFinishing}
             >
               <Icon icon="mdi:plus" /> Tambah Finishing
             </button>
-            {/* Daftar Finishing dengan aksi edit & hapus */}
-            <ul className="mt-3 text-sm list-disc list-inside text-gray-700">
-              {product.finishing?.map((f) => (
-                <li key={f.id} className="mb-2">
+            {/* Daftar Finishing */}
+            <ul className="mt-4 space-y-3">
+              {finishing.map((f) => (
+                <li
+                  key={f.id}
+                  className="bg-white shadow-md rounded-lg p-4 border border-gray-200"
+                >
                   {f.isEditing ? (
-                    <div className="flex flex-col sm:flex-row gap-2 items-center">
-                      {/* Inline edit fields */}
+                    <div className="grid sm:grid-cols-4 gap-3 items-center">
                       <input
                         type="text"
                         value={f.jenis}
                         onChange={(e) =>
-                          setProduct({
-                            ...product,
-                            finishing: product.finishing?.map((item) =>
+                          setFinishing(
+                            finishing.map((item) =>
                               item.id === f.id
                                 ? { ...item, jenis: e.target.value }
                                 : item
-                            ),
-                          })
+                            )
+                          )
                         }
-                        className="border border-black/50 rounded p-1 flex-1"
+                        className="border border-gray-300 rounded px-2 py-1 w-full"
                       />
                       <input
-                        type="text"
+                        type="number"
                         value={f.hargaTambahan}
                         onChange={(e) =>
-                          setProduct({
-                            ...product,
-                            finishing: product.finishing?.map((item) =>
+                          setFinishing(
+                            finishing.map((item) =>
                               item.id === f.id
                                 ? { ...item, hargaTambahan: e.target.value }
                                 : item
-                            ),
-                          })
+                            )
+                          )
                         }
-                        className="border border-black/50 rounded p-1 flex-1"
+                        className="border border-gray-300 rounded px-2 py-1 w-full"
                       />
                       <select
                         value={f.kategori}
                         onChange={(e) =>
-                          setProduct({
-                            ...product,
-                            finishing: product.finishing?.map((item) =>
+                          setFinishing(
+                            finishing.map((item) =>
                               item.id === f.id
                                 ? { ...item, kategori: e.target.value }
                                 : item
-                            ),
-                          })
-                        }
-                        className="border border-black/50 rounded p-1 flex-1"
-                      >
-                        <option value="Cover">Cover</option>
-                        <option value="Isi">Isi</option>
-                        <option value="Umum">Umum</option>
-                      </select>
-                      <button
-                        type="button"
-                        className="text-green-600 font-semibold"
-                        onClick={() =>
-                          handleSaveEditFinishing(
-                            f.id,
-                            f.jenis,
-                            f.hargaTambahan,
-                            f.kategori
+                            )
                           )
                         }
+                        className="border border-gray-300 rounded px-2 py-1 w-full"
                       >
-                        Save
-                      </button>
-                      <button
-                        type="button"
-                        className="text-red-600 font-semibold"
-                        onClick={() => handleCancelEdit(f.id)}
-                      >
-                        Cancel
-                      </button>
+                        <option value="cover">Cover</option>
+                        <option value="isi">Isi</option>
+                        <option value="umum">Umum</option>
+                      </select>
+                      <div className="flex gap-2 justify-end">
+                        <button
+                          type="button"
+                          className="flex items-center gap-1 bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded"
+                          onClick={() =>
+                            handleSaveEditFinishing(
+                              f.id,
+                              f.jenis,
+                              f.hargaTambahan,
+                              f.kategori
+                            )
+                          }
+                        >
+                          <Icon icon="material-symbols:save" width={20} />
+                          Simpan
+                        </button>
+                        <button
+                          type="button"
+                          className="flex items-center gap-1 bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
+                          onClick={() => handleCancelEdit(f.id)}
+                        >
+                          <Icon icon="mdi:cancel" width={20} />
+                          Batal
+                        </button>
+                      </div>
                     </div>
                   ) : (
-                    <div className="flex items-center justify-between">
-                      <div>
-                        {f.jenis} - {f.hargaTambahan} ({f.kategori})
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                      <div className="text-gray-800 font-medium">
+                        {f.jenis} - Rp {Number(f.hargaTambahan).toLocaleString()} ({f.kategori})
                       </div>
                       <div className="flex gap-2">
                         <button
                           type="button"
-                          className="text-blue-600 font-semibold"
+                          className="flex items-center gap-1 text-blue-600 hover:underline"
                           onClick={() => handleEditFinishing(f.id)}
                         >
+                          <Icon icon="mdi:pencil" width={20} />
                           Edit
                         </button>
                         <button
                           type="button"
-                          className="text-red-600 font-semibold"
+                          className="flex items-center gap-1 text-red-600 hover:underline"
                           onClick={() => handleDeleteFinishing(f.id)}
                         >
+                          <Icon icon="mdi:trash-can" width={20} />
                           Hapus
                         </button>
                       </div>
@@ -517,7 +534,7 @@ const EditProductAdminPage: React.FC = () => {
             />
           </div>
 
-          {/* Tombol */}
+          {/* Button */}
           <div className="flex justify-end space-x-2">
             <button
               type="button"
@@ -527,8 +544,7 @@ const EditProductAdminPage: React.FC = () => {
               <Icon icon="mdi:arrow-left" /> Batal
             </button>
             <button
-              type="button"
-              onClick={handleSave}
+              type="submit"
               className="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 flex items-center gap-1 cursor-pointer"
             >
               <Icon icon="mdi:content-save" /> Simpan
