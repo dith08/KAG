@@ -12,35 +12,41 @@ const AddBahanBakuAdminPage: React.FC = () => {
   const [stok, setStok] = useState("");
   const [satuan, setSatuan] = useState("");
   const [harga, setHarga] = useState("");
+  const [unit, setUnit] = useState("");
   const [kategori, setKategori] = useState("umum");
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  const token = localStorage.getItem("token");
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const token = localStorage.getItem("token");
 
-  if (!token) {
-    alert("Tidak ada token. Silakan login kembali.");
-    return;
-  }
+    if (!token) {
+      alert("Tidak ada token. Silakan login kembali.");
+      return;
+    }
 
-  try {
-    const newBahan = { nama, jenis, stok, satuan, harga, kategori };
+    try {
+      const newBahan = { nama, jenis, stok, satuan, harga, kategori };
 
-    const response = await api.post("/api/materials", newBahan, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: "application/json",
-      },
-    });
+      const response = await api.post("/api/materials", newBahan, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json",
+        },
+      });
 
-    console.log("Response:", response.data);
-    alert("Bahan Baku berhasil ditambahkan!");
-    navigate("/admin/produk");
-  } catch (error: any) {
-    console.error("Error saat menambahkan bahan baku:", error.response || error.message);
-    alert("Gagal menambahkan bahan baku. Pastikan Anda sudah login dan token valid.");
-  }
-};
+      console.log("Response:", response.data);
+      alert("Bahan Baku berhasil ditambahkan!");
+      navigate("/admin/produk");
+    } catch (error: any) {
+      console.error(
+        "Error saat menambahkan bahan baku:",
+        error.response || error.message
+      );
+      alert(
+        "Gagal menambahkan bahan baku. Pastikan Anda sudah login dan token valid."
+      );
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -52,8 +58,13 @@ const handleSubmit = async (e: React.FormEvent) => {
           className="bg-white rounded-2xl shadow-xl p-6 md:p-10 max-w-3xl mx-auto space-y-6"
         >
           <div className="flex items-center space-x-3 mb-6">
-            <Icon icon="mdi:invoice-text-plus" className="text-green-700 text-4xl" />
-            <h1 className="text-2xl md:text-3xl font-bold text-green-700">Tambah Bahan Baku</h1>
+            <Icon
+              icon="mdi:invoice-text-plus"
+              className="text-green-700 text-4xl"
+            />
+            <h1 className="text-2xl md:text-3xl font-bold text-green-700">
+              Tambah Bahan Baku
+            </h1>
           </div>
 
           {/* Nama Bahan */}
@@ -107,18 +118,31 @@ const handleSubmit = async (e: React.FormEvent) => {
             </div>
           </div>
 
-          {/* Harga */}
-          <div>
-            <label className="block mb-2 font-semibold">Harga</label>
-            <input
-              type="number"
-              min="0"
-              className="w-full border border-black/50 rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-green-700"
-              value={harga}
-              onChange={(e) => setHarga(e.target.value)}
-              placeholder="Contoh: 75000"
-              required
-            />
+          {/* Harga dan Unit */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block mb-2 font-semibold">Harga (per unit)</label>
+              <input
+                type="number"
+                min="0"
+                className="w-full border border-black/50 rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-green-700"
+                value={harga}
+                onChange={(e) => setHarga(e.target.value)}
+                placeholder="Contoh: 75000"
+                required
+              />
+            </div>
+            <div>
+              <label className="block mb-2 font-semibold">Unit</label>
+              <input
+                type="text"
+                className="w-full border border-black/50 rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-green-700"
+                value={unit}
+                onChange={(e) => setUnit(e.target.value)}
+                placeholder="Contoh: per rim, per kg"
+                required
+              />
+            </div>
           </div>
 
           {/* Kategori */}

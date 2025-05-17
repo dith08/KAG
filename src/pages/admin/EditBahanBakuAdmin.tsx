@@ -11,7 +11,8 @@ export interface BahanBaku {
   jenis: string;
   stok: number;
   satuan: string;
-  harga: string;
+  harga: number;
+  unit: string;
   kategori?: string;
 }
 
@@ -158,17 +159,30 @@ const EditBahanBakuAdminPage: React.FC = () => {
                 </div>
               </div>
 
-              <div>
-                <label className="block mb-2 font-semibold">Harga</label>
-                <input
-                  type="text"
-                  name="harga"
-                  value={bahan.harga}
-                  onChange={handleChange}
-                  placeholder="Contoh: Rp.75.000/rim"
-                  className="w-full border border-black/50 rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-green-700"
-                  required
-                />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block mb-2 font-semibold">Harga (per unit)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    className="w-full border border-black/50 rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-green-700"
+                    value={bahan.harga}
+                    onChange={handleChange}
+                    placeholder="Contoh: 75000"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block mb-2 font-semibold">Unit</label>
+                  <input
+                    type="text"
+                    className="w-full border border-black/50 rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-green-700"
+                    value={bahan.unit}
+                    onChange={handleChange}
+                    placeholder="Contoh: per rim, per kg"
+                    required
+                  />
+                </div>
               </div>
 
               <div>
