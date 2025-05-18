@@ -6,6 +6,7 @@ import SidebarAdmin from "../../components/admin/SidebarAdmin";
 import { Icon } from "@iconify/react";
 import api from "../../services/api"; // sesuaikan path
 import { getBaseUrl } from "../../utils/getBaseUrl";
+import { useToast } from "../../components/toast/useToast";
 
 interface OptionItem {
   id: number;
@@ -17,6 +18,9 @@ interface OptionItem {
 const EditProductAdminPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [isFetching, setIsFetching] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { showToast } = useToast();
 
   const [sizeList, setSizeList] = useState<OptionItem[]>([]);
   const [newSize, setNewSize] = useState("");
@@ -42,12 +46,8 @@ const EditProductAdminPage: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setIsFetching(true);
         const token = localStorage.getItem("token");
-        if (!token) {
-          alert("Token tidak ditemukan. Silakan login ulang.");
-          return;
-        }
-
         const headers = { Authorization: `Bearer ${token}` };
 
         // Ambil data master
@@ -111,12 +111,15 @@ const EditProductAdminPage: React.FC = () => {
           );
         }
       } catch (err) {
+        showToast("Gagal mengambil data", "error");
         console.error("Gagal fetch data:", err);
+      } finally {
+        setIsFetching(false);
       }
     };
 
     fetchData();
-  }, [id]); // Hanya jalankan saat id berubah
+  }, [id, showToast]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -133,14 +136,10 @@ const EditProductAdminPage: React.FC = () => {
 
   const handleSave = async () => {
     if (!product) return;
-
     const token = localStorage.getItem("token");
-    if (!token) {
-      alert("Token tidak ditemukan. Silakan login ulang.");
-      return;
-    }
 
     try {
+      setIsSubmitting(true);
       const formData = new FormData();
 
       // Tambahkan data dasar
@@ -174,295 +173,350 @@ const EditProductAdminPage: React.FC = () => {
         },
       });
 
-      alert("Produk berhasil disimpan");
+      showToast("Produk berhasil diperbarui!", "success");
       navigate("/admin/produk");
     } catch (err: any) {
       console.error("Gagal update:", err);
       if (err.response?.status === 422) {
-        alert("Validasi gagal. Cek data yang dimasukkan.");
+        showToast("Validasi gagal. Cek data yang dimasukkan.", "error");
       } else if (err.response?.status === 500) {
-        alert("Terjadi kesalahan di server. Cek data atau coba lagi nanti.");
+        showToast(
+          "Terjadi kesalahan di server. Cek data atau coba lagi nanti.",
+          "error"
+        );
       } else {
-        alert("Gagal menyimpan produk, cek console untuk detail.");
+        showToast(
+          "Gagal menyimpan produk. Cek koneksi atau coba lagi.",
+          "error"
+        );
       }
+    } finally {
+      setIsSubmitting(false);
     }
   };
-
-  if (!product) return <div>Loading...</div>;
 
   return (
     <div className="min-h-screen bg-gray-50">
       <NavbarAdmin />
       <SidebarAdmin />
       <div className="md:ml-64 pt-28 px-4 md:px-8 pb-10">
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSave();
-          }}
-          className="bg-white rounded-2xl shadow-xl p-8 max-w-3xl mx-auto space-y-6"
-        >
-          {/* Header */}
-          <div className="flex flex-row items-center justify-between gap-4 mb-4">
-            <h1 className="text-2xl md:text-3xl font-bold text-green-700 flex items-center gap-2">
-              <Icon icon="mdi:archive-edit" className="w-7 h-7 md:w-9 md:h-9" />
-              Edit Produk
-            </h1>
-            <div
-              onClick={() =>
-                setProduct({ ...product, status: !product.status })
-              }
-              className={`cursor-pointer flex items-center gap-2 p-2 md:p-3 rounded-lg transition-all duration-300 ${
-                product?.status
-                  ? "bg-green-100 hover:bg-green-200"
-                  : "bg-red-100 hover:bg-red-200"
-              }`}
-            >
+        {isFetching ? (
+          <div className="flex justify-start items-center">
+            <Icon icon="mdi:loading" className="animate-spin mr-2" />
+            <p className="text-gray-500">Memuat data...</p>
+          </div>
+        ) : product ? (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSave();
+            }}
+            className="bg-white rounded-2xl shadow-xl p-8 max-w-3xl mx-auto space-y-6"
+          >
+            {/* Header */}
+            <div className="flex flex-row items-center justify-between gap-4 mb-4">
+              <h1 className="text-2xl md:text-3xl font-bold text-green-700 flex items-center gap-2">
+                <Icon
+                  icon="mdi:archive-edit"
+                  className="w-7 h-7 md:w-9 md:h-9"
+                />
+                Edit Produk
+              </h1>
               <div
-                className={`w-3 md:w-4 h-3 md:h-4 rounded-full ${
-                  product?.status ? "bg-green-500" : "bg-red-500"
-                }`}
-              ></div>
-              <span
-                className={`hidden md:block text-sm md:text-base font-medium ${
-                  product?.status ? "text-green-700" : "text-red-700"
+                onClick={() =>
+                  product &&
+                  setProduct({
+                    ...product,
+                    status: !product.status,
+                  } as OptionItem)
+                }
+                className={`cursor-pointer flex items-center gap-2 p-2 md:p-3 rounded-lg transition-all duration-300 ${
+                  product?.status
+                    ? "bg-green-100 hover:bg-green-200"
+                    : "bg-red-100 hover:bg-red-200"
                 }`}
               >
-                {product?.status ? "Produk Tersedia" : "Produk Tidak Tersedia"}
-              </span>
-              <Icon
-                icon={product?.status ? "mdi:check-circle" : "mdi:close-circle"}
-                className={`ml-1 md:ml-2 w-4 md:w-5 h-4 md:h-5 ${
-                  product?.status ? "text-green-600" : "text-red-600"
-                }`}
-              />
-            </div>
-          </div>
-
-          {/* Nama Produk */}
-          <div>
-            <label className="block mb-1 font-semibold">Nama Produk</label>
-            <input
-              type="text"
-              className="w-full border border-black/50 rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-green-700"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </div>
-
-          {/* Gambar Produk */}
-          <div>
-            <label className="block mb-1 font-semibold">Gambar Produk</label>
-            <input
-              type="file"
-              accept="image/*"
-              className="w-full border border-black/50 rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-green-700"
-              onChange={handleImageChange}
-            />
-            {imagePreview && (
-              <div className="mt-4">
-                <img
-                  src={imagePreview}
-                  alt="Preview"
-                  className="w-40 h-40 object-contain rounded-xl shadow"
+                <div
+                  className={`w-3 md:w-4 h-3 md:h-4 rounded-full ${
+                    product?.status ? "bg-green-500" : "bg-red-500"
+                  }`}
+                ></div>
+                <span
+                  className={`hidden md:block text-sm md:text-base font-medium ${
+                    product?.status ? "text-green-700" : "text-red-700"
+                  }`}
+                >
+                  {product?.status
+                    ? "Produk Tersedia"
+                    : "Produk Tidak Tersedia"}
+                </span>
+                <Icon
+                  icon={
+                    product?.status ? "mdi:check-circle" : "mdi:close-circle"
+                  }
+                  className={`ml-1 md:ml-2 w-4 md:w-5 h-4 md:h-5 ${
+                    product?.status ? "text-green-600" : "text-red-600"
+                  }`}
                 />
               </div>
-            )}
-          </div>
-
-          {/* Deskripsi */}
-          <div>
-            <label className="block mb-1 font-semibold">Deskripsi Produk</label>
-            <textarea
-              className="w-full border border-black/50 rounded-lg min-h-[100px] p-2 focus:outline-none focus:ring-1 focus:ring-green-700"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder={`- Masukkan deskripsi produk dalam bentuk list\n- Gunakan tanda (-) untuk setiap poin`}
-            />
-          </div>
-
-          {/* Bahan */}
-          <div>
-            <label className="block mb-1 font-semibold">Bahan</label>
-            <div className="flex gap-2 mb-2">
-              <select
-                className="w-full border border-black/50 rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-green-700"
-                value={newMaterial}
-                onChange={(e) => {
-                  const selected = e.target.value;
-                  if (selected && !materials.includes(selected)) {
-                    setMaterials([...materials, selected]);
-                  }
-                  setNewMaterial(""); // reset dropdown
-                }}
-              >
-                <option value="">Pilih Bahan</option>
-                {materialList.map((bahan) => (
-                  <option
-                    key={bahan.id}
-                    value={bahan.id.toString()}
-                    disabled={materials.includes(bahan.id.toString())}
-                  >
-                    {bahan.nama} ({bahan.kategori})
-                  </option>
-                ))}
-              </select>
             </div>
 
-            <ul className="mt-2 list-disc list-inside text-sm text-gray-700">
-              {materials.map((mat) => (
-                <li key={mat} className="flex justify-between items-center">
-                  <span>
-                    {`${
-                      materialList.find((b) => b.id.toString() === mat)?.nama ||
-                      "Bahan tidak ditemukan"
-                    } (${
-                      materialList.find((b) => b.id.toString() === mat)
-                        ?.kategori
-                    })`}
-                  </span>
-                  <button
-                    type="button"
-                    className="text-red-600 hover:text-red-800"
-                    onClick={() => {
-                      setMaterials(materials.filter((m) => m !== mat));
-                    }}
-                  >
-                    <Icon icon="mdi:trash-can-outline" width={18} height={18} />
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Ukuran */}
-          <div>
-            <label className="block mb-1 font-semibold">Ukuran</label>
-            <div className="flex gap-2 mb-2">
-              <select
+            {/* Nama Produk */}
+            <div>
+              <label className="block mb-1 font-semibold">Nama Produk</label>
+              <input
+                type="text"
                 className="w-full border border-black/50 rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-green-700"
-                value={newSize}
-                onChange={(e) => {
-                  const selected = e.target.value;
-                  if (selected && !sizes.includes(selected)) {
-                    setSizes([...sizes, selected]);
-                  }
-                  setNewSize("");
-                }}
-              >
-                <option value="">Pilih Ukuran</option>
-                {sizeList.map((size) => (
-                  <option
-                    key={size.id}
-                    value={size.id.toString()}
-                    disabled={sizes.includes(size.id.toString())}
-                  >
-                    {size.nama}
-                  </option>
-                ))}
-              </select>
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
             </div>
 
-            <ul className="mt-2 list-disc list-inside text-sm text-gray-700">
-              {sizes.map((sz, index) => (
-                <li key={index} className="flex justify-between items-center">
-                  <span>
-                    {sizeList.find((s) => s.id.toString() === sz)?.nama}
-                  </span>
-                  <button
-                    type="button"
-                    className="text-red-600 hover:text-red-800"
-                    onClick={() => {
-                      setSizes(sizes.filter((_, i) => i !== index));
-                    }}
-                  >
-                    <Icon icon="mdi:trash-can-outline" width={18} height={18} />
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Finishing */}
-          <div>
-            <label className="block mb-1 font-semibold">Finishing</label>
-            <div className="flex gap-2 mb-2">
-              <select
+            {/* Gambar Produk */}
+            <div>
+              <label className="block mb-1 font-semibold">Gambar Produk</label>
+              <input
+                type="file"
+                accept="image/*"
                 className="w-full border border-black/50 rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-green-700"
-                value={newFinishing}
-                onChange={(e) => {
-                  const selected = e.target.value;
-                  if (selected && !finishings.includes(selected)) {
-                    setFinishings([...finishings, selected]);
-                  }
-                  setNewFinishing("");
-                }}
-              >
-                <option value="">Pilih Finishing</option>
-                {finishingList.map((item) => (
-                  <option
-                    key={item.id}
-                    value={item.id.toString()}
-                    disabled={finishings.includes(item.id.toString())}
-                  >
-                    {item.nama} ({item.kategori})
-                  </option>
-                ))}
-              </select>
+                onChange={handleImageChange}
+              />
+              {imagePreview && (
+                <div className="mt-4">
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
+                    className="w-40 h-40 object-contain rounded-xl shadow"
+                  />
+                </div>
+              )}
             </div>
 
-            <ul className="mt-2 list-disc list-inside text-sm text-gray-700">
-              {finishings.map((fns, index) => (
-                <li key={index} className="flex justify-between items-center">
-                  <span>
-                    {finishingList.find((f) => f.id.toString() === fns)?.nama} (
-                    {finishingList.find((f) => f.id.toString() === fns)?.kategori})
-                  </span>
-                  <button
-                    type="button"
-                    className="text-red-600 hover:text-red-800"
-                    onClick={() => {
-                      setFinishings(finishings.filter((_, i) => i !== index));
-                    }}
-                  >
-                    <Icon icon="mdi:trash-can-outline" width={18} height={18} />
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
+            {/* Deskripsi */}
+            <div>
+              <label className="block mb-1 font-semibold">
+                Deskripsi Produk
+              </label>
+              <textarea
+                className="w-full border border-black/50 rounded-lg min-h-[100px] p-2 focus:outline-none focus:ring-1 focus:ring-green-700"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder={`- Masukkan deskripsi produk dalam bentuk list\n- Gunakan tanda (-) untuk setiap poin`}
+              />
+            </div>
 
-          {/* Harga */}
-          <div>
-            <label className="block mb-1 font-semibold">
-              Harga per PCS (Rp)
-            </label>
-            <input
-              type="number"
-              min="0"
-              className="w-full border border-black/50 rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-green-700"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-            />
-          </div>
+            {/* Bahan */}
+            <div>
+              <label className="block mb-1 font-semibold">Bahan</label>
+              <div className="flex gap-2 mb-2">
+                <select
+                  className="w-full border border-black/50 rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-green-700"
+                  value={newMaterial}
+                  onChange={(e) => {
+                    const selected = e.target.value;
+                    if (selected && !materials.includes(selected)) {
+                      setMaterials([...materials, selected]);
+                    }
+                    setNewMaterial(""); // reset dropdown
+                  }}
+                >
+                  <option value="">Pilih Bahan</option>
+                  {materialList.map((bahan) => (
+                    <option
+                      key={bahan.id}
+                      value={bahan.id.toString()}
+                      disabled={materials.includes(bahan.id.toString())}
+                    >
+                      {bahan.nama} ({bahan.kategori})
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-          {/* Button */}
-          <div className="flex justify-end space-x-2">
-            <button
-              type="button"
-              className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 flex items-center gap-1 cursor-pointer"
-              onClick={() => navigate("/admin/produk")}
-            >
-              <Icon icon="mdi:arrow-left" /> Batal
-            </button>
-            <button
-              type="submit"
-              className="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 flex items-center gap-1 cursor-pointer"
-            >
-              <Icon icon="mdi:content-save" /> Simpan
-            </button>
-          </div>
-        </form>
+              <ul className="mt-2 list-disc list-inside text-sm text-gray-700">
+                {materials.map((mat) => (
+                  <li key={mat} className="flex justify-between items-center">
+                    <span>
+                      {`${
+                        materialList.find((b) => b.id.toString() === mat)
+                          ?.nama || "Bahan tidak ditemukan"
+                      } (${
+                        materialList.find((b) => b.id.toString() === mat)
+                          ?.kategori
+                      })`}
+                    </span>
+                    <button
+                      type="button"
+                      className="text-red-600 hover:text-red-800"
+                      onClick={() => {
+                        setMaterials(materials.filter((m) => m !== mat));
+                      }}
+                    >
+                      <Icon
+                        icon="mdi:trash-can-outline"
+                        width={18}
+                        height={18}
+                      />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Ukuran */}
+            <div>
+              <label className="block mb-1 font-semibold">Ukuran</label>
+              <div className="flex gap-2 mb-2">
+                <select
+                  className="w-full border border-black/50 rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-green-700"
+                  value={newSize}
+                  onChange={(e) => {
+                    const selected = e.target.value;
+                    if (selected && !sizes.includes(selected)) {
+                      setSizes([...sizes, selected]);
+                    }
+                    setNewSize("");
+                  }}
+                >
+                  <option value="">Pilih Ukuran</option>
+                  {sizeList.map((size) => (
+                    <option
+                      key={size.id}
+                      value={size.id.toString()}
+                      disabled={sizes.includes(size.id.toString())}
+                    >
+                      {size.nama}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <ul className="mt-2 list-disc list-inside text-sm text-gray-700">
+                {sizes.map((sz, index) => (
+                  <li key={index} className="flex justify-between items-center">
+                    <span>
+                      {sizeList.find((s) => s.id.toString() === sz)?.nama}
+                    </span>
+                    <button
+                      type="button"
+                      className="text-red-600 hover:text-red-800"
+                      onClick={() => {
+                        setSizes(sizes.filter((_, i) => i !== index));
+                      }}
+                    >
+                      <Icon
+                        icon="mdi:trash-can-outline"
+                        width={18}
+                        height={18}
+                      />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Finishing */}
+            <div>
+              <label className="block mb-1 font-semibold">Finishing</label>
+              <div className="flex gap-2 mb-2">
+                <select
+                  className="w-full border border-black/50 rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-green-700"
+                  value={newFinishing}
+                  onChange={(e) => {
+                    const selected = e.target.value;
+                    if (selected && !finishings.includes(selected)) {
+                      setFinishings([...finishings, selected]);
+                    }
+                    setNewFinishing("");
+                  }}
+                >
+                  <option value="">Pilih Finishing</option>
+                  {finishingList.map((item) => (
+                    <option
+                      key={item.id}
+                      value={item.id.toString()}
+                      disabled={finishings.includes(item.id.toString())}
+                    >
+                      {item.nama} ({item.kategori})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <ul className="mt-2 list-disc list-inside text-sm text-gray-700">
+                {finishings.map((fns, index) => (
+                  <li key={index} className="flex justify-between items-center">
+                    <span>
+                      {finishingList.find((f) => f.id.toString() === fns)?.nama}{" "}
+                      (
+                      {
+                        finishingList.find((f) => f.id.toString() === fns)
+                          ?.kategori
+                      }
+                      )
+                    </span>
+                    <button
+                      type="button"
+                      className="text-red-600 hover:text-red-800"
+                      onClick={() => {
+                        setFinishings(finishings.filter((_, i) => i !== index));
+                      }}
+                    >
+                      <Icon
+                        icon="mdi:trash-can-outline"
+                        width={18}
+                        height={18}
+                      />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Harga */}
+            <div>
+              <label className="block mb-1 font-semibold">
+                Harga per PCS (Rp)
+              </label>
+              <input
+                type="number"
+                min="0"
+                className="w-full border border-black/50 rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-green-700"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+              />
+            </div>
+
+            {/* Button */}
+            <div className="flex justify-end space-x-2">
+              <button
+                type="button"
+                className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 flex items-center gap-1 cursor-pointer"
+                onClick={() => navigate("/admin/produk")}
+              >
+                <Icon icon="mdi:arrow-left" /> Batal
+              </button>
+              <button
+                type="submit"
+                className="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 flex items-center gap-1 cursor-pointer"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Icon icon="mdi:loading" className="mr-2 animate-spin" />
+                    Menyimpan...
+                  </>
+                ) : (
+                  <>
+                    <Icon icon="mdi:content-save" className="mr-2" />
+                    Simpan
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
+        ) : (
+          <p className="text-red-500">Data produk tidak ditemukan.</p>
+        )}
       </div>
     </div>
   );

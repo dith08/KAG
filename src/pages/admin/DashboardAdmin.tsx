@@ -11,6 +11,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { Icon } from "@iconify/react";
+import { useState } from "react";
 
 const DashboardAdminPage: React.FC = () => {
   const notifications = [
@@ -55,7 +56,9 @@ const DashboardAdminPage: React.FC = () => {
     },
   ];
 
-  const salesData = [
+  const [filter, setFilter] = useState<"harian" | "bulanan">("harian");
+
+  const salesDataHarian = [
     { date: "01 Apr", total: 1200000 },
     { date: "02 Apr", total: 800000 },
     { date: "03 Apr", total: 1400000 },
@@ -64,6 +67,16 @@ const DashboardAdminPage: React.FC = () => {
     { date: "06 Apr", total: 900000 },
     { date: "07 Apr", total: 1300000 },
   ];
+
+  const salesDataBulanan = [
+    { date: "Jan", total: 12000000 },
+    { date: "Feb", total: 9500000 },
+    { date: "Mar", total: 13500000 },
+    { date: "Apr", total: 11000000 },
+    { date: "Mei", total: 15000000 },
+  ];
+
+  const salesData = filter === "harian" ? salesDataHarian : salesDataBulanan;
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-gray-50">
@@ -80,7 +93,31 @@ const DashboardAdminPage: React.FC = () => {
             <div className="w-full lg:w-7/10 space-y-8">
               {/* Grafik Penjualan */}
               <div className="bg-white p-6 rounded-xl shadow">
-                <h2 className="text-xl font-semibold mb-4">Grafik Penjualan</h2>
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-xl font-semibold">Grafik Penjualan</h2>
+                  <div className="space-x-2">
+                    <button
+                      onClick={() => setFilter("harian")}
+                      className={`px-3 py-1 rounded-full text-sm cursor-pointer ${
+                        filter === "harian"
+                          ? "bg-green-700 text-white"
+                          : "bg-gray-200 text-gray-700"
+                      }`}
+                    >
+                      Harian
+                    </button>
+                    <button
+                      onClick={() => setFilter("bulanan")}
+                      className={`px-3 py-1 rounded-full text-sm cursor-pointer ${
+                        filter === "bulanan"
+                          ? "bg-green-700 text-white"
+                          : "bg-gray-200 text-gray-700"
+                      }`}
+                    >
+                      Bulanan
+                    </button>
+                  </div>
+                </div>
                 <div className="h-64">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={salesData}>

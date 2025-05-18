@@ -4,6 +4,7 @@ import NavbarAdmin from "../../components/admin/NavbarAdmin";
 import SidebarAdmin from "../../components/admin/SidebarAdmin";
 import { Icon } from "@iconify/react";
 import api from "../../services/api";
+import { useToast } from "../../components/toast/useToast";
 
 export interface BahanBaku {
   id: number;
@@ -22,11 +23,14 @@ const EditBahanBakuAdminPage: React.FC = () => {
 
   const [bahan, setBahan] = useState<BahanBaku | null>(null);
   const [kategori, setKategori] = useState<string>("umum");
-  const [loading, setLoading] = useState<boolean>(true);
+  const [isFetching, setIsFetching] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { showToast } = useToast();
 
   useEffect(() => {
     const fetchBahan = async () => {
       try {
+        setIsFetching(true);
         const token = localStorage.getItem("token");
         const response = await api.get(`/api/materials/${id}`, {
           headers: {
@@ -37,16 +41,16 @@ const EditBahanBakuAdminPage: React.FC = () => {
         setKategori(response.data.kategori || "umum");
       } catch (error) {
         console.error("Gagal mengambil data bahan baku:", error);
-        alert("Gagal memuat data bahan baku.");
+        showToast("Gagal mengambil data bahan baku.", "error");
       } finally {
-        setLoading(false);
+        setIsFetching(false);
       }
     };
 
     if (id) {
       fetchBahan();
     }
-  }, [id]);
+  }, [id, showToast]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -61,6 +65,7 @@ const EditBahanBakuAdminPage: React.FC = () => {
     if (!bahan) return;
 
     try {
+      setIsSubmitting(true);
       const token = localStorage.getItem("token");
       const dataToSave = { ...bahan, kategori };
 
@@ -70,11 +75,15 @@ const EditBahanBakuAdminPage: React.FC = () => {
         },
       });
 
-      alert("Data berhasil diperbarui.");
+      showToast("Bahan baku berhasil diperbarui!", "success");
       navigate("/admin/produk");
     } catch (error) {
+      showToast("Gagal menyimpan data bahan.", "error");
       console.error("Gagal menyimpan data bahan:", error);
-      alert("Terjadi kesalahan saat menyimpan data.");
+    } finally {
+      setTimeout(() => {
+        setIsSubmitting(false);
+      }, 2000);
     }
   };
 
@@ -83,26 +92,29 @@ const EditBahanBakuAdminPage: React.FC = () => {
       <NavbarAdmin />
       <SidebarAdmin />
       <div className="md:ml-64 pt-28 px-4 md:px-8 pb-10">
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSubmit();
-          }}
-          className="bg-white rounded-2xl shadow-xl p-6 md:p-10 max-w-3xl mx-auto space-y-6"
-        >
-          <div className="flex items-center space-x-3 mb-6">
-            <Icon
-              icon="mdi:invoice-text-edit"
-              className="text-green-700 text-4xl"
-            />
-            <h1 className="text-2xl md:text-3xl font-bold text-green-700">
-              Edit Bahan Baku
-            </h1>
-          </div>
-
-          {loading ? (
+        {isFetching ? (
+          <div className="flex justify-start items-center">
+            <Icon icon="mdi:loading" className="animate-spin mr-2" />
             <p className="text-gray-500">Memuat data...</p>
-          ) : bahan ? (
+          </div>
+        ) : bahan ? (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSubmit();
+            }}
+            className="bg-white rounded-2xl shadow-xl p-6 md:p-10 max-w-3xl mx-auto space-y-6"
+          >
+            <div className="flex items-center space-x-3 mb-6">
+              <Icon
+                icon="mdi:invoice-text-edit"
+                className="text-green-700 text-4xl"
+              />
+              <h1 className="text-2xl md:text-3xl font-bold text-green-700">
+                Edit Bahan Baku
+              </h1>
+            </div>
+
             <>
               <div>
                 <label className="block mb-2 font-semibold">Nama Bahan</label>
@@ -161,9 +173,12 @@ const EditBahanBakuAdminPage: React.FC = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block mb-2 font-semibold">Harga (per unit)</label>
+                  <label className="block mb-2 font-semibold">
+                    Harga (per unit)
+                  </label>
                   <input
                     type="number"
+                    name="harga"
                     min="0"
                     className="w-full border border-black/50 rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-green-700"
                     value={bahan.harga}
@@ -176,6 +191,7 @@ const EditBahanBakuAdminPage: React.FC = () => {
                   <label className="block mb-2 font-semibold">Unit</label>
                   <input
                     type="text"
+                    name="unit"
                     className="w-full border border-black/50 rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-green-700"
                     value={bahan.unit}
                     onChange={handleChange}
@@ -210,17 +226,27 @@ const EditBahanBakuAdminPage: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="flex items-center bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition cursor-pointer"
+                  className="flex items-center bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 cursor-pointer disabled:bg-yellow-500 disabled:cursor-not-allowed"
+                  disabled={isSubmitting}
                 >
-                  <Icon icon="mdi:content-save" className="mr-2" />
-                  Simpan
+                  {isSubmitting ? (
+                    <>
+                      <Icon icon="mdi:loading" className="mr-2 animate-spin" />
+                      Menyimpan...
+                    </>
+                  ) : (
+                    <>
+                      <Icon icon="mdi:content-save" className="mr-2" />
+                      Simpan
+                    </>
+                  )}
                 </button>
               </div>
             </>
-          ) : (
-            <p className="text-red-500">Data bahan tidak ditemukan.</p>
-          )}
-        </form>
+          </form>
+        ) : (
+          <p className="text-red-500">Data bahan tidak ditemukan.</p>
+        )}
       </div>
     </div>
   );

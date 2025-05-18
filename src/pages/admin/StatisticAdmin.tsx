@@ -31,14 +31,6 @@ const dataProduk = [
   { name: "Produk D", terjual: 120 },
 ];
 
-const dataTren = [
-  { bulan: "Jan", total: 4000 },
-  { bulan: "Feb", total: 3000 },
-  { bulan: "Mar", total: 5000 },
-  { bulan: "Apr", total: 2500 },
-  { bulan: "Mei", total: 4200 },
-];
-
 const dummyCustomer = [
   { nama: "Ahmad", totalTransaksi: 12, terakhir: "14 April 2025" },
   { nama: "Budi", totalTransaksi: 8, terakhir: "10 April 2025" },
@@ -161,6 +153,28 @@ const StatisticAdminPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [dateFilter, setDateFilter] = useState("");
 
+  const [filter, setFilter] = useState<"harian" | "bulanan">("bulanan");
+
+  const dataBulanan = [
+    { bulan: "Jan", total: 4000 },
+    { bulan: "Feb", total: 3000 },
+    { bulan: "Mar", total: 5000 },
+    { bulan: "Apr", total: 2500 },
+    { bulan: "Mei", total: 4200 },
+  ];
+
+  const dataHarian = [
+    { tanggal: "01 Mei", total: 200 },
+    { tanggal: "02 Mei", total: 150 },
+    { tanggal: "03 Mei", total: 180 },
+    { tanggal: "04 Mei", total: 300 },
+    { tanggal: "05 Mei", total: 220 },
+    { tanggal: "06 Mei", total: 190 },
+    { tanggal: "07 Mei", total: 250 },
+  ];
+
+  const dataTren = filter === "bulanan" ? dataBulanan : dataHarian;
+
   const handleHistoryClick = (nama: string) => {
     setSelectedBahan(selectedBahan === nama ? null : nama);
   };
@@ -196,7 +210,10 @@ const StatisticAdminPage: React.FC = () => {
     autoTable(doc, {
       startY: y + 10,
       head: [["Bulan", "Total"]],
-      body: dataTren.map((t) => [t.bulan, t.total.toString()]),
+      body: dataTren.map((t) => [
+        "bulan" in t ? t.bulan : t.tanggal,
+        t.total.toString(),
+      ]),
       headStyles: { fillColor: [21, 128, 61] },
     });
     y = doc.lastAutoTable?.finalY ? doc.lastAutoTable.finalY + 10 : y + 30;
@@ -353,20 +370,39 @@ const StatisticAdminPage: React.FC = () => {
                 </ResponsiveContainer>
               </div>
               <div className="bg-gray-50 p-4 rounded-xl shadow-sm">
-                <h3 className="text-center font-semibold mb-3 text-green-700">
-                  Grafik Tren Penjualan
-                </h3>
+                <div className="flex justify-between items-center mb-3">
+                  <h3 className="font-semibold text-green-700">
+                    Grafik Tren Penjualan
+                  </h3>
+                  <select
+                    value={filter}
+                    onChange={(e) =>
+                      setFilter(e.target.value as "harian" | "bulanan")
+                    }
+                    className="text-sm border rounded-md px-2 py-1 text-gray-600"
+                  >
+                    <option value="bulanan">Bulanan</option>
+                    <option value="harian">Harian</option>
+                  </select>
+                </div>
                 <ResponsiveContainer width="100%" height={220}>
                   <LineChart data={dataTren}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="bulan" />
+                    <XAxis
+                      dataKey={filter === "bulanan" ? "bulan" : "tanggal"}
+                    />
                     <YAxis />
-                    <Tooltip />
+                    <Tooltip
+                      formatter={(value: number) =>
+                        `Rp ${value.toLocaleString()}`
+                      }
+                    />
                     <Line
                       type="monotone"
                       dataKey="total"
                       stroke="#F9A825"
                       strokeWidth={2}
+                      dot={{ r: 4 }}
                     />
                   </LineChart>
                 </ResponsiveContainer>

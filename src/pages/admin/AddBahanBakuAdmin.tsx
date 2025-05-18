@@ -4,9 +4,12 @@ import NavbarAdmin from "../../components/admin/NavbarAdmin";
 import SidebarAdmin from "../../components/admin/SidebarAdmin";
 import { Icon } from "@iconify/react";
 import api from "../../services/api";
+import { useToast } from "../../components/toast/useToast";
 
 const AddBahanBakuAdminPage: React.FC = () => {
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+  const { showToast } = useToast();
   const [nama, setNama] = useState("");
   const [jenis, setJenis] = useState("");
   const [stok, setStok] = useState("");
@@ -19,12 +22,8 @@ const AddBahanBakuAdminPage: React.FC = () => {
     e.preventDefault();
     const token = localStorage.getItem("token");
 
-    if (!token) {
-      alert("Tidak ada token. Silakan login kembali.");
-      return;
-    }
-
     try {
+      setIsLoading(true);
       const newBahan = { nama, jenis, stok, satuan, harga, kategori };
 
       const response = await api.post("/api/materials", newBahan, {
@@ -34,20 +33,21 @@ const AddBahanBakuAdminPage: React.FC = () => {
         },
       });
 
+      showToast("Bahan baku berhasil ditambahkan!", "success");
       console.log("Response:", response.data);
-      alert("Bahan Baku berhasil ditambahkan!");
       navigate("/admin/produk");
     } catch (error: any) {
+      showToast("Gagal menambahkan bahan baku.", "error");
       console.error(
-        "Error saat menambahkan bahan baku:",
+        "Gagal menambahkan bahan baku:",
         error.response || error.message
       );
-      alert(
-        "Gagal menambahkan bahan baku. Pastikan Anda sudah login dan token valid."
-      );
+    } finally {
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 2000);
     }
   };
-
   return (
     <div className="min-h-screen bg-gray-50">
       <NavbarAdmin />
@@ -121,7 +121,9 @@ const AddBahanBakuAdminPage: React.FC = () => {
           {/* Harga dan Unit */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block mb-2 font-semibold">Harga (per unit)</label>
+              <label className="block mb-2 font-semibold">
+                Harga (per unit)
+              </label>
               <input
                 type="number"
                 min="0"
@@ -172,10 +174,20 @@ const AddBahanBakuAdminPage: React.FC = () => {
             </button>
             <button
               type="submit"
-              className="flex items-center bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 cursor-pointer"
+              className="flex items-center bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 cursor-pointer disabled:bg-yellow-500 disabled:cursor-not-allowed"
+              disabled={isLoading}
             >
-              <Icon icon="mdi:content-save" className="mr-2" />
-              Simpan
+              {isLoading ? (
+                <>
+                  <Icon icon="mdi:loading" className="mr-2 animate-spin" />
+                  Menyimpan...
+                </>
+              ) : (
+                <>
+                  <Icon icon="mdi:content-save" className="mr-2" />
+                  Simpan
+                </>
+              )}
             </button>
           </div>
         </form>
