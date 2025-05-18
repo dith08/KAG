@@ -5,6 +5,7 @@ import NavbarAdmin from "../../components/admin/NavbarAdmin";
 import SidebarAdmin from "../../components/admin/SidebarAdmin";
 import { Icon } from "@iconify/react";
 import api from "../../services/api";
+import { useToast } from "../../components/toast/useToast";
 
 const AddProductAdminPage: React.FC = () => {
   interface OptionItem {
@@ -14,6 +15,8 @@ const AddProductAdminPage: React.FC = () => {
   }
 
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+  const { showToast } = useToast();
 
   const [sizeList, setSizeList] = useState<OptionItem[]>([]);
   const [newSize, setNewSize] = useState("");
@@ -45,11 +48,12 @@ const AddProductAdminPage: React.FC = () => {
         });
         setMaterialList(response.data);
       } catch (error) {
+        showToast("Gagal mengambil data bahan baku", "error");
         console.error("Gagal mengambil data bahan baku", error);
       }
     };
     fetchBahan();
-  }, []);
+  }, [showToast]);
 
   useEffect(() => {
     const fetchSizeAndFinishing = async () => {
@@ -68,12 +72,13 @@ const AddProductAdminPage: React.FC = () => {
         setSizeList(sizeRes.data);
         setFinishingList(finishingRes.data.data);
       } catch (error) {
+        showToast("Gagal mengambil data ukuran dan finishing", "error");
         console.error("Gagal mengambil data ukuran dan finishing:", error);
       }
     };
 
     fetchSizeAndFinishing();
-  }, []);
+  }, [showToast]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -114,6 +119,7 @@ const AddProductAdminPage: React.FC = () => {
     );
 
     try {
+      setIsLoading(true);
       const res = await api.post("/api/products", formData, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -121,18 +127,24 @@ const AddProductAdminPage: React.FC = () => {
         },
       });
 
+      showToast("Produk berhasil ditambahkan!", "success");
       console.log("Produk berhasil ditambah:", res.data);
       navigate("/admin/produk");
     } catch (err: any) {
       console.error("Gagal tambah produk:", err);
 
       if (err.response?.status === 422) {
-        alert("Validasi gagal. Cek data yang dimasukkan.");
+        showToast("Validasi gagal. Cek data yang dimasukkan.", "error");
       } else if (err.response?.status === 500) {
-        alert("Terjadi kesalahan di server. Cek data atau coba lagi nanti.");
+        showToast(
+          "Terjadi kesalahan di server. Cek data atau coba lagi nanti.",
+          "error"
+        );
       } else {
-        alert("Gagal tambah produk, cek console untuk detail.");
+        showToast("Gagal tambah produk. Cek koneksi atau coba lagi.", "error");
       }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -369,7 +381,17 @@ const AddProductAdminPage: React.FC = () => {
               type="submit"
               className="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 flex items-center gap-1 cursor-pointer"
             >
-              <Icon icon="mdi:content-save" /> Simpan
+              {isLoading ? (
+                <>
+                  <Icon icon="mdi:loading" className="mr-2 animate-spin" />
+                  Menyimpan...
+                </>
+              ) : (
+                <>
+                  <Icon icon="mdi:content-save" className="mr-2" />
+                  Simpan
+                </>
+              )}
             </button>
           </div>
         </form>
