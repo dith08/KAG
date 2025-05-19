@@ -14,6 +14,13 @@ const AddProductAdminPage: React.FC = () => {
     kategori: string;
   }
 
+  interface ProductAttribute {
+    id?: number;
+    nama: string;
+    tipe: "text" | "number" | "select";
+    opsi: string[] | null;
+  }
+
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const { showToast } = useToast();
@@ -29,6 +36,18 @@ const AddProductAdminPage: React.FC = () => {
   const [materialList, setMaterialList] = useState<OptionItem[]>([]);
   const [newMaterial, setNewMaterial] = useState("");
   const [materials, setMaterials] = useState<string[]>([]);
+
+  // State untuk atribut produk
+  const [attributes, setAttributes] = useState<ProductAttribute[]>([]);
+  const [newAttribute, setNewAttribute] = useState<ProductAttribute>({
+    nama: "",
+    tipe: "text",
+    opsi: null,
+  });
+  const [showAttributeForm, setShowAttributeForm] = useState(false);
+  const [editingAttributeIndex, setEditingAttributeIndex] = useState<
+    number | null
+  >(null);
 
   const [name, setName] = useState<string>("");
   const [product, setProduct] = useState<{
@@ -88,6 +107,93 @@ const AddProductAdminPage: React.FC = () => {
     }
   };
 
+  // Fungsi untuk menangani perubahan pada form atribut
+  const handleAttributeChange = (field: keyof ProductAttribute, value: any) => {
+    setNewAttribute((prev) => {
+      if (field === "tipe" && value === "select" && !prev.opsi) {
+        return { ...prev, [field]: value, opsi: [""] };
+      }
+      if (field === "tipe" && value !== "select") {
+        return { ...prev, [field]: value, opsi: null };
+      }
+      return { ...prev, [field]: value };
+    });
+  };
+
+  // Fungsi untuk menangani perubahan opsi pada tipe select
+  const handleOptionChange = (index: number, value: string) => {
+    setNewAttribute((prev) => {
+      if (!prev.opsi) return prev;
+      const updatedOptions = [...prev.opsi];
+      updatedOptions[index] = value;
+      return { ...prev, opsi: updatedOptions };
+    });
+  };
+
+  // Fungsi untuk menambahkan opsi baru pada tipe select
+  const addOption = () => {
+    setNewAttribute((prev) => {
+      if (!prev.opsi) return { ...prev, opsi: [""] };
+      return { ...prev, opsi: [...prev.opsi, ""] };
+    });
+  };
+
+  // Fungsi untuk menghapus opsi pada tipe select
+  const removeOption = (index: number) => {
+    setNewAttribute((prev) => {
+      if (!prev.opsi) return prev;
+      const updatedOptions = prev.opsi.filter((_, i) => i !== index);
+      return { ...prev, opsi: updatedOptions.length ? updatedOptions : [""] };
+    });
+  };
+
+  // Fungsi untuk menambahkan atribut baru atau memperbarui yang sudah ada
+  const handleAddAttribute = () => {
+    if (!newAttribute.nama.trim()) {
+      showToast("Nama atribut tidak boleh kosong", "error");
+      return;
+    }
+
+    if (
+      newAttribute.tipe === "select" &&
+      (!newAttribute.opsi || newAttribute.opsi.some((opt) => !opt.trim()))
+    ) {
+      showToast("Semua opsi harus diisi", "error");
+      return;
+    }
+
+    if (editingAttributeIndex !== null) {
+      // Update existing attribute
+      const updatedAttributes = [...attributes];
+      updatedAttributes[editingAttributeIndex] = { ...newAttribute };
+      setAttributes(updatedAttributes);
+      setEditingAttributeIndex(null);
+    } else {
+      // Add new attribute
+      setAttributes([...attributes, { ...newAttribute }]);
+    }
+
+    // Reset form
+    setNewAttribute({
+      nama: "",
+      tipe: "text",
+      opsi: null,
+    });
+    setShowAttributeForm(false);
+  };
+
+  // Fungsi untuk mengedit atribut
+  const editAttribute = (index: number) => {
+    setNewAttribute({ ...attributes[index] });
+    setEditingAttributeIndex(index);
+    setShowAttributeForm(true);
+  };
+
+  // Fungsi untuk menghapus atribut
+  const removeAttribute = (index: number) => {
+    setAttributes(attributes.filter((_, i) => i !== index));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -120,15 +226,38 @@ const AddProductAdminPage: React.FC = () => {
 
     try {
       setIsLoading(true);
-      const res = await api.post("/api/products", formData, {
+      // Pertama, simpan produk
+      const productRes = await api.post("/api/products", formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
         },
       });
 
+      // Jika ada atribut, simpan atribut produk
+      if (attributes.length > 0) {
+        const productId = productRes.data.id;
+
+        // Simpan setiap atribut
+        const attributePromises = attributes.map((attr) => {
+          return api.post(
+            `/api/products/${productId}/attributes`,
+            {
+              nama: attr.nama,
+              tipe: attr.tipe,
+              opsi: attr.tipe === "select" ? attr.opsi : null,
+            },
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+        });
+
+        await Promise.all(attributePromises);
+      }
+
       showToast("Produk berhasil ditambahkan!", "success");
-      console.log("Produk berhasil ditambah:", res.data);
+      console.log("Produk berhasil ditambah:", productRes.data);
       navigate("/admin/produk");
     } catch (err: any) {
       console.error("Gagal tambah produk:", err);
@@ -244,7 +373,7 @@ const AddProductAdminPage: React.FC = () => {
                   </span>
                   <button
                     type="button"
-                    className="text-red-600 hover:text-red-800"
+                    className="text-red-600 hover:text-red-800 cursor-pointer"
                     onClick={() =>
                       setMaterials(materials.filter((_, i) => i !== index))
                     }
@@ -292,7 +421,7 @@ const AddProductAdminPage: React.FC = () => {
                   </span>
                   <button
                     type="button"
-                    className="text-red-600 hover:text-red-800"
+                    className="text-red-600 hover:text-red-800 cursor-pointer"
                     onClick={() =>
                       setSizes(sizes.filter((_, i) => i !== index))
                     }
@@ -341,7 +470,7 @@ const AddProductAdminPage: React.FC = () => {
                   </span>
                   <button
                     type="button"
-                    className="text-red-600 hover:text-red-800"
+                    className="text-red-600 hover:text-red-800 cursor-pointer"
                     onClick={() =>
                       setFinishings(finishings.filter((_, i) => i !== index))
                     }
@@ -351,6 +480,179 @@ const AddProductAdminPage: React.FC = () => {
                 </li>
               ))}
             </ul>
+          </div>
+
+          {/* Field Baru */}
+          <div>
+            <div className="flex justify-between items-center mb-1">
+              <label className="font-semibold">Field Baru</label>
+              <button
+                type="button"
+                className="text-green-700 hover:text-green-800 text-md flex items-center gap-1 cursor-pointer"
+                onClick={() => {
+                  setNewAttribute({ nama: "", tipe: "text", opsi: null });
+                  setEditingAttributeIndex(null);
+                  setShowAttributeForm(!showAttributeForm);
+                }}
+              >
+                <Icon
+                  icon={
+                    showAttributeForm ? "mdi:minus-circle" : "mdi:plus-circle"
+                  }
+                  width={18}
+                  height={18}
+                />
+                {showAttributeForm ? "Tutup Form" : "Tambah Field"}
+              </button>
+            </div>
+
+            {/* Form Tambah/Edit Field */}
+            {showAttributeForm && (
+              <div className="bg-gray-100 p-4 rounded-lg mb-4 mt-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">
+                      Nama Field
+                    </label>
+                    <input
+                      type="text"
+                      className="w-full border border-black/50 rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-green-700"
+                      value={newAttribute.nama}
+                      onChange={(e) =>
+                        handleAttributeChange("nama", e.target.value)
+                      }
+                      placeholder="contoh: Warna, Orientasi, dll"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">
+                      Tipe Field
+                    </label>
+                    <select
+                      className="w-full border border-black/50 rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-green-700"
+                      value={newAttribute.tipe}
+                      onChange={(e) =>
+                        handleAttributeChange("tipe", e.target.value)
+                      }
+                    >
+                      <option value="text">Text</option>
+                      <option value="number">Angka</option>
+                      <option value="select">Pilihan</option>
+                    </select>
+                  </div>
+                </div>
+
+                {newAttribute.tipe === "select" && (
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium mb-1">
+                      Opsi Pilihan
+                    </label>
+                    {newAttribute.opsi?.map((option, index) => (
+                      <div key={index} className="flex gap-2 mb-2">
+                        <input
+                          type="text"
+                          className="w-full border border-black/50 rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-green-700"
+                          value={option}
+                          onChange={(e) =>
+                            handleOptionChange(index, e.target.value)
+                          }
+                          placeholder={`Opsi ${index + 1}`}
+                        />
+                        <button
+                          type="button"
+                          className="text-red-600 hover:text-red-800 cursor-pointer"
+                          onClick={() => removeOption(index)}
+                          disabled={newAttribute.opsi?.length === 1}
+                        >
+                          <Icon
+                            icon="mdi:trash-can-outline"
+                            width={18}
+                            height={18}
+                          />
+                        </button>
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      className="text-green-700 hover:text-green-800 text-sm flex items-center gap-1 cursor-pointer"
+                      onClick={addOption}
+                    >
+                      <Icon icon="mdi:plus-circle" width={16} height={16} />
+                      Tambah Opsi
+                    </button>
+                  </div>
+                )}
+
+                <div className="flex justify-end">
+                  <button
+                    type="button"
+                    className="bg-green-700 text-white px-3 py-1 rounded-lg hover:bg-green-800 text-sm cursor-pointer"
+                    onClick={handleAddAttribute}
+                  >
+                    {editingAttributeIndex !== null
+                      ? "Update Field"
+                      : "Tambah Field"}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Daftar Field */}
+            {attributes.length > 0 ? (
+              <div className="mt-2 border rounded-lg overflow-hidden">
+                <table className="w-full">
+                  <thead className="bg-gray-100">
+                    <tr>
+                      <th className="px-4 py-2 text-left">Nama</th>
+                      <th className="px-4 py-2 text-left">Tipe</th>
+                      <th className="px-4 py-2 text-left">Opsi</th>
+                      <th className="px-4 py-2 text-center">Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {attributes.map((attr, index) => (
+                      <tr key={index} className="border-t">
+                        <td className="px-4 py-2">{attr.nama}</td>
+                        <td className="px-4 py-2">
+                          {attr.tipe === "text" && "Text"}
+                          {attr.tipe === "number" && "Angka"}
+                          {attr.tipe === "select" && "Pilihan"}
+                        </td>
+                        <td className="px-4 py-2">
+                          {attr.tipe === "select" && attr.opsi?.join(", ")}
+                        </td>
+                        <td className="px-4 py-2 text-center">
+                          <div className="flex justify-center gap-2">
+                            <button
+                              type="button"
+                              className="text-blue-600 hover:text-blue-800"
+                              onClick={() => editAttribute(index)}
+                            >
+                              <Icon icon="mdi:pencil" width={18} height={18} />
+                            </button>
+                            <button
+                              type="button"
+                              className="text-red-600 hover:text-red-800 cursor-pointer"
+                              onClick={() => removeAttribute(index)}
+                            >
+                              <Icon
+                                icon="mdi:trash-can-outline"
+                                width={18}
+                                height={18}
+                              />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500 italic">
+                Belum ada tambahan field
+              </p>
+            )}
           </div>
 
           {/* Harga */}

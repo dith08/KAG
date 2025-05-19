@@ -69,9 +69,6 @@ const ProdukTabel = () => {
   }, [showToast]);
 
   const handleDelete = async (id: number) => {
-    const konfirmasi = confirm("Yakin ingin menghapus produk ini?");
-    if (!konfirmasi) return;
-
     try {
       const token = localStorage.getItem("token");
       await api.delete(`/api/products/${id}`, {
