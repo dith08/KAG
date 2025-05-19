@@ -133,7 +133,7 @@ const StokBahanTabel = () => {
                   <span>{bahan.satuan}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="font-medium">Harga:</span>
+                  <span className="font-medium">Harga (per unit):</span>
                   <span>Rp {Number(bahan.harga).toLocaleString("id-ID")}</span>
                 </div>
                 <div className="flex justify-between">
@@ -177,7 +177,7 @@ const StokBahanTabel = () => {
                 <th className="p-3 whitespace-nowrap">Jenis</th>
                 <th className="p-3 whitespace-nowrap">Stok</th>
                 <th className="p-3 whitespace-nowrap">Satuan</th>
-                <th className="p-3 whitespace-nowrap">Harga</th>
+                <th className="p-3 whitespace-nowrap">Harga (unit)</th>
                 <th className="p-3 whitespace-nowrap">Kategori</th>
                 <th className="p-3 text-center whitespace-nowrap">Aksi</th>
               </tr>

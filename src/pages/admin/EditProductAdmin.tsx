@@ -334,32 +334,33 @@ const EditProductAdminPage: React.FC = () => {
               </div>
 
               <ul className="mt-2 list-disc list-inside text-sm text-gray-700">
-                {materials.map((mat) => (
-                  <li key={mat} className="flex justify-between items-center">
-                    <span>
-                      {`${
-                        materialList.find((b) => b.id.toString() === mat)
-                          ?.nama || "Bahan tidak ditemukan"
-                      } (${
-                        materialList.find((b) => b.id.toString() === mat)
-                          ?.kategori
-                      })`}
-                    </span>
-                    <button
-                      type="button"
-                      className="text-red-600 hover:text-red-800"
-                      onClick={() => {
-                        setMaterials(materials.filter((m) => m !== mat));
-                      }}
-                    >
-                      <Icon
-                        icon="mdi:trash-can-outline"
-                        width={18}
-                        height={18}
-                      />
-                    </button>
-                  </li>
-                ))}
+                {materials.map((mat) => {
+                  const data = materialList.find(
+                    (b) => b.id.toString() === mat
+                  );
+                  return (
+                    <li key={mat} className="flex justify-between items-center">
+                      <span>
+                        {data
+                          ? `${data.nama} (${data.kategori})`
+                          : "Bahan tidak ditemukan"}
+                      </span>
+                      <button
+                        type="button"
+                        className="text-red-600 hover:text-red-800 cursor-pointer"
+                        onClick={() => {
+                          setMaterials(materials.filter((m) => m !== mat));
+                        }}
+                      >
+                        <Icon
+                          icon="mdi:trash-can-outline"
+                          width={18}
+                          height={18}
+                        />
+                      </button>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
 
@@ -399,7 +400,7 @@ const EditProductAdminPage: React.FC = () => {
                     </span>
                     <button
                       type="button"
-                      className="text-red-600 hover:text-red-800"
+                      className="text-red-600 hover:text-red-800 cursor-pointer"
                       onClick={() => {
                         setSizes(sizes.filter((_, i) => i !== index));
                       }}
@@ -444,32 +445,38 @@ const EditProductAdminPage: React.FC = () => {
               </div>
 
               <ul className="mt-2 list-disc list-inside text-sm text-gray-700">
-                {finishings.map((fns, index) => (
-                  <li key={index} className="flex justify-between items-center">
-                    <span>
-                      {finishingList.find((f) => f.id.toString() === fns)?.nama}{" "}
-                      (
-                      {
-                        finishingList.find((f) => f.id.toString() === fns)
-                          ?.kategori
-                      }
-                      )
-                    </span>
-                    <button
-                      type="button"
-                      className="text-red-600 hover:text-red-800"
-                      onClick={() => {
-                        setFinishings(finishings.filter((_, i) => i !== index));
-                      }}
+                {finishings.map((fnsId, index) => {
+                  const finishing = finishingList.find(
+                    (f) => f.id.toString() === fnsId
+                  );
+                  return (
+                    <li
+                      key={index}
+                      className="flex justify-between items-center"
                     >
-                      <Icon
-                        icon="mdi:trash-can-outline"
-                        width={18}
-                        height={18}
-                      />
-                    </button>
-                  </li>
-                ))}
+                      <span>
+                        {finishing
+                          ? `${finishing.nama} (${finishing.kategori})`
+                          : "Finishing tidak ditemukan"}
+                      </span>
+                      <button
+                        type="button"
+                        className="text-red-600 hover:text-red-800 cursor-pointer"
+                        onClick={() => {
+                          setFinishings(
+                            finishings.filter((_, i) => i !== index)
+                          );
+                        }}
+                      >
+                        <Icon
+                          icon="mdi:trash-can-outline"
+                          width={18}
+                          height={18}
+                        />
+                      </button>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
 

@@ -126,6 +126,7 @@ const FinishingTabel = () => {
     } catch (err) {
       showToast("Gagal mengedit finishing", "error");
       console.error("Gagal mengedit finishing:", err);
+      fetchFinishingList();
     } finally {
       setIsUpdating(false);
     }
