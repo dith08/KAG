@@ -13,8 +13,13 @@ export interface BahanBaku {
   stok: number;
   satuan: string;
   harga: number;
-  unit: string;
+  unit_id: number;
   kategori?: string;
+}
+
+interface Unit {
+  id: number;
+  nama: string;
 }
 
 const EditBahanBakuAdminPage: React.FC = () => {
@@ -25,6 +30,7 @@ const EditBahanBakuAdminPage: React.FC = () => {
   const [kategori, setKategori] = useState<string>("umum");
   const [isFetching, setIsFetching] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [units, setUnits] = useState<Unit[]>([]);
   const { showToast } = useToast();
 
   useEffect(() => {
@@ -52,12 +58,34 @@ const EditBahanBakuAdminPage: React.FC = () => {
     }
   }, [id, showToast]);
 
+  useEffect(() => {
+    const fetchUnits = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await api.get("/api/units", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setUnits(response.data);
+      } catch (error) {
+        console.error("Gagal mengambil data unit:", error);
+        showToast("Gagal mengambil data unit.", "error");
+      }
+    };
+
+    fetchUnits();
+  }, [showToast]);
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     if (bahan) {
       const { name, value } = e.target;
-      setBahan({ ...bahan, [name]: value });
+      setBahan({
+        ...bahan,
+        [name]: name === "unit_id" ? Number(value) : value,
+      });
     }
   };
 
@@ -67,7 +95,11 @@ const EditBahanBakuAdminPage: React.FC = () => {
     try {
       setIsSubmitting(true);
       const token = localStorage.getItem("token");
-      const dataToSave = { ...bahan, kategori };
+      const dataToSave = {
+        ...bahan,
+        kategori,
+        unit_id: bahan.unit_id,
+      };
 
       await api.put(`/api/materials/${id}`, dataToSave, {
         headers: {
@@ -189,15 +221,22 @@ const EditBahanBakuAdminPage: React.FC = () => {
                 </div>
                 <div>
                   <label className="block mb-2 font-semibold">Unit</label>
-                  <input
-                    type="text"
-                    name="unit"
+                  <select
+                    name="unit_id"
                     className="w-full border border-black/50 rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-green-700"
-                    value={bahan.unit}
+                    value={bahan.unit_id || ""}
                     onChange={handleChange}
-                    placeholder="Contoh: per rim, per kg"
                     required
-                  />
+                  >
+                    <option value="" disabled>
+                      Pilih unit
+                    </option>
+                    {units.map((unit) => (
+                      <option key={unit.id} value={unit.id}>
+                        {unit.nama}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
 

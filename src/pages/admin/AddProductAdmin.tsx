@@ -331,8 +331,7 @@ const AddProductAdminPage: React.FC = () => {
               onChange={(e) =>
                 setProduct({ ...product, description: e.target.value })
               }
-              placeholder="- Masukkan deskripsi produk dalam bentuk list 
-- Gunakan tanda (-) untuk setiap poin"
+              placeholder="Masukkan deskripsi produk dalam bentuk list"
             />
           </div>
 
@@ -625,7 +624,7 @@ const AddProductAdminPage: React.FC = () => {
                           <div className="flex justify-center gap-2">
                             <button
                               type="button"
-                              className="text-blue-600 hover:text-blue-800"
+                              className="text-green-600 hover:text-green-700 cursor-pointer"
                               onClick={() => editAttribute(index)}
                             >
                               <Icon icon="mdi:pencil" width={18} height={18} />
