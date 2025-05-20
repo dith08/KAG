@@ -1,10 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import NavbarAdmin from "../../components/admin/NavbarAdmin";
 import SidebarAdmin from "../../components/admin/SidebarAdmin";
 import { Icon } from "@iconify/react";
 import api from "../../services/api";
 import { useToast } from "../../components/toast/useToast";
+
+interface Unit {
+  id: string | number;
+  nama: string;
+}
 
 const AddBahanBakuAdminPage: React.FC = () => {
   const navigate = useNavigate();
@@ -17,6 +22,35 @@ const AddBahanBakuAdminPage: React.FC = () => {
   const [harga, setHarga] = useState("");
   const [unit, setUnit] = useState("");
   const [kategori, setKategori] = useState("umum");
+  const [units, setUnits] = useState<Unit[]>([]);
+  const [isLoadingUnits, setIsLoadingUnits] = useState(false);
+
+  // Fetch units from API
+  useEffect(() => {
+    const fetchUnits = async () => {
+      const token = localStorage.getItem("token");
+      try {
+        setIsLoadingUnits(true);
+        const response = await api.get("/api/units", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        });
+        setUnits(response.data);
+      } catch (error: any) {
+        console.error(
+          "Failed to fetch units:",
+          error.response || error.message
+        );
+        showToast("Gagal mengambil data unit.", "error");
+      } finally {
+        setIsLoadingUnits(false);
+      }
+    };
+
+    fetchUnits();
+  }, [showToast]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,7 +58,15 @@ const AddBahanBakuAdminPage: React.FC = () => {
 
     try {
       setIsLoading(true);
-      const newBahan = { nama, jenis, stok, satuan, harga, kategori };
+      const newBahan = {
+        nama,
+        jenis,
+        stok: parseInt(stok),
+        satuan,
+        harga: parseFloat(harga),
+        unit_id: unit,
+        kategori,
+      };
 
       const response = await api.post("/api/materials", newBahan, {
         headers: {
@@ -48,6 +90,7 @@ const AddBahanBakuAdminPage: React.FC = () => {
       }, 2000);
     }
   };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <NavbarAdmin />
@@ -136,14 +179,29 @@ const AddBahanBakuAdminPage: React.FC = () => {
             </div>
             <div>
               <label className="block mb-2 font-semibold">Unit</label>
-              <input
-                type="text"
+              <select
                 className="w-full border border-black/50 rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-green-700"
                 value={unit}
                 onChange={(e) => setUnit(e.target.value)}
-                placeholder="Contoh: per rim, per kg"
                 required
-              />
+                disabled={isLoadingUnits}
+              >
+                <option value="">Pilih Unit</option>
+                {units.map((unitItem) => (
+                  <option key={unitItem.id} value={unitItem.id}>
+                    {unitItem.nama}
+                  </option>
+                ))}
+              </select>
+              {isLoadingUnits && (
+                <p className="text-sm text-gray-500 mt-1">
+                  <Icon
+                    icon="mdi:loading"
+                    className="inline mr-1 animate-spin"
+                  />
+                  Memuat data unit...
+                </p>
+              )}
             </div>
           </div>
 

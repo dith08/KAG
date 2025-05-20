@@ -4,7 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import NavbarAdmin from "../../components/admin/NavbarAdmin";
 import SidebarAdmin from "../../components/admin/SidebarAdmin";
 import { Icon } from "@iconify/react";
-import api from "../../services/api"; // sesuaikan path
+import api from "../../services/api";
 import { getBaseUrl } from "../../utils/getBaseUrl";
 import { useToast } from "../../components/toast/useToast";
 
@@ -13,6 +13,13 @@ interface OptionItem {
   nama: string;
   status: boolean;
   kategori?: string;
+}
+
+interface ProductAttribute {
+  id?: number;
+  nama: string;
+  tipe: "text" | "number" | "select";
+  opsi: string[] | null;
 }
 
 const EditProductAdminPage: React.FC = () => {
@@ -33,6 +40,18 @@ const EditProductAdminPage: React.FC = () => {
   const [materialList, setMaterialList] = useState<OptionItem[]>([]);
   const [newMaterial, setNewMaterial] = useState("");
   const [materials, setMaterials] = useState<string[]>([]);
+
+  // State untuk atribut produk
+  const [attributes, setAttributes] = useState<ProductAttribute[]>([]);
+  const [newAttribute, setNewAttribute] = useState<ProductAttribute>({
+    nama: "",
+    tipe: "text",
+    opsi: null,
+  });
+  const [showAttributeForm, setShowAttributeForm] = useState(false);
+  const [editingAttributeIndex, setEditingAttributeIndex] = useState<
+    number | null
+  >(null);
 
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
@@ -71,6 +90,22 @@ const EditProductAdminPage: React.FC = () => {
           Array.isArray(finishingRes.data?.data)
             ? finishingRes.data.data
             : finishingRes.data || []
+        );
+
+        // Fetch product attributes
+        const attributesRes = await api.get(`/api/products/${id}/attributes`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        // Set attributes
+        setAttributes(
+          attributesRes.data.map((attr: any) => ({
+            id: attr.id,
+            nama: attr.nama,
+            tipe: attr.tipe,
+            opsi:
+              typeof attr.opsi === "string" ? JSON.parse(attr.opsi) : attr.opsi,
+          }))
         );
 
         // Jika edit mode dan id ada
@@ -134,6 +169,163 @@ const EditProductAdminPage: React.FC = () => {
     }
   };
 
+  // Handle attribute form change
+  const handleAttributeChange = (field: keyof ProductAttribute, value: any) => {
+    setNewAttribute((prev) => {
+      if (field === "tipe" && value === "select" && !prev.opsi) {
+        return { ...prev, [field]: value, opsi: [""] };
+      }
+      if (field === "tipe" && value !== "select") {
+        return { ...prev, [field]: value, opsi: null };
+      }
+      return { ...prev, [field]: value };
+    });
+  };
+
+  // Handle option change for select attribute
+  const handleOptionChange = (index: number, value: string) => {
+    setNewAttribute((prev) => {
+      if (!prev.opsi) return prev;
+      const updatedOptions = [...prev.opsi];
+      updatedOptions[index] = value;
+      return { ...prev, opsi: updatedOptions };
+    });
+  };
+
+  // Add option for select attribute
+  const addOption = () => {
+    setNewAttribute((prev) => {
+      if (!prev.opsi) return { ...prev, opsi: [""] };
+      return { ...prev, opsi: [...prev.opsi, ""] };
+    });
+  };
+
+  // Remove option for select attribute
+  const removeOption = (index: number) => {
+    setNewAttribute((prev) => {
+      if (!prev.opsi) return prev;
+      const updatedOptions = prev.opsi.filter((_, i) => i !== index);
+      return { ...prev, opsi: updatedOptions.length ? updatedOptions : [""] };
+    });
+  };
+
+  // Add or update attribute
+  const handleAddAttribute = () => {
+    if (!newAttribute.nama.trim()) {
+      showToast("Nama atribut tidak boleh kosong", "error");
+      return;
+    }
+
+    if (
+      newAttribute.tipe === "select" &&
+      (!newAttribute.opsi || newAttribute.opsi.some((opt) => !opt.trim()))
+    ) {
+      showToast("Semua opsi harus diisi", "error");
+      return;
+    }
+
+    if (editingAttributeIndex !== null) {
+      // Update existing attribute
+      const updatedAttributes = [...attributes];
+      // Preserve the ID if it exists when editing
+      const existingId = updatedAttributes[editingAttributeIndex].id;
+      updatedAttributes[editingAttributeIndex] = {
+        ...newAttribute,
+        id: existingId,
+      };
+      setAttributes(updatedAttributes);
+      setEditingAttributeIndex(null);
+    } else {
+      // Add new attribute (without ID for new attributes)
+      setAttributes([...attributes, { ...newAttribute }]);
+    }
+
+    // Reset form
+    setNewAttribute({
+      nama: "",
+      tipe: "text",
+      opsi: null,
+    });
+    setShowAttributeForm(false);
+  };
+
+  // Edit attribute
+  const editAttribute = (index: number) => {
+    setNewAttribute({ ...attributes[index] });
+    setEditingAttributeIndex(index);
+    setShowAttributeForm(true);
+  };
+
+  // Remove attribute
+  const removeAttribute = (index: number) => {
+    setAttributes(attributes.filter((_, i) => i !== index));
+  };
+
+  const updateProductAttributes = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      // 1. Get existing attributes from server to compare
+      const existingAttrsRes = await api.get(`/api/products/${id}/attributes`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const existingAttrs = existingAttrsRes.data;
+
+      // 2. Identify attributes to add, update, or delete
+      const attrsToAdd = attributes.filter((attr) => !attr.id);
+      const attrsToUpdate = attributes.filter(
+        (attr) => attr.id && existingAttrs.some((ea: any) => ea.id === attr.id)
+      );
+      const attrsToDelete = existingAttrs.filter(
+        (ea: any) => !attributes.some((attr) => attr.id === ea.id)
+      );
+
+      // 3. Delete attributes that were removed
+      const deletePromises = attrsToDelete.map((attr: any) =>
+        api.delete(`/api/products/${id}/attributes/${attr.id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+      );
+
+      // 4. Update existing attributes
+      const updatePromises = attrsToUpdate.map((attr) =>
+        api.put(
+          `/api/products/${id}/attributes/${attr.id}`,
+          {
+            nama: attr.nama,
+            tipe: attr.tipe,
+            opsi: attr.tipe === "select" ? attr.opsi : null,
+          },
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        )
+      );
+
+      // 5. Add new attributes
+      const addPromises = attrsToAdd.map((attr) =>
+        api.post(
+          `/api/products/${id}/attributes`,
+          {
+            nama: attr.nama,
+            tipe: attr.tipe,
+            opsi: attr.tipe === "select" ? attr.opsi : null,
+          },
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        )
+      );
+
+      // Execute all promises
+      await Promise.all([...deletePromises, ...updatePromises, ...addPromises]);
+
+      return true;
+    } catch (error) {
+      console.error("Error updating product attributes:", error);
+      throw error;
+    }
+  };
+
   const handleSave = async () => {
     if (!product) return;
     const token = localStorage.getItem("token");
@@ -172,6 +364,8 @@ const EditProductAdminPage: React.FC = () => {
           "Content-Type": "multipart/form-data",
         },
       });
+
+      await updateProductAttributes();
 
       showToast("Produk berhasil diperbarui!", "success");
       navigate("/admin/produk");
@@ -301,7 +495,7 @@ const EditProductAdminPage: React.FC = () => {
                 className="w-full border border-black/50 rounded-lg min-h-[100px] p-2 focus:outline-none focus:ring-1 focus:ring-green-700"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder={`- Masukkan deskripsi produk dalam bentuk list\n- Gunakan tanda (-) untuk setiap poin`}
+                placeholder="Masukkan deskripsi produk dalam bentuk list"
               />
             </div>
 
@@ -478,6 +672,185 @@ const EditProductAdminPage: React.FC = () => {
                   );
                 })}
               </ul>
+            </div>
+
+            <div>
+              <div className="flex justify-between items-center mb-1">
+                <label className="font-semibold">Field Baru</label>
+                <button
+                  type="button"
+                  className="text-green-700 hover:text-green-800 text-md flex items-center gap-1 cursor-pointer"
+                  onClick={() => {
+                    setNewAttribute({ nama: "", tipe: "text", opsi: null });
+                    setEditingAttributeIndex(null);
+                    setShowAttributeForm(!showAttributeForm);
+                  }}
+                >
+                  <Icon
+                    icon={
+                      showAttributeForm ? "mdi:minus-circle" : "mdi:plus-circle"
+                    }
+                    width={18}
+                    height={18}
+                  />
+                  {showAttributeForm ? "Tutup Form" : "Tambah Field"}
+                </button>
+              </div>
+
+              {/* Form Tambah/Edit Field */}
+              {showAttributeForm && (
+                <div className="bg-gray-100 p-4 rounded-lg mb-4 mt-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-1">
+                        Nama Field
+                      </label>
+                      <input
+                        type="text"
+                        className="w-full border border-black/50 rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-green-700"
+                        value={newAttribute.nama}
+                        onChange={(e) =>
+                          handleAttributeChange("nama", e.target.value)
+                        }
+                        placeholder="contoh: Warna, Orientasi, dll"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-1">
+                        Tipe Field
+                      </label>
+                      <select
+                        className="w-full border border-black/50 rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-green-700"
+                        value={newAttribute.tipe}
+                        onChange={(e) =>
+                          handleAttributeChange("tipe", e.target.value)
+                        }
+                      >
+                        <option value="text">Text</option>
+                        <option value="number">Angka</option>
+                        <option value="select">Pilihan</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {newAttribute.tipe === "select" && (
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium mb-1">
+                        Opsi Pilihan
+                      </label>
+                      {newAttribute.opsi?.map((option, index) => (
+                        <div key={index} className="flex gap-2 mb-2">
+                          <input
+                            type="text"
+                            className="w-full border border-black/50 rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-green-700"
+                            value={option}
+                            onChange={(e) =>
+                              handleOptionChange(index, e.target.value)
+                            }
+                            placeholder={`Opsi ${index + 1}`}
+                          />
+                          <button
+                            type="button"
+                            className="text-red-600 hover:text-red-800 cursor-pointer"
+                            onClick={() => removeOption(index)}
+                            disabled={newAttribute.opsi?.length === 1}
+                          >
+                            <Icon
+                              icon="mdi:trash-can-outline"
+                              width={18}
+                              height={18}
+                            />
+                          </button>
+                        </div>
+                      ))}
+                      <button
+                        type="button"
+                        className="text-green-700 hover:text-green-800 text-sm flex items-center gap-1 cursor-pointer"
+                        onClick={addOption}
+                      >
+                        <Icon icon="mdi:plus-circle" width={16} height={16} />
+                        Tambah Opsi
+                      </button>
+                    </div>
+                  )}
+
+                  <div className="flex justify-end">
+                    <button
+                      type="button"
+                      className="bg-green-700 text-white px-3 py-1 rounded-lg hover:bg-green-800 text-sm cursor-pointer"
+                      onClick={handleAddAttribute}
+                    >
+                      {editingAttributeIndex !== null
+                        ? "Update Field"
+                        : "Tambah Field"}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Daftar Field */}
+              <div className="mt-2">
+                <h3 className="font-medium mb-2">Daftar Field</h3>
+                {attributes.length > 0 ? (
+                  <div className="border rounded-lg overflow-hidden">
+                    <table className="w-full">
+                      <thead className="bg-gray-100">
+                        <tr>
+                          <th className="px-4 py-2 text-left">Nama</th>
+                          <th className="px-4 py-2 text-left">Tipe</th>
+                          <th className="px-4 py-2 text-left">Opsi</th>
+                          <th className="px-4 py-2 text-center">Aksi</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {attributes.map((attr, index) => (
+                          <tr key={index} className="border-t">
+                            <td className="px-4 py-2">{attr.nama}</td>
+                            <td className="px-4 py-2">
+                              {attr.tipe === "text" && "Text"}
+                              {attr.tipe === "number" && "Angka"}
+                              {attr.tipe === "select" && "Pilihan"}
+                            </td>
+                            <td className="px-4 py-2">
+                              {attr.tipe === "select" && attr.opsi?.join(", ")}
+                            </td>
+                            <td className="px-4 py-2 text-center">
+                              <div className="flex justify-center gap-2">
+                                <button
+                                  type="button"
+                                  className="text-green-600 hover:text-green-700 cursor-pointer"
+                                  onClick={() => editAttribute(index)}
+                                >
+                                  <Icon
+                                    icon="mdi:pencil"
+                                    width={18}
+                                    height={18}
+                                  />
+                                </button>
+                                <button
+                                  type="button"
+                                  className="text-red-600 hover:text-red-800 cursor-pointer"
+                                  onClick={() => removeAttribute(index)}
+                                >
+                                  <Icon
+                                    icon="mdi:trash-can-outline"
+                                    width={18}
+                                    height={18}
+                                  />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-500 italic">
+                    Belum ada tambahan field
+                  </p>
+                )}
+              </div>
             </div>
 
             {/* Harga */}
