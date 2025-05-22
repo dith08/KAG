@@ -64,7 +64,7 @@ const EditProductAdminPage: React.FC = () => {
   // Fetch bahan, ukuran, finishing, produk
   useEffect(() => {
     const fetchData = async () => {
-      try {
+      try { 
         setIsFetching(true);
         const token = localStorage.getItem("token");
         const headers = { Authorization: `Bearer ${token}` };
@@ -676,7 +676,7 @@ const EditProductAdminPage: React.FC = () => {
 
             <div>
               <div className="flex justify-between items-center mb-1">
-                <label className="font-semibold">Field Baru</label>
+                <label className="font-semibold">Spesifikasi Baru</label>
                 <button
                   type="button"
                   className="text-green-700 hover:text-green-800 text-md flex items-center gap-1 cursor-pointer"
@@ -693,17 +693,17 @@ const EditProductAdminPage: React.FC = () => {
                     width={18}
                     height={18}
                   />
-                  {showAttributeForm ? "Tutup Form" : "Tambah Field"}
+                  {showAttributeForm ? "Tutup Form" : "Tambah Spesifikasi"}
                 </button>
               </div>
 
-              {/* Form Tambah/Edit Field */}
+              {/* Form Tambah/Edit Spesifikasi Baru */}
               {showAttributeForm && (
                 <div className="bg-gray-100 p-4 rounded-lg mb-4 mt-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <div>
                       <label className="block text-sm font-medium mb-1">
-                        Nama Field
+                        Nama Spesifikasi
                       </label>
                       <input
                         type="text"
@@ -717,7 +717,7 @@ const EditProductAdminPage: React.FC = () => {
                     </div>
                     <div>
                       <label className="block text-sm font-medium mb-1">
-                        Tipe Field
+                        Tipe Spesifikasi
                       </label>
                       <select
                         className="w-full border border-black/50 rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-green-700"
@@ -781,16 +781,16 @@ const EditProductAdminPage: React.FC = () => {
                       onClick={handleAddAttribute}
                     >
                       {editingAttributeIndex !== null
-                        ? "Update Field"
-                        : "Tambah Field"}
+                        ? "Update Spesifikasi"
+                        : "Tambah Spesifikasi Baru"} 
                     </button>
                   </div>
                 </div>
               )}
 
-              {/* Daftar Field */}
+              {/* Daftar Spesfikasi*/}
               <div className="mt-2">
-                <h3 className="font-medium mb-2">Daftar Field</h3>
+                <h3 className="font-medium mb-2">{attributes.length > 0 && "Daftar Spesifikasi"}</h3>
                 {attributes.length > 0 ? (
                   <div className="border rounded-lg overflow-hidden">
                     <table className="w-full">
@@ -847,7 +847,7 @@ const EditProductAdminPage: React.FC = () => {
                   </div>
                 ) : (
                   <p className="text-sm text-gray-500 italic">
-                    Belum ada tambahan field
+                    Belum ada tambahan spesifikasi
                   </p>
                 )}
               </div>

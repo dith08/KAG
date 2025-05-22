@@ -26,11 +26,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     return userData ? JSON.parse(userData) : null;
   });
 
-  const login = (userData: User, token: string) => {
-    localStorage.setItem("token", token);
-    localStorage.setItem("user", JSON.stringify(userData));
-    setIsLoggedIn(true);
-    setUser(userData);
+  const login = (userData: User, token: string): Promise<void> => {
+    return new Promise((resolve) => {
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(userData));
+      setIsLoggedIn(true);
+      setUser(userData);
+      // Pakai setTimeout 0 utk memastikan state update selesai
+      setTimeout(() => {
+        resolve();
+      }, 0);
+    });
   };
 
   const logout = () => {

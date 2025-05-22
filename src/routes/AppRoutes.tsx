@@ -40,7 +40,6 @@ const AppRoutes: React.FC = () => {
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
         <Route path="/customer/produk" element={<ProdukPage />} />
-        <Route path="/customer/produk/:slug" element={<ProdukDetailPage />} />
 
         {/* Customer Protected Routes */}
         <Route
@@ -52,6 +51,7 @@ const AppRoutes: React.FC = () => {
           <Route path="notification" element={<NotificationPage />} />
           <Route path="profile" element={<ProfilePage />} />
           <Route path="checkout" element={<CheckoutPage />} />
+          <Route path="/customer/produk/:slug" element={<ProdukDetailPage />} />
         </Route>
 
         {/* Admin Protected Routes */}

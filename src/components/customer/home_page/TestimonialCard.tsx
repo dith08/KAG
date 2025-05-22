@@ -68,29 +68,37 @@ const TestimonialCard: React.FC<{ testimonial: Testimonial }> = ({
       variants={itemVariants}
       transition={{ duration: 0.6, ease: "easeOut" }}
     >
-      {/* Bagian Gambar */}
-      <div className="md:w-1/3 lg:w-1/4 w-full bg-green-600 rounded-t-lg md:rounded-l-lg md:rounded-tr-none flex items-center justify-center p-4">
+      {/* Bagian Gambar - Lebar lebih kecil di desktop */}
+      <div className="md:w-1/4 lg:w-1/5 w-full bg-green-600 rounded-t-lg md:rounded-l-lg md:rounded-tr-none flex items-center justify-center p-4">
         <img
           src={testimonial.image}
           alt={testimonial.name}
-          className="w-24 h-24 md:w-20 md:h-20 lg:w-24 lg:h-24 rounded-full object-cover"
+          className="w-20 h-20 md:w-16 md:h-16 lg:w-20 lg:h-20 rounded-full object-cover" // Mengurangi ukuran gambar
         />
       </div>
 
-      {/* Bagian Konten */}
-      <div className="md:w-2/3 lg:w-3/4 w-full p-6 flex flex-col text-start">
-        <h3 className="font-bold text-white text-xl md:text-xl lg:text-2xl mb-2">
+      {/* Bagian Konten - Lebar lebih besar di desktop */}
+      <div className="md:w-3/4 lg:w-4/5 w-full p-4 sm:p-6 flex flex-col text-start">
+        {" "}
+        {/* Mengurangi padding sedikit */}
+        <h3 className="font-bold text-white text-lg md:text-xl lg:text-xl mb-1">
+          {" "}
+          {/* Mengurangi ukuran font judul */}
           {testimonial.name}
         </h3>
-        <p className="text-base lg:text-lg text-white mb-4">
+        <p className="text-sm lg:text-base text-white mb-3 line-clamp-4">
+          {" "}
+          {/* Mengurangi ukuran font review dan menambahkan line-clamp */}
           {testimonial.review}
         </p>
-        <div className="flex mt-auto pt-4">
+        <div className="flex mt-auto pt-2">
+          {" "}
+          {/* Mengurangi padding-top */}
           {Array.from({ length: 5 }, (_, i) => (
             <Icon
               key={i}
               icon={i < testimonial.rating ? "mdi:star" : "mdi:star-outline"}
-              className="text-2xl text-white"
+              className="text-xl text-white" // Mengurangi ukuran ikon bintang
             />
           ))}
         </div>
@@ -102,7 +110,7 @@ const TestimonialCard: React.FC<{ testimonial: Testimonial }> = ({
 const TestimonialList: React.FC = () => {
   return (
     <motion.div
-      className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 p-6"
+      className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6"
       variants={containerVariants}
       initial="hidden"
       whileInView="show"
