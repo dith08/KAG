@@ -24,7 +24,7 @@ const HomePage = () => {
       <div className="py-16 sm:py-20 bg-green-700 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2
-            className="text-2xl md:text-3xl font-bold text-center mb-8 sm:mb-10"
+            className="text-2xl md:text-3 xl font-bold text-center mb-8 sm:mb-10"
             data-aos="fade-up"
           >
             PRODUK TERLARIS KAMI!
@@ -33,7 +33,7 @@ const HomePage = () => {
           {/* Judul Kategori */}
           <div className="flex items-center my-6 sm:my-8" data-aos="fade-up">
             <div className="flex-grow border-t border-2 sm:border-4 border-yellow-500"></div>
-            <span className="mx-3 sm:mx-4 text-lg sm:text-2xl lg:text-3xl text-yellow-500 font-bold whitespace-nowrap">
+            <span className="mx-3 sm:mx-4 text-lg sm:text-xl lg:text-2xl text-yellow-500 font-bold whitespace-nowrap">
               PAPERBAG
             </span>
             <div className="flex-grow border-t border-2 sm:border-4 border-yellow-500"></div>
@@ -43,15 +43,15 @@ const HomePage = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 justify-items-center mt-8 sm:mt-10">
             <ProdukTerlarisCard
               image="/images/paperbag1.png"
-              title={"Paperbag Makanan"}
+              title={"Paperbag Kraft"}
             />
             <ProdukTerlarisCard
               image="/images/paperbag2.png"
-              title={"Paperbag Minuman"}
+              title={"Paperbag Glossy"}
             />
             <ProdukTerlarisCard
               image="/images/paperbag3.png"
-              title={"Paperbag Barang"}
+              title={"Paperbag Duplex"}
             />
           </div>
         </div>
@@ -65,7 +65,7 @@ const HomePage = () => {
           3 LANGKAH MUDAH ORDER <br /> PRINT ONLINE
         </h2>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 md:gap-6 mb-20 px-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 md:gap-6 mb-20">
           {langkahData.map((item) => (
             <LangkahPesan key={item.step} {...item} />
           ))}

@@ -33,9 +33,8 @@ const ProductGallery: React.FC = () => {
 
   return (
     <section className="py-16 px-6 sm:px-10 md:px-16 lg:px-24 bg-green-700">
-      <div className="max-w-5xl mx-auto">
-        {" "}
-        {/* <-- Batas ukuran galeri */}
+      {/* Batasi lebar maksimum galeri */}
+      <div className="max-w-4xl mx-auto">
         <h2
           className="text-2xl md:text-3xl font-bold text-center mb-12 text-white"
           data-aos="fade-up"
@@ -43,7 +42,8 @@ const ProductGallery: React.FC = () => {
           GALERI PRODUK
         </h2>
         <LightGallery plugins={[lgThumbnail, lgZoom]} mode="lg-fade">
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 justify-center">
+          {/* Tetap 3 kolom di semua ukuran layar, tapi dengan gap yang lebih besar */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8 justify-center">
             {images.map((src, index) => (
               <a
                 key={index}
@@ -53,7 +53,6 @@ const ProductGallery: React.FC = () => {
                 className="group block overflow-hidden rounded-xl shadow-md hover:shadow-2xl transition-all duration-500"
               >
                 <div className="relative w-full" style={{ paddingTop: "100%" }}>
-                  {/* Pakai teknik padding-top 100% agar kotaknya kecil tetap 1:1 */}
                   <img
                     className="absolute inset-0 w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
                     src={src}

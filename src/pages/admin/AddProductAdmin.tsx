@@ -481,10 +481,10 @@ const AddProductAdminPage: React.FC = () => {
             </ul>
           </div>
 
-          {/* Field Baru */}
+          {/* Spesifikasi Baru */}
           <div>
             <div className="flex justify-between items-center mb-1">
-              <label className="font-semibold">Field Baru</label>
+              <label className="font-semibold">Spesifikasi Baru</label>
               <button
                 type="button"
                 className="text-green-700 hover:text-green-800 text-md flex items-center gap-1 cursor-pointer"
@@ -501,17 +501,17 @@ const AddProductAdminPage: React.FC = () => {
                   width={18}
                   height={18}
                 />
-                {showAttributeForm ? "Tutup Form" : "Tambah Field"}
+                {showAttributeForm ? "Tutup Form" : "Tambah Spesifikasi"}
               </button>
             </div>
 
-            {/* Form Tambah/Edit Field */}
+            {/* Form Tambah/Edit Spesifikasi */}
             {showAttributeForm && (
               <div className="bg-gray-100 p-4 rounded-lg mb-4 mt-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                   <div>
                     <label className="block text-sm font-medium mb-1">
-                      Nama Field
+                      Nama Spesifikasi
                     </label>
                     <input
                       type="text"
@@ -525,7 +525,7 @@ const AddProductAdminPage: React.FC = () => {
                   </div>
                   <div>
                     <label className="block text-sm font-medium mb-1">
-                      Tipe Field
+                      Tipe Spesifikasi
                     </label>
                     <select
                       className="w-full border border-black/50 rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-green-700"
@@ -589,8 +589,8 @@ const AddProductAdminPage: React.FC = () => {
                     onClick={handleAddAttribute}
                   >
                     {editingAttributeIndex !== null
-                      ? "Update Field"
-                      : "Tambah Field"}
+                      ? "Update Spesifikasi"
+                      : "Tambah Spesifikasi Baru"} 
                   </button>
                 </div>
               </div>
@@ -649,7 +649,7 @@ const AddProductAdminPage: React.FC = () => {
               </div>
             ) : (
               <p className="text-sm text-gray-500 italic">
-                Belum ada tambahan field
+                Belum ada tambahan spesifikasi
               </p>
             )}
           </div>
