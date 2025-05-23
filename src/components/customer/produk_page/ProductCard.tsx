@@ -10,6 +10,7 @@ interface Product {
   nama: string;
   harga: string;
   gambar: string;
+  status: string; // Tambahkan properti status
 }
 
 const containerVariants = {
@@ -25,6 +26,7 @@ const itemVariants = {
   hidden: { opacity: 0, y: 30, scale: 0.95 },
   show: { opacity: 1, y: 0, scale: 1 },
 };
+
 const ProductList: React.FC = () => {
   const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
@@ -33,7 +35,7 @@ const ProductList: React.FC = () => {
     api
       .get("/api/products")
       .then((res) => {
-        setProducts(res.data); // langsung karena response array
+        setProducts(res.data); // Data produk sudah termasuk status
       })
       .catch((err) => {
         console.error("Gagal mengambil data produk:", err);
@@ -47,36 +49,63 @@ const ProductList: React.FC = () => {
       initial="hidden"
       animate="show"
     >
-      {products.map((product) => (
-        <motion.div
-          key={product.id}
-          className="bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col w-full"
-          variants={itemVariants}
-          transition={{ duration: 0.5, ease: "easeOut" }}
-        >
-          <div className="bg-green-700 p-4 flex justify-center">
-            <img
-              src={`${getBaseUrl()}/${product.gambar}`}
-              alt={product.nama}
-              className="h-32 w-32 sm:h-40 sm:w-40 object-contain"
-            />
-          </div>
-          <div className="p-4 text-center flex flex-col flex-grow">
-            <h3 className="font-medium text-lg">{product.nama}</h3>
-            <p className="text-green-700 font-medium mt-1">
-              Rp. {parseInt(product.harga).toLocaleString("id-ID")}
-            </p>
-            <button
-              onClick={() =>
-                navigate(`/customer/produk/${slugify(product.nama)}`)
-              }
-              className="mt-4 bg-yellow-500 text-white px-4 py-2 rounded-md w-full hover:bg-yellow-600 transition cursor-pointer"
+      {products.map((product) => {
+        const isAvailable = product.status === "Tersedia"; // Cek status produk
+        return (
+          <motion.div
+            key={product.id}
+            className={`rounded-2xl shadow-lg overflow-hidden flex flex-col w-full ${
+              isAvailable ? "bg-white" : "bg-gray-300"
+            }`} // Abu-abu jika tidak tersedia
+            variants={itemVariants}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+          >
+            <div
+              className={`p-4 flex justify-center ${
+                isAvailable ? "bg-green-700" : "bg-gray-500"
+              }`} // Ubah warna header jika tidak tersedia
             >
-              Pesan Sekarang
-            </button>
-          </div>
-        </motion.div>
-      ))}
+              <img
+                src={`${getBaseUrl()}/${product.gambar}`}
+                alt={product.nama}
+                className={`h-32 w-32 sm:h-40 sm:w-40 object-contain ${
+                  !isAvailable ? "opacity-50" : ""
+                }`} // Kurangi opacity gambar jika tidak tersedia
+              />
+            </div>
+            <div className="p-4 text-center flex flex-col flex-grow">
+              <h3
+                className={`font-medium text-lg ${
+                  !isAvailable ? "text-gray-600" : ""
+                }`} // Warna teks abu-abu jika tidak tersedia
+              >
+                {product.nama}
+              </h3>
+              <p
+                className={`font-medium mt-1 ${
+                  isAvailable ? "text-green-700" : "text-gray-600"
+                }`} // Warna harga abu-abu jika tidak tersedia
+              >
+                Rp. {parseInt(product.harga).toLocaleString("id-ID")}
+              </p>
+              <button
+                onClick={() =>
+                  isAvailable &&
+                  navigate(`/customer/produk/${slugify(product.nama)}`)
+                } // Hanya navigasi jika tersedia
+                className={`mt-4 px-4 py-2 rounded-md w-full transition cursor-pointer ${
+                  isAvailable
+                    ? "bg-yellow-500 text-white hover:bg-yellow-600"
+                    : "bg-gray-400 text-gray-600 cursor-not-allowed"
+                }`} // Styling tombol berdasarkan status
+                disabled={!isAvailable} // Nonaktifkan tombol jika tidak tersedia
+              >
+                {isAvailable ? "Pesan Sekarang" : "Tidak Tersedia"}
+              </button>
+            </div>
+          </motion.div>
+        );
+      })}
     </motion.div>
   );
 };

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Icon } from "@iconify/react";
 import api from "../../../services/api";
 import { getBaseUrl } from "../../../utils/getBaseUrl";
@@ -48,6 +48,7 @@ const FormPemesanan: React.FC = () => {
   const { slug } = useParams();
   const [products, setProducts] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   // Data yang sudah dikategorikan
   const [categorizedMaterials, setCategorizedMaterials] =
@@ -283,7 +284,7 @@ const FormPemesanan: React.FC = () => {
     );
   };
 
-  // Validasi apakah semua dropdown yang ada sudah terisi
+  // Validasi apakah semua input yang ada sudah terisi
   const isValidSelection = () => {
     // Cek materials
     const materialCategories = Object.keys(
@@ -316,10 +317,23 @@ const FormPemesanan: React.FC = () => {
       return false;
     }
 
+    // Cek dynamic attributes - pastikan semua attribute yang required telah diisi
+    for (const attribute of attributes) {
+      // Jika attribute tidak memiliki value atau value kosong, maka tidak valid
+      if (!attribute.value || attribute.value.trim() === "") {
+        return false;
+      }
+    }
+
+    // Cek apakah file desain sudah diupload
+    if (!selectedFile) {
+      return false;
+    }
+
     return true;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     // Validasi
@@ -328,29 +342,75 @@ const FormPemesanan: React.FC = () => {
       return;
     }
 
-    // Collect selected materials and finishings
-    const selectedMaterialIds = Object.values(selectedMaterials).filter(
-      (id) => id !== null
-    );
-    const selectedFinishingIds = Object.values(selectedFinishings).filter(
-      (id) => id !== null
-    );
+    try {
+      // Collect selected materials and finishings
+      const selectedMaterialIds = Object.values(selectedMaterials).filter(
+        (id) => id !== null
+      );
+      const selectedFinishingIds = Object.values(selectedFinishings).filter(
+        (id) => id !== null
+      );
 
-    const data = {
-      product_id: products?.id,
-      material_ids: selectedMaterialIds,
-      finishing_ids: selectedFinishingIds,
-      size_id: selectedSize,
-      harga: hargaSatuan,
-      jumlah,
-      catatan,
-      attributes: attributes
-        .filter((attr) => attr.value.trim() !== "") // Only send attributes with values
-        .map((a) => ({ id: a.id, value: a.value })),
-    };
+      const data = {
+        product_id: products?.id,
+        quantity: jumlah,
+        material_ids: selectedMaterialIds,
+        finishing_ids: selectedFinishingIds,
+        size_id: selectedSize,
+        harga: hargaSatuan,
+        catatan,
+        attributes: attributes
+          .filter((attr) => attr.value.trim() !== "") // Only send attributes with values
+          .map((a) => ({ id: a.id, value: a.value })),
+      };
 
-    console.log("Data pemesanan:", data);
-    // TODO: Submit ke backend untuk menambah ke keranjang
+      console.log("Data pemesanan:", data);
+
+      // Get token for authentication
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("Anda harus login terlebih dahulu!");
+        return;
+      }
+
+      // Submit to backend
+      const response = await api.post("/api/cart", data, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.status === 200 || response.status === 201) {
+        alert("Berhasil ditambahkan ke keranjang!");
+
+        // Reset form or redirect to cart page
+        // Optional: Reset selections
+        setSelectedMaterials({ umum: null, cover: null, isi: null });
+        setSelectedFinishings({ umum: null, cover: null, isi: null });
+        setSelectedSize(null);
+        setJumlah(100);
+        setCatatan("");
+        setSelectedFile(null);
+        setAttributes((prev) => prev.map((attr) => ({ ...attr, value: "" })));
+      }
+
+      navigate(`/customer/keranjang`);
+    } catch (error: any) {
+      console.error("Error adding to cart:", error);
+
+      if (error.response?.status === 401) {
+        alert("Sesi Anda telah berakhir. Silakan login kembali!");
+      } else if (error.response?.status === 409) {
+        alert("Produk ini sudah ada di keranjang!");
+      } else if (error.response?.data?.message) {
+        alert(`Error: ${error.response.data.message}`);
+      } else {
+        alert(
+          "Terjadi kesalahan saat menambahkan ke keranjang. Silakan coba lagi."
+        );
+      }
+    }
   };
 
   if (loading) {
@@ -642,6 +702,15 @@ const FormPemesanan: React.FC = () => {
                   </label>
                 </div>
 
+                {!selectedFile && (
+                  <p className="mt-4 text-sm">
+                    Tidak punya desain?{" "}
+                    <span className="text-blue-600 cursor-pointer hover:underline">
+                      klik disini
+                    </span>
+                  </p>
+                )}
+
                 {selectedFile && (
                   <div className="mt-4 p-3 bg-green-50 rounded-lg border border-green-200">
                     <div className="flex items-center justify-center space-x-2">
@@ -649,6 +718,20 @@ const FormPemesanan: React.FC = () => {
                       <span className="text-sm font-medium text-green-700">
                         {selectedFile.name}
                       </span>
+                      <button
+                        onClick={() => {
+                          const uploadElement = document.getElementById(
+                            "design-upload"
+                          ) as HTMLInputElement;
+                          if (uploadElement) {
+                            uploadElement.value = "";
+                          }
+                          setSelectedFile(null);
+                        }}
+                        className="ml-2 text-red-600 hover:text-red-800 cursor-pointer"
+                      >
+                        <Icon icon="mdi:trash-can" />
+                      </button>
                     </div>
                   </div>
                 )}
