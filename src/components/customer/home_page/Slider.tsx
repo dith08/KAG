@@ -4,6 +4,7 @@ import api from "../../../services/api";
 import { getBaseUrl } from "../../../utils/getBaseUrl";
 import { useNavigate } from "react-router-dom";
 import { slugify } from "../../../utils/slugify";
+import { useToast } from "../../toast/useToast";
 
 interface Slide {
   title: string;
@@ -12,6 +13,7 @@ interface Slide {
   price: string;
   buttonText: string;
   image: string;
+  status: string; // Tambahkan properti status
 }
 
 export default function Slider() {
@@ -20,6 +22,7 @@ export default function Slider() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { showToast } = useToast(); // Gunakan useToast
 
   const goToSlide = (index: number) => {
     setCurrentSlide(index);
@@ -28,7 +31,7 @@ export default function Slider() {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      setError("");
+      setError(null); // Ubah ke null untuk konsistensi
 
       const response = await api.get("/api/products");
 
@@ -38,16 +41,26 @@ export default function Slider() {
 
       const data = response.data;
 
-      const formattedSlides: Slide[] = data.map((product: { nama: string; deskripsi: string; harga: string; gambar: string; }) => ({
-        title: product.nama.toUpperCase(),
-        subtitle: "",
-        description: product.deskripsi,
-        price: `Start from Rp.${parseFloat(product.harga).toLocaleString(
-          "id-ID"
-        )}!`,
-        buttonText: "Pesan Sekarang",
-        image: `${getBaseUrl()}/${product.gambar}`,
-      }));
+      const formattedSlides: Slide[] = data.map(
+        (product: {
+          nama: string;
+          deskripsi: string;
+          harga: string;
+          gambar: string;
+          status: string; // Tambahkan status dari data produk
+        }) => ({
+          title: product.nama.toUpperCase(),
+          subtitle: "",
+          description: product.deskripsi,
+          price: `Start from Rp.${parseFloat(product.harga).toLocaleString(
+            "id-ID"
+          )}!`,
+          buttonText:
+            product.status === "Tersedia" ? "Pesan Sekarang" : "Tidak Tersedia",
+          image: `${getBaseUrl()}/${product.gambar}`,
+          status: product.status, // Tambahkan status ke slide
+        })
+      );
 
       setSlidesData(formattedSlides);
     } catch (error: unknown) {
@@ -63,7 +76,7 @@ export default function Slider() {
 
   useEffect(() => {
     fetchProducts();
-  }, []); // selalu fetch saat mount
+  }, []); // Selalu fetch saat mount
 
   useEffect(() => {
     if (slidesData.length > 0) {
@@ -94,41 +107,67 @@ export default function Slider() {
         animate={{ x: `-${currentSlide * 100}%`, opacity: 1, y: 0 }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
       >
-        {slidesData.map((slide, index) => (
-          <div
-            key={index}
-            className="w-full flex-shrink-0 grid grid-cols-1 md:grid-cols-2 items-center min-h-[500px]"
-            style={{ minWidth: "100%" }}
-          >
-            <div className="px-4 py-8 md:px-12 md:py-16 lg:px-24 max-w-3xl mx-auto md:text-start text-center">
-              <h2 className="text-2xl md:text-4xl font-bold leading-tight">
-                <span className="text-green-700">{slide.title}</span>
-              </h2>
-              <div className="mt-3 md:mt-5 text-sm md:text-base leading-relaxed text-gray-700">
-                <p className="text-justify">{slide.description}</p>
+        {slidesData.map((slide, index) => {
+          const isAvailable = slide.status === "Tersedia"; // Cek status slide
+          return (
+            <div
+              key={index}
+              className="w-full flex-shrink-0 grid grid-cols-1 md:grid-cols-2 items-center min-h-[300px] md:min-h-[500px]"
+              style={{ minWidth: "100%" }}
+            >
+              <div className="px-4 py-4 md:px-12 md:py-16 lg:px-24 max-w-3xl mx-auto text-left md:text-start">
+                <h2
+                  className={`text-2xl md:text-4xl font-bold leading-tight ${
+                    isAvailable ? "text-green-700" : "text-gray-600"
+                  }`} // Warna teks abu-abu jika tidak tersedia
+                >
+                  {slide.title}
+                </h2>
+                <div
+                  className={`mt-2 md:mt-5 text-sm md:text-base leading-relaxed ${
+                    isAvailable ? "text-gray-700" : "text-gray-500"
+                  }`} // Warna deskripsi abu-abu jika tidak tersedia
+                >
+                  <p className="text-justify">{slide.description}</p>
+                </div>
+                <p
+                  className={`mt-2 md:mt-5 font-semibold ${
+                    isAvailable ? "text-gray-600" : "text-gray-500"
+                  }`} // Warna harga abu-abu jika tidak tersedia
+                >
+                  {slide.price}
+                </p>
+                <button
+                  onClick={() => {
+                    if (isAvailable) {
+                      navigate(`/customer/produk/${slugify(slide.title)}`);
+                    } else {
+                      showToast("Produk Tidak Tersedia", "error"); // Tampilkan toast jika tidak tersedia
+                    }
+                  }}
+                  className={`mt-3 md:mt-6 px-4 py-2 md:px-6 md:py-3 text-sm md:text-base font-semibold rounded-lg transition duration-300 cursor-pointer ${
+                    isAvailable
+                      ? "border-2 border-yellow-500 text-yellow-500 hover:bg-yellow-500 hover:text-white"
+                      : "border-2 border-gray-400 text-gray-400 bg-gray-200 cursor-not-allowed"
+                  }`} // Styling tombol berdasarkan status
+                  disabled={!isAvailable} // Nonaktifkan tombol jika tidak tersedia
+                >
+                  {slide.buttonText}
+                </button>
               </div>
-              <p className="mt-3 md:mt-5 font-semibold text-gray-600">
-                {slide.price}
-              </p>
-              <button
-                onClick={() =>
-                  navigate(`/customer/produk/${slugify(slide.title)}`)
-                }
-                className="mt-4 md:mt-6 px-4 py-2 md:px-6 md:py-3 text-sm md:text-base border-2 border-yellow-500 text-yellow-500 font-semibold rounded-lg hover:bg-yellow-500 hover:text-white transition duration-300 cursor-pointer"
-              >
-                {slide.buttonText}
-              </button>
-            </div>
 
-            <div className="hidden md:flex h-full items-center justify-center p-8 md:p-16">
-              <img
-                src={slide.image}
-                alt={slide.title}
-                className="max-w-full max-h-[30rem] object-contain"
-              />
+              <div className="hidden md:flex h-full items-center justify-center p-8 md:p-16">
+                <img
+                  src={slide.image}
+                  alt={slide.title}
+                  className={`max-w-full max-h-[30rem] object-contain ${
+                    !isAvailable ? "opacity-50" : ""
+                  }`} // Kurangi opacity gambar jika tidak tersedia
+                />
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </motion.div>
 
       <div className="absolute bottom-4 md:bottom-8 left-1/2 transform -translate-x-1/2 flex gap-2 md:gap-3">
