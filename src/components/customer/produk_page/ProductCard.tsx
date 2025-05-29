@@ -93,9 +93,9 @@ const ProductList: React.FC = () => {
                   isAvailable &&
                   navigate(`/customer/produk/${slugify(product.nama)}`)
                 } // Hanya navigasi jika tersedia
-                className={`mt-4 px-4 py-2 rounded-md w-full transition cursor-pointer ${
+                className={`mt-4 px-4 py-2 rounded-md w-full transition ${
                   isAvailable
-                    ? "bg-yellow-500 text-white hover:bg-yellow-600"
+                    ? "bg-yellow-500 text-white hover:bg-yellow-600 cursor-pointer"
                     : "bg-gray-400 text-gray-600 cursor-not-allowed"
                 }`} // Styling tombol berdasarkan status
                 disabled={!isAvailable} // Nonaktifkan tombol jika tidak tersedia

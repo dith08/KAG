@@ -92,49 +92,67 @@ const DashboardAdminPage: React.FC = () => {
             {/* Kiri (Main) */}
             <div className="w-full lg:w-7/10 space-y-8">
               {/* Grafik Penjualan */}
-              <div className="bg-white p-6 rounded-xl shadow">
-                <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-xl font-semibold">Grafik Penjualan</h2>
-                  <div className="space-x-2">
+              <div className="bg-white p-4 sm:p-6 rounded-xl shadow-md">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 space-y-3 sm:space-y-0">
+                  <h2 className="text-lg sm:text-xl font-semibold text-gray-800">
+                    Grafik Penjualan
+                  </h2>
+                  <div className="flex space-x-2 w-full sm:w-auto">
                     <button
                       onClick={() => setFilter("harian")}
-                      className={`px-3 py-1 rounded-full text-sm cursor-pointer ${
+                      className={`flex-1 sm:flex-none px-3 py-1.5 rounded-full text-sm font-medium cursor-pointer transition-colors ${
                         filter === "harian"
-                          ? "bg-green-700 text-white"
-                          : "bg-gray-200 text-gray-700"
+                          ? "bg-green-600 text-white"
+                          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                       }`}
                     >
                       Harian
                     </button>
                     <button
                       onClick={() => setFilter("bulanan")}
-                      className={`px-3 py-1 rounded-full text-sm cursor-pointer ${
+                      className={`flex-1 sm:flex-none px-3 py-1.5 rounded-full text-sm font-medium cursor-pointer transition-colors ${
                         filter === "bulanan"
-                          ? "bg-green-700 text-white"
-                          : "bg-gray-200 text-gray-700"
+                          ? "bg-green-600 text-white"
+                          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                       }`}
                     >
                       Bulanan
                     </button>
                   </div>
                 </div>
-                <div className="h-64">
+                <div className="h-72 sm:h-80">
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={salesData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="date" />
+                    <LineChart
+                      data={salesData}
+                      margin={{ top: 10, right: 10, left: -20, bottom: 10 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                      <XAxis
+                        dataKey="date"
+                        tick={{ fontSize: 12 }}
+                        angle={-45}
+                        textAnchor="end"
+                        interval="preserveStartEnd"
+                        height={50}
+                      />
                       <YAxis
+                        tick={{ fontSize: 12 }}
                         tickFormatter={(value) => `Rp ${value / 1000000}jt`}
+                        width={70}
                       />
                       <Tooltip
-                        formatter={(value) => `Rp ${value.toLocaleString()}`}
+                        formatter={(value) =>
+                          `Rp ${value.toLocaleString("id-ID")}`
+                        }
+                        labelStyle={{ fontSize: 12 }}
+                        itemStyle={{ fontSize: 12 }}
                       />
                       <Line
                         type="monotone"
                         dataKey="total"
                         stroke="#F9A825"
-                        strokeWidth={3}
-                        dot={{ r: 4 }}
+                        strokeWidth={2}
+                        dot={{ r: 3 }}
                       />
                     </LineChart>
                   </ResponsiveContainer>

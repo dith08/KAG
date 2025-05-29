@@ -5,6 +5,11 @@ import api from "../../services/api";
 import ConfirmPopup from "../ConfirmPopup";
 import { useToast } from "../toast/useToast";
 
+export type Unit = {
+  id: number;
+  nama: string;
+};
+
 export type BahanBaku = {
   id: number;
   nama: string;
@@ -12,12 +17,13 @@ export type BahanBaku = {
   stok: number;
   satuan: string;
   harga: string;
-  unit: string;
+  unit_id: number; // Ubah dari 'unit' menjadi 'unit_id' untuk konsistensi
   kategori: "cover" | "isi" | "umum";
 };
 
 const StokBahanTabel = () => {
   const [bahanBakuList, setBahanBakuList] = useState<BahanBaku[]>([]);
+  const [unitList, setUnitList] = useState<Unit[]>([]);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -25,25 +31,38 @@ const StokBahanTabel = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchBahanBaku = async () => {
+    const fetchData = async () => {
       try {
         setIsLoading(true);
         const token = localStorage.getItem("token");
-        const response = await api.get("/api/materials", {
+
+        // Ambil data bahan baku
+        const bahanResponse = await api.get("/api/materials", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-        setBahanBakuList(response.data);
+        setBahanBakuList(bahanResponse.data);
+        console.log("Data bahan baku:", bahanResponse.data); // Log untuk debug
+
+        // Ambil data unit
+        const unitResponse = await api.get("/api/units", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setUnitList(unitResponse.data);
+        console.log("Data unit:", unitResponse.data); // Log untuk debug
       } catch (error) {
-        console.error("Gagal mengambil data bahan baku:", error);
+        console.error("Gagal mengambil data:", error);
+        showToast("Gagal memuat data.", "error");
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchBahanBaku();
-  }, []);
+    fetchData();
+  }, [showToast]);
 
   const handleDelete = async (id: number) => {
     try {
@@ -79,6 +98,13 @@ const StokBahanTabel = () => {
     setIsPopupOpen(true);
   };
 
+  const getUnitName = (unitId: number | string) => {
+    const id = Number(unitId); // Konversi ke number jika string
+    console.log("Mencari unit dengan ID:", id, "di unitList:", unitList); // Log untuk debug
+    const unit = unitList.find((u) => u.id === id);
+    return unit ? unit.nama : "Tidak diketahui";
+  };
+
   return (
     <div className="bg-white p-4 lg:p-6 rounded-2xl shadow-lg">
       <ConfirmPopup
@@ -104,62 +130,55 @@ const StokBahanTabel = () => {
 
       {/* Mobile View */}
       <div className="lg:hidden space-y-4">
-        {isLoading ? (
-          <div className="flex justify-start items-center">
-            <Icon icon="mdi:loading" className="animate-spin mr-2" />
-            <p className="text-gray-500">Memuat data...</p>
-          </div>
-        ) : (
-          bahanBakuList.map((bahan) => (
-            <div
-              key={bahan.id}
-              className="bg-white p-4 rounded-lg border shadow-sm"
-            >
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="font-medium">Nama:</span>
-                  <span>{bahan.nama}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="font-medium">Jenis:</span>
-                  <span>{bahan.jenis}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="font-medium">Stok:</span>
-                  <span>{bahan.stok}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="font-medium">Satuan:</span>
-                  <span>{bahan.satuan}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="font-medium">Harga (per unit):</span>
-                  <span>Rp {Number(bahan.harga).toLocaleString("id-ID")}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="font-medium">Kategori:</span>
-                  <span>{bahan.kategori}</span>
-                </div>
-                <div className="flex justify-end gap-2 mt-2">
-                  <button
-                    onClick={() =>
-                      navigate(`/admin/bahan-baku/${bahan.id}/edit`)
-                    }
-                    className="text-green-700 hover:text-green-800 cursor-pointer"
-                  >
-                    <Icon icon="mdi:pencil-outline" width="20" height="20" />
-                  </button>
-                  <button
-                    onClick={() => handleOpenPopup(bahan.id)}
-                    className="text-red-600 hover:text-red-700 cursor-pointer"
-                  >
-                    <Icon icon="mdi:trash-can-outline" width="20" height="20" />
-                  </button>
-                </div>
+        {bahanBakuList.map((bahan) => (
+          <div
+            key={bahan.id}
+            className="bg-white p-4 rounded-lg border shadow-sm"
+          >
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span className="font-medium">Nama:</span>
+                <span>{bahan.nama}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-medium">Jenis:</span>
+                <span>{bahan.jenis}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-medium">Stok:</span>
+                <span>{bahan.stok}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-medium">Satuan:</span>
+                <span>{bahan.satuan}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-medium">Harga<br/>(per unit):</span>
+                <span className="text-right">
+                  Rp {Number(bahan.harga).toLocaleString("id-ID")}<br/>
+                  <span>({getUnitName(bahan.unit_id)})</span>
+                </span>              </div>
+              <div className="flex justify-between">
+                <span className="font-medium">Kategori:</span>
+                <span>{bahan.kategori}</span>
+              </div>
+              <div className="flex justify-end gap-2 mt-2">
+                <button
+                  onClick={() => navigate(`/admin/bahan-baku/${bahan.id}/edit`)}
+                  className="text-green-700 hover:text-green-800 cursor-pointer"
+                >
+                  <Icon icon="mdi:pencil-outline" width="20" height="20" />
+                </button>
+                <button
+                  onClick={() => handleOpenPopup(bahan.id)}
+                  className="text-red-600 hover:text-red-700 cursor-pointer"
+                >
+                  <Icon icon="mdi:trash-can-outline" width="20" height="20" />
+                </button>
               </div>
             </div>
-          ))
-        )}
+          </div>
+        ))}
       </div>
 
       {/* Desktop View */}
@@ -193,7 +212,8 @@ const StokBahanTabel = () => {
                   <td className="p-3 whitespace-nowrap">{bahan.stok}</td>
                   <td className="p-3 whitespace-nowrap">{bahan.satuan}</td>
                   <td className="p-3 whitespace-nowrap">
-                    Rp {Number(bahan.harga).toLocaleString("id-ID")}
+                    Rp {Number(bahan.harga).toLocaleString("id-ID")}{" "}
+                    <span>({getUnitName(bahan.unit_id)})</span>
                   </td>
                   <td className="p-3 whitespace-nowrap">{bahan.kategori}</td>
                   <td className="p-3 text-center space-x-2 whitespace-nowrap">
