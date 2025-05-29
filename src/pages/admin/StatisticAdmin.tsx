@@ -345,9 +345,9 @@ const StatisticAdminPage: React.FC = () => {
         <NavbarAdmin />
 
         <div className="p-4 lg:p-6 space-y-10 mt-18 lg:mt-24">
-          <h1 className="text-2xl font-bold text-center lg:text-left text-green-700 flex items-center gap-3 mb-8">
-            <Icon icon="mdi:chart-box" className="w-9 h-9" /> LAPORAN &
-            STATISTIK
+          <h1 className="text-xl md:text-2xl font-bold text-center lg:text-left text-green-700 flex items-center gap-2 mb-4">
+            <Icon icon="mdi:chart-box" className="w-8 h-8" />
+            LAPORAN & STATISTIK
           </h1>
           {/* Laporan Penjualan */}
           <section className="bg-white rounded-2xl shadow-md p-6">

@@ -5,6 +5,7 @@ import { Icon } from "@iconify/react";
 import api from "../../../services/api";
 import { getBaseUrl } from "../../../utils/getBaseUrl";
 import { slugify } from "../../../utils/slugify";
+import { useToast } from "../../toast/useToast";
 
 interface Product {
   id: number;
@@ -49,6 +50,7 @@ const FormPemesanan: React.FC = () => {
   const [products, setProducts] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { showToast } = useToast();
 
   // Data yang sudah dikategorikan
   const [categorizedMaterials, setCategorizedMaterials] =
@@ -382,7 +384,7 @@ const FormPemesanan: React.FC = () => {
       });
 
       if (response.status === 200 || response.status === 201) {
-        alert("Berhasil ditambahkan ke keranjang!");
+        showToast("Produk berhasil ditambahkan ke keranjang", "success");
 
         // Reset form or redirect to cart page
         // Optional: Reset selections
@@ -759,7 +761,7 @@ const FormPemesanan: React.FC = () => {
 
                 <button
                   type="submit"
-                  className="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-4 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                  className="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-4 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 cursor-pointer"
                   disabled={!isValidSelection()}
                 >
                   <Icon icon="mdi:cart-plus" className="text-xl" />

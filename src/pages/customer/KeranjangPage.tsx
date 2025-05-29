@@ -8,6 +8,8 @@ import CartSummary from "../../components/customer/keranjang_page/CartSummary";
 import api from "../../services/api";
 import { Icon } from "@iconify/react";
 import { getBaseUrl } from "../../utils/getBaseUrl";
+import { useToast } from "../../components/toast/useToast";
+import { useNavigate } from "react-router-dom";
 
 // Interface for cart item from backend
 interface CartItemResponse {
@@ -35,6 +37,8 @@ const KeranjangPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
+  const { showToast } = useToast();
+  const navigate = useNavigate();
 
   const footerRef = useRef<HTMLDivElement>(null);
   const [footerHeight, setFooterHeight] = useState(0);
@@ -240,7 +244,8 @@ const KeranjangPage = () => {
       const updateSuccess = await updateCartQuantities();
       if (updateSuccess) {
         console.log("Proceeding to checkout with products:", products);
-        alert("Keranjang berhasil diupdate! Melanjutkan ke checkout...");
+        showToast("Checkout berhasil!", "success");
+        navigate("/customer/checkout");
       }
     } catch (error) {
       console.error("Checkout error:", error);
@@ -367,7 +372,8 @@ const KeranjangPage = () => {
                   Mulai Belanja
                 </a>
               </div>
-            </div>          )}
+            </div>
+          )}
         </div>
 
         {/* Cart Summary */}

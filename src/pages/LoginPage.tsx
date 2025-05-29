@@ -124,12 +124,12 @@ const LoginPage: React.FC = () => {
             />
             <label htmlFor="remember">Ingat saya</label>
           </div>
-          <a
+          {/* <a
             href="/forgot-password"
             className="text-green-700 text-base font-medium hover:text-green-600"
           >
             Lupa password?
-          </a>
+          </a> */}
         </div>
 
         <Button
