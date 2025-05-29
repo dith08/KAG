@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import api from "../../../services/api";
 import { getBaseUrl } from "../../../utils/getBaseUrl";
@@ -13,7 +13,7 @@ interface Slide {
   price: string;
   buttonText: string;
   image: string;
-  status: string; // Tambahkan properti status
+  status: string;
 }
 
 export default function Slider() {
@@ -22,16 +22,24 @@ export default function Slider() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
-  const { showToast } = useToast(); // Gunakan useToast
+  const { showToast } = useToast();
+  const sliderRef = useRef<HTMLDivElement>(null);
+
+  // State untuk touch events
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
+  const [touchMoveX, setTouchMoveX] = useState<number>(0);
+  const [isDragging, setIsDragging] = useState<boolean>(false);
 
   const goToSlide = (index: number) => {
     setCurrentSlide(index);
+    setIsDragging(false);
+    setTouchMoveX(0); // Reset posisi saat slide berpindah
   };
 
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      setError(null); // Ubah ke null untuk konsistensi
+      setError(null);
 
       const response = await api.get("/api/products");
 
@@ -47,7 +55,7 @@ export default function Slider() {
           deskripsi: string;
           harga: string;
           gambar: string;
-          status: string; // Tambahkan status dari data produk
+          status: string;
         }) => ({
           title: product.nama.toUpperCase(),
           subtitle: "",
@@ -58,7 +66,7 @@ export default function Slider() {
           buttonText:
             product.status === "Tersedia" ? "Pesan Sekarang" : "Tidak Tersedia",
           image: `${getBaseUrl()}/${product.gambar}`,
-          status: product.status, // Tambahkan status ke slide
+          status: product.status,
         })
       );
 
@@ -76,16 +84,47 @@ export default function Slider() {
 
   useEffect(() => {
     fetchProducts();
-  }, []); // Selalu fetch saat mount
+  }, []);
 
+  // Auto-slide hanya aktif jika tidak sedang drag
   useEffect(() => {
-    if (slidesData.length > 0) {
+    if (slidesData.length > 0 && !isDragging) {
       const interval = setInterval(() => {
         setCurrentSlide((prev) => (prev + 1) % slidesData.length);
       }, 5000);
       return () => clearInterval(interval);
     }
-  }, [slidesData]);
+  }, [slidesData, isDragging]);
+
+  // Handle touch start
+  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    setTouchStartX(e.touches[0].clientX);
+    setIsDragging(true);
+  };
+
+  // Handle touch move
+  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (touchStartX !== null) {
+      const currentX = e.touches[0].clientX;
+      const diff = touchStartX - currentX;
+      setTouchMoveX(diff / (sliderRef.current?.offsetWidth || 1)); // Normalisasi pergerakan
+    }
+  };
+
+  // Handle touch end
+  const handleTouchEnd = () => {
+    if (touchStartX !== null) {
+      const threshold = 0.3; // Ambang batas untuk pindah slide (30% dari lebar slide)
+      if (touchMoveX > threshold) {
+        setCurrentSlide((prev) => Math.min(prev + 1, slidesData.length - 1));
+      } else if (touchMoveX < -threshold) {
+        setCurrentSlide((prev) => Math.max(prev - 1, 0));
+      }
+      setTouchStartX(null);
+      setTouchMoveX(0);
+      setIsDragging(false);
+    }
+  };
 
   if (loading) {
     return <div className="text-center py-16">Loading products...</div>;
@@ -100,15 +139,25 @@ export default function Slider() {
   }
 
   return (
-    <div className="relative w-full h-full overflow-hidden bg-[#D9D9D9] pt-14">
+    <div
+      className="relative w-full h-full overflow-hidden bg-[#D9D9D9] pt-14"
+      ref={sliderRef}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
       <motion.div
         className="flex w-full h-full"
         initial={{ opacity: 0, y: 50 }}
-        animate={{ x: `-${currentSlide * 100}%`, opacity: 1, y: 0 }}
+        animate={{
+          x: `-${currentSlide * 100 + touchMoveX * 100}%`, // Tambahkan offset touchMoveX
+          opacity: 1,
+          y: 0,
+        }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
       >
         {slidesData.map((slide, index) => {
-          const isAvailable = slide.status === "Tersedia"; // Cek status slide
+          const isAvailable = slide.status === "Tersedia";
           return (
             <div
               key={index}
@@ -119,21 +168,21 @@ export default function Slider() {
                 <h2
                   className={`text-2xl md:text-4xl font-bold leading-tight ${
                     isAvailable ? "text-green-700" : "text-gray-600"
-                  }`} // Warna teks abu-abu jika tidak tersedia
+                  }`}
                 >
                   {slide.title}
                 </h2>
                 <div
                   className={`mt-2 md:mt-5 text-sm md:text-base leading-relaxed ${
                     isAvailable ? "text-gray-700" : "text-gray-500"
-                  }`} // Warna deskripsi abu-abu jika tidak tersedia
+                  }`}
                 >
                   <p className="text-justify">{slide.description}</p>
                 </div>
                 <p
                   className={`mt-2 md:mt-5 font-semibold ${
                     isAvailable ? "text-gray-600" : "text-gray-500"
-                  }`} // Warna harga abu-abu jika tidak tersedia
+                  }`}
                 >
                   {slide.price}
                 </p>
@@ -142,27 +191,27 @@ export default function Slider() {
                     if (isAvailable) {
                       navigate(`/customer/produk/${slugify(slide.title)}`);
                     } else {
-                      showToast("Produk Tidak Tersedia", "error"); // Tampilkan toast jika tidak tersedia
+                      showToast("Produk Tidak Tersedia", "error");
                     }
                   }}
                   className={`mt-3 md:mt-6 px-4 py-2 md:px-6 md:py-3 text-sm md:text-base font-semibold rounded-lg transition duration-300 cursor-pointer ${
                     isAvailable
                       ? "border-2 border-yellow-500 text-yellow-500 hover:bg-yellow-500 hover:text-white"
                       : "border-2 border-gray-400 text-gray-400 bg-gray-200 cursor-not-allowed"
-                  }`} // Styling tombol berdasarkan status
-                  disabled={!isAvailable} // Nonaktifkan tombol jika tidak tersedia
+                  }`}
+                  disabled={!isAvailable}
                 >
                   {slide.buttonText}
                 </button>
               </div>
 
-              <div className="hidden md:flex h-full items-center justify-center p-8 md:p-16">
+              <div className="hidden md:flex md:h-full items-center justify-center p-8 md:p-16">
                 <img
                   src={slide.image}
                   alt={slide.title}
                   className={`max-w-full max-h-[30rem] object-contain ${
                     !isAvailable ? "opacity-50" : ""
-                  }`} // Kurangi opacity gambar jika tidak tersedia
+                  }`}
                 />
               </div>
             </div>
