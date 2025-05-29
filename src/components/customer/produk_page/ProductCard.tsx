@@ -10,7 +10,11 @@ interface Product {
   nama: string;
   harga: string;
   gambar: string;
-  status: string; // Tambahkan properti status
+  status: string;
+}
+
+interface ProductListProps {
+  searchQuery: string;
 }
 
 const containerVariants = {
@@ -27,20 +31,30 @@ const itemVariants = {
   show: { opacity: 1, y: 0, scale: 1 },
 };
 
-const ProductList: React.FC = () => {
+const ProductList: React.FC<ProductListProps> = ({ searchQuery }) => {
   const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
 
   useEffect(() => {
     api
       .get("/api/products")
       .then((res) => {
-        setProducts(res.data); // Data produk sudah termasuk status
+        setProducts(res.data);
+        setFilteredProducts(res.data); // Inisialisasi filteredProducts dengan semua produk
       })
       .catch((err) => {
         console.error("Gagal mengambil data produk:", err);
       });
   }, []);
+
+  useEffect(() => {
+    // Filter produk berdasarkan searchQuery
+    const filtered = products.filter((product) =>
+      product.nama.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    setFilteredProducts(filtered);
+  }, [searchQuery, products]);
 
   return (
     <motion.div
@@ -49,42 +63,47 @@ const ProductList: React.FC = () => {
       initial="hidden"
       animate="show"
     >
-      {products.map((product) => {
-        const isAvailable = product.status === "Tersedia"; // Cek status produk
+      {filteredProducts.length === 0 && searchQuery && (
+        <div className="col-span-full text-center text-gray-600 text-base sm:text-lg">
+          Tidak ada produk yang cocok dengan pencarian "{searchQuery}".
+        </div>
+      )}
+      {filteredProducts.map((product) => {
+        const isAvailable = product.status === "Tersedia";
         return (
           <motion.div
             key={product.id}
             className={`rounded-2xl shadow-lg overflow-hidden flex flex-col w-full ${
               isAvailable ? "bg-white" : "bg-gray-300"
-            }`} // Abu-abu jika tidak tersedia
+            }`}
             variants={itemVariants}
             transition={{ duration: 0.5, ease: "easeOut" }}
           >
             <div
               className={`p-4 flex justify-center ${
                 isAvailable ? "bg-green-700" : "bg-gray-500"
-              }`} // Ubah warna header jika tidak tersedia
+              }`}
             >
               <img
                 src={`${getBaseUrl()}/${product.gambar}`}
                 alt={product.nama}
                 className={`h-32 w-32 sm:h-40 sm:w-40 object-contain ${
                   !isAvailable ? "opacity-50" : ""
-                }`} // Kurangi opacity gambar jika tidak tersedia
+                }`}
               />
             </div>
             <div className="p-4 text-center flex flex-col flex-grow">
               <h3
                 className={`font-medium text-lg ${
                   !isAvailable ? "text-gray-600" : ""
-                }`} // Warna teks abu-abu jika tidak tersedia
+                }`}
               >
                 {product.nama}
               </h3>
               <p
                 className={`font-medium mt-1 ${
                   isAvailable ? "text-green-700" : "text-gray-600"
-                }`} // Warna harga abu-abu jika tidak tersedia
+                }`}
               >
                 Rp. {parseInt(product.harga).toLocaleString("id-ID")}
               </p>
@@ -92,13 +111,13 @@ const ProductList: React.FC = () => {
                 onClick={() =>
                   isAvailable &&
                   navigate(`/customer/produk/${slugify(product.nama)}`)
-                } // Hanya navigasi jika tersedia
+                }
                 className={`mt-4 px-4 py-2 rounded-md w-full transition ${
                   isAvailable
                     ? "bg-yellow-500 text-white hover:bg-yellow-600 cursor-pointer"
                     : "bg-gray-400 text-gray-600 cursor-not-allowed"
-                }`} // Styling tombol berdasarkan status
-                disabled={!isAvailable} // Nonaktifkan tombol jika tidak tersedia
+                }`}
+                disabled={!isAvailable}
               >
                 {isAvailable ? "Pesan Sekarang" : "Tidak Tersedia"}
               </button>

@@ -1,9 +1,16 @@
 import { Icon } from "@iconify/react";
+import { useState } from "react";
 import Navbar from "../../components/customer/Navbar";
 import ProductList from "../../components/customer/produk_page/ProductCard";
 import Footer from "../../components/customer/Footer";
 
 const ProdukPage = () => {
+  const [searchQuery, setSearchQuery] = useState<string>("");
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+
   return (
     <div className="bg-[#D9D9D9] min-h-screen">
       <Navbar
@@ -33,15 +40,21 @@ const ProdukPage = () => {
             <input
               type="text"
               placeholder="Cari produk"
-              className="w-full px-3 sm:px-4 py-2 bg-white rounded-l-md focus:outline-none border border-gray-200 border-r-0"
+              value={searchQuery}
+              onChange={handleSearchChange}
+              className="w-full px-3 sm:px-4 py-2 bg-white rounded-l-md focus:outline-none focus:ring-2 focus:ring-yellow-500 border border-gray-200 border-r-0 text-sm sm:text-base"
+              aria-label="Cari produk"
             />
-            <button className="bg-yellow-500 text-white px-3 sm:px-4 py-2 rounded-r-md cursor-pointer">
+            <button
+              className="bg-yellow-500 text-white px-3 sm:px-4 py-2 rounded-r-md hover:bg-yellow-600 transition-colors duration-200 cursor-pointer"
+              aria-label="Tombol cari"
+            >
               <Icon icon="cuida:search-outline" className="w-5 h-5" />
             </button>
           </div>
         </div>
       </div>
-      <ProductList />
+      <ProductList searchQuery={searchQuery} />
       <Footer />
     </div>
   );

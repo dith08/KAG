@@ -50,41 +50,47 @@ export const ToastComponent = ({ toast, visible, onClose }: ToastProps) => {
         }
 
         .slide-in {
-          animation: slideIn 0.5s ease forwards;
+          animation: slideIn 0.3s ease-out forwards;
         }
 
         .slide-out {
-          animation: slideOut 0.5s ease forwards;
+          animation: slideOut 0.3s ease-in forwards;
         }
       `}</style>
 
       {show && (
         <div
-          className={`fixed top-2 sm:top-4 md:top-5 right-2 sm:right-4 md:right-5 z-50 w-[90%] sm:w-[360px] max-w-sm 
-            flex items-start gap-3 p-4 rounded-lg shadow-lg border-l-4 
+          className={`fixed top-4 right-4 z-50 w-[calc(100%-2rem)] sm:w-80 md:w-96 max-w-md 
+            flex items-start gap-3 p-3 sm:p-4 rounded-xl shadow-xl border-l-4 
             ${visible ? "slide-in" : "slide-out"}
             ${
               toast.type === "success"
-                ? "bg-green-50 border-green-500 text-green-700"
-                : "bg-red-50 border-red-500 text-red-700"
-            }`}
+                ? "bg-green-100 border-green-600 text-green-800"
+                : "bg-red-100 border-red-600 text-red-800"
+            } transition-all duration-300`}
+          role="alert"
+          aria-live="assertive"
+          aria-atomic="true"
         >
           <Icon
             icon={
               toast.type === "success" ? "mdi:check-circle" : "mdi:alert-circle"
             }
-            className="text-2xl flex-shrink-0 mt-0.5"
+            className="text-xl sm:text-2xl flex-shrink-0 mt-0.5"
           />
-          <span className="flex-1 pr-6 break-words">{toast.message}</span>
+          <span className="flex-1 text-sm sm:text-base pr-8 break-words leading-snug">
+            {toast.message}
+          </span>
 
           <button
-            className="absolute top-2 right-2 text-gray-500 hover:text-gray-800"
+            className="absolute top-2 right-2 text-gray-600 hover:text-gray-900 transition-colors duration-200"
             onClick={() => {
               setShow(false);
               onClose();
             }}
+            aria-label="Close toast"
           >
-            <Icon icon="mdi:close" className="text-lg" />
+            <Icon icon="mdi:close" className="text-base sm:text-lg" />
           </button>
         </div>
       )}
