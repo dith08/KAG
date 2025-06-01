@@ -91,7 +91,7 @@ const FormPemesanan: React.FC = () => {
 
   const [selectedSize, setSelectedSize] = useState<number | null>(null);
   const [hargaSatuan, setHargaSatuan] = useState<number>(0);
-  const [jumlah, setJumlah] = useState<number>(100);
+  const [jumlah, setJumlah] = useState<number>(1000);
   const [catatan, setCatatan] = useState<string>("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
@@ -449,6 +449,12 @@ const FormPemesanan: React.FC = () => {
             Form Pemesanan
           </h1>
           <p className="text-xl text-gray-600">{products.nama}</p>
+          <div className="mt-3 p-3 bg-yellow-100 border border-yellow-400 rounded-lg flex items-center">
+            <Icon icon="mdi:alert-circle" className="text-yellow-700 mr-2" />
+            <p className="text-sm text-yellow-700 font-medium">
+              Minimal pemesanan 1000 pcs
+            </p>
+          </div>
         </div>
 
         <form
@@ -567,7 +573,7 @@ const FormPemesanan: React.FC = () => {
                     className="w-full border-2 border-gray-200 rounded-lg p-3 focus:border-2 focus:border-green-700 focus:outline-none appearance-none bg-white"
                     value={jumlah}
                     onChange={(e) => setJumlah(Number(e.target.value))}
-                    min={100}
+                    min={1000}
                     required
                   />
                 </div>

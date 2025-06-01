@@ -194,9 +194,9 @@ export default function Slider() {
                       showToast("Produk Tidak Tersedia", "error");
                     }
                   }}
-                  className={`mt-3 md:mt-6 px-4 py-2 md:px-6 md:py-3 text-sm md:text-base font-semibold rounded-lg transition duration-300 cursor-pointer ${
+                  className={`mt-3 md:mt-6 px-4 py-2 md:px-6 md:py-3 text-sm md:text-base font-semibold rounded-lg transition duration-300 ${
                     isAvailable
-                      ? "border-2 border-yellow-500 text-yellow-500 hover:bg-yellow-500 hover:text-white"
+                      ? "border-2 border-yellow-500 text-yellow-500 hover:bg-yellow-500 hover:text-white cursor-pointer"
                       : "border-2 border-gray-400 text-gray-400 bg-gray-200 cursor-not-allowed"
                   }`}
                   disabled={!isAvailable}

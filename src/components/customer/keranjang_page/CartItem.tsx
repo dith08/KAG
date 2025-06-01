@@ -26,8 +26,8 @@ const CartItem: React.FC<CartItemProps> = ({
   onCheckChange,
   isChecked,
 }) => {
-  const MINIMUM_QUANTITY = 100;
-  const MAXIMUM_QUANTITY = 1000;
+  const MINIMUM_QUANTITY = 1000;
+  const MAXIMUM_QUANTITY = 10000;
 
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<number | null>(null);
