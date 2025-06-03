@@ -307,7 +307,7 @@ const StatisticAdminPage: React.FC = () => {
                     onChange={(e) =>
                       setProdukFilter(e.target.value as "bulanan" | "tahunan")
                     }
-                    className="text-sm border rounded-md px-2 py-1 text-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className="text-sm border rounded-md px-2 py-1 text-gray-600 focus:outline-none focus:ring-1 focus:ring-green-700"
                   >
                     <option value="bulanan">Bulanan</option>
                     <option value="tahunan">Tahunan</option>
@@ -358,7 +358,7 @@ const StatisticAdminPage: React.FC = () => {
                     onChange={(e) =>
                       setTrenFilter(e.target.value as "bulanan" | "tahunan")
                     }
-                    className="text-sm border rounded-md px-2 py-1 text-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className="text-sm border rounded-md px-2 py-1 text-gray-600 focus:outline-none focus:ring-1 focus:ring-green-700"
                   >
                     <option value="bulanan">Bulanan</option>
                     <option value="tahunan">Tahunan</option>
@@ -450,7 +450,7 @@ const StatisticAdminPage: React.FC = () => {
                   placeholder="Cari nama bahan..."
                   value={stokSearch}
                   onChange={(e) => setStokSearch(e.target.value)}
-                  className="w-full sm:w-64 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full sm:w-64 px-4 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-green-700"
                 />
                 <ModernTable
                   headers={[
@@ -477,13 +477,13 @@ const StatisticAdminPage: React.FC = () => {
                     placeholder="Cari berdasarkan nama atau ID..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full sm:w-64 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className="w-full sm:w-64 px-4 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-green-700"
                   />
                   <input
                     type="date"
                     value={dateFilter}
                     onChange={(e) => setDateFilter(e.target.value)}
-                    className="w-full sm:w-40 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className="w-full sm:w-40 px-4 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-green-700"
                   />
                 </div>
                 <ModernTable
