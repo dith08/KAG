@@ -140,7 +140,7 @@ const UkuranTabel = () => {
         title="Hapus Ukuran"
       />
       {/* Versi Dekstop */}
-      <div className="hidden lg:block overflow-x-auto rounded-xl shadow-md p-4 lg:p-6 bg-white">
+      <div className="hidden lg:block overflow-x-auto rounded-xl p-2 bg-white">
         <h2 className="text-lg font-semibold text-green-700 flex items-center gap-1 mb-4">
           <Icon icon="mdi:ruler" className="w-5 h-5" />
           Data Ukuran
@@ -275,7 +275,7 @@ const UkuranTabel = () => {
       </div>
 
       {/* Versi Mobile */}
-      <div className="lg:hidden bg-white rounded-xl shadow-md p-4">
+      <div className="lg:hidden bg-white rounded-xl p-2">
         <h2 className="text-lg font-semibold text-green-700 flex items-center justify-center gap-1 mb-4">
           <Icon icon="mdi:ruler" className="w-5 h-5" />
           Data Ukuran

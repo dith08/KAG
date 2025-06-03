@@ -105,7 +105,7 @@ const ProdukTabel = () => {
   );
 
   return (
-    <div className="bg-white p-4 lg:p-6 rounded-2xl shadow-lg">
+    <div className="bg-white p-2 rounded-2xl">
       <ConfirmPopup
         isOpen={isPopupOpen}
         message="Apakah Anda yakin ingin hapus produk ini?"
@@ -244,7 +244,7 @@ const ProdukTabel = () => {
                       {p.status ? "Tersedia" : "Tidak Tersedia"}
                     </span>
                   </td>
-                  <td className="p-3 text-center space-x-2 whitespace-nowrap">
+                  <td className="p-3 text-left space-x-2 whitespace-nowrap">
                     <button
                       onClick={() => navigate(`/admin/products/${p.id}/edit`)}
                       className="text-green-700 hover:text-green-800 cursor-pointer"

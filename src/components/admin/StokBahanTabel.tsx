@@ -106,7 +106,7 @@ const StokBahanTabel = () => {
   };
 
   return (
-    <div className="bg-white p-4 lg:p-6 rounded-2xl shadow-lg">
+    <div className="bg-white p-2 rounded-2xl">
       <ConfirmPopup
         isOpen={isPopupOpen}
         message="Apakah Anda yakin ingin hapus bahan baku ini?"

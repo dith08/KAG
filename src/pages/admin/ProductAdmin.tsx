@@ -5,8 +5,19 @@ import UkuranTabel from "../../components/admin/UkuranTabel";
 import StokBahanTabel from "../../components/admin/StokBahanTabel";
 import ProdukTabel from "../../components/admin/ProdukTabel";
 import FinishingTabel from "../../components/admin/FinishingTabel";
+import { Tabs } from "../../components/admin/Tabs";
+import { useState } from "react";
 
 const ProductAdminPage: React.FC = () => {
+  const [activeTab, setActiveTab] = useState("produk");
+
+  const tabs = [
+    { id: "produk", label: "Produk" },
+    { id: "bahan", label: "Bahan Baku" },
+    { id: "ukuran", label: "Ukuran" },
+    { id: "finishing", label: "Finishing" },
+  ];
+
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-gray-50">
       <SidebarAdmin />
@@ -18,26 +29,13 @@ const ProductAdminPage: React.FC = () => {
             KELOLA PRODUK & BAHAN
           </h1>
 
-          <div className="flex flex-col gap-6 lg:grid lg:grid-cols-2 lg:gap-8">
-            {/* Bahan Baku */}
-            <div className="order-1">
-              <StokBahanTabel />
-            </div>
+          <Tabs activeTab={activeTab} setActiveTab={setActiveTab} tabs={tabs} />
 
-            {/* Ukuran */}
-            <div className="order-2">
-              <UkuranTabel />
-            </div>
-
-            {/* Produk */}
-            <div className="order-3">
-              <ProdukTabel />
-            </div>
-
-            {/* Finishing */}
-            <div className="order-4">
-              <FinishingTabel />
-            </div>
+          <div className="bg-white rounded-2xl shadow-lg p-6">
+            {activeTab === "produk" && <ProdukTabel />}
+            {activeTab === "bahan" && <StokBahanTabel />}
+            {activeTab === "ukuran" && <UkuranTabel />}
+            {activeTab === "finishing" && <FinishingTabel />}
           </div>
         </div>
       </div>
