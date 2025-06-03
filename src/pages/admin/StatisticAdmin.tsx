@@ -23,18 +23,74 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
+import { Card } from "../../components/admin/Card";
+import { ModernTable } from "../../components/admin/ModernTable";
+import { Tabs } from "../../components/admin/Tabs";
 
-const dataProduk = [
+// Fungsi format angka ke format singkat (jt, rb)
+const formatNumber = (num: number): string => {
+  if (num >= 1000000) {
+    return `${(num / 1000000).toFixed(1).replace(".0", "")}jt`;
+  } else if (num >= 1000) {
+    return `${(num / 1000).toFixed(1).replace(".0", "")}rb`;
+  }
+  return num.toString();
+};
+
+// Data
+const dataProdukBulanan = [
   { name: "Produk A", terjual: 240 },
   { name: "Produk B", terjual: 456 },
   { name: "Produk C", terjual: 300 },
   { name: "Produk D", terjual: 120 },
 ];
 
-const dummyCustomer = [
-  { nama: "Ahmad", totalTransaksi: 12, terakhir: "14 April 2025" },
-  { nama: "Budi", totalTransaksi: 8, terakhir: "10 April 2025" },
-  { nama: "Citra", totalTransaksi: 15, terakhir: "12 April 2025" },
+const dataProdukTahunan = [
+  { name: "Produk A", terjual: 2880 },
+  { name: "Produk B", terjual: 5472 },
+  { name: "Produk C", terjual: 3600 },
+  { name: "Produk D", terjual: 1440 },
+];
+
+const dataBulanan = [
+  { bulan: "Jan", total: 4000000 },
+  { bulan: "Feb", total: 3000000 },
+  { bulan: "Mar", total: 5000000 },
+  { bulan: "Apr", total: 2000000 },
+  { bulan: "Mei", total: 25000000 },
+];
+
+const dataTahunan = [
+  { tahun: "2023", total: 18000000 },
+  { tahun: "2024", total: 22000000 },
+  { tahun: "2025", total: 25000000 },
+];
+
+const dummyTransaksi = [
+  {
+    id: "#TRX001",
+    nama: "Isham",
+    tanggal: "15 April 2025",
+    total: "Rp 250.000",
+    produk: "Produk A",
+    status: "Selesai",
+  },
+  {
+    id: "#TRX002",
+    nama: "Aulia",
+    tanggal: "16 April 2025",
+    total: "Rp 300.000",
+    produk: "Produk B",
+    status: "Menunggu",
+  },
+  {
+    id: "#TRX003",
+    nama: "Rizki",
+    tanggal: "17 April 2025",
+    total: "Rp 150.000",
+    produk: "Produk C",
+    status: "Selesai",
+  },
 ];
 
 const dummyStok = [
@@ -46,142 +102,47 @@ const dummyStok = [
 const dummyHistoriStok = [
   {
     nama: "Kertas HVS",
-    tanggal: "15 April 2025",
+    tanggal: "15 Mei 2025",
     aktivitas: "Penambahan",
     jumlah: "+500 lembar",
   },
   {
     nama: "Kertas Art Carton",
-    tanggal: "14 April 2025",
+    tanggal: "14 Mei 2025",
     aktivitas: "Penggunaan",
     jumlah: "-200 lembar",
   },
   {
     nama: "Tinta Hitam",
-    tanggal: "13 April 2025",
+    tanggal: "13 Mei 2025",
     aktivitas: "Penambahan",
     jumlah: "+10 botol",
   },
 ];
 
-const dummyTransaksi = [
-  {
-    id: "#TRX001",
-    nama: "Isham",
-    total: "Rp 250.000",
-    tanggal: "15 April 2025",
-  },
-  {
-    id: "#TRX002",
-    nama: "Aulia",
-    total: "Rp 300.000",
-    tanggal: "16 April 2025",
-  },
-  {
-    id: "#TRX003",
-    nama: "Rizki",
-    total: "Rp 150.000",
-    tanggal: "17 April 2025",
-  },
-];
-
-interface TableProps {
-  headers: string[];
-  data: Record<string, string | number>[];
-  showHistoryButton?: boolean;
-  onHistoryClick?: (nama: string) => void;
-}
-
-const Table: React.FC<TableProps> = ({
-  headers,
-  data,
-  showHistoryButton,
-  onHistoryClick,
-}) => (
-  <div className="overflow-x-auto rounded-2xl shadow">
-    <table className="min-w-full divide-y divide-gray-200">
-      <thead className="bg-green-700 text-white">
-        <tr>
-          {headers.map((head: string) => (
-            <th
-              key={head}
-              className="px-5 py-3 text-left text-sm font-semibold uppercase tracking-wider"
-            >
-              {head}
-            </th>
-          ))}
-          {showHistoryButton && (
-            <th className="px-5 py-3 text-left text-sm font-semibold uppercase tracking-wider">
-              Aksi
-            </th>
-          )}
-        </tr>
-      </thead>
-      <tbody className="bg-white divide-y divide-gray-200">
-        {data.map((row, i: number) => (
-          <tr
-            key={i}
-            className="hover:bg-green-50 transition-colors duration-200"
-          >
-            {Object.values(row).map((cell: string | number, idx: number) => (
-              <td key={idx} className="px-5 py-4 text-sm text-gray-700">
-                {cell}
-              </td>
-            ))}
-            {showHistoryButton && (
-              <td className="px-5 py-4 text-sm">
-                <button
-                  onClick={() =>
-                    onHistoryClick &&
-                    onHistoryClick(row["Nama Bahan"] as string)
-                  }
-                  className="bg-green-600 text-white px-3 py-1 rounded-lg hover:bg-green-700 flex items-center gap-2"
-                >
-                  <Icon icon="mdi:history" /> Lihat Histori
-                </button>
-              </td>
-            )}
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-);
+// Hitung total pendapatan dari entri terakhir dataBulanan
+const pendapatanBulanIni = dataBulanan[dataBulanan.length - 1].total;
+const pendapatanBulanLalu = dataBulanan[dataBulanan.length - 2].total;
+const kenaikanPersen =
+  ((pendapatanBulanIni - pendapatanBulanLalu) / pendapatanBulanLalu) * 100;
 
 const StatisticAdminPage: React.FC = () => {
-  const [selectedBahan, setSelectedBahan] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [dateFilter, setDateFilter] = useState("");
+  const [produkFilter, setProdukFilter] = useState<"bulanan" | "tahunan">(
+    "bulanan"
+  );
+  const [trenFilter, setTrenFilter] = useState<"bulanan" | "tahunan">(
+    "bulanan"
+  );
+  const [activeTab, setActiveTab] = useState("stok");
+  const [showProdukDetail, setShowProdukDetail] = useState(false);
+  const [showTrenDetail, setShowTrenDetail] = useState(false);
+  const [stokSearch, setStokSearch] = useState("");
 
-  const [filter, setFilter] = useState<"harian" | "bulanan">("bulanan");
-
-  const dataBulanan = [
-    { bulan: "Jan", total: 4000 },
-    { bulan: "Feb", total: 3000 },
-    { bulan: "Mar", total: 5000 },
-    { bulan: "Apr", total: 2500 },
-    { bulan: "Mei", total: 4200 },
-  ];
-
-  const dataHarian = [
-    { tanggal: "01 Mei", total: 200 },
-    { tanggal: "02 Mei", total: 150 },
-    { tanggal: "03 Mei", total: 180 },
-    { tanggal: "04 Mei", total: 300 },
-    { tanggal: "05 Mei", total: 220 },
-    { tanggal: "06 Mei", total: 190 },
-    { tanggal: "07 Mei", total: 250 },
-  ];
-
-  const dataTren = filter === "bulanan" ? dataBulanan : dataHarian;
-
-  const handleHistoryClick = (nama: string) => {
-    setSelectedBahan(selectedBahan === nama ? null : nama);
-  };
-
-  const filteredHistory = selectedBahan
-    ? dummyHistoriStok.filter((h) => h.nama === selectedBahan)
-    : [];
+  const dataProduk =
+    produkFilter === "bulanan" ? dataProdukBulanan : dataProdukTahunan;
+  const dataTren = trenFilter === "bulanan" ? dataBulanan : dataTahunan;
 
   const filteredTransaksi = dummyTransaksi.filter((t) => {
     const matchesSearch =
@@ -191,11 +152,14 @@ const StatisticAdminPage: React.FC = () => {
     return matchesSearch && matchesDate;
   });
 
+  const filteredStok = dummyStok.filter((s) =>
+    s.nama.toLowerCase().includes(stokSearch.toLowerCase())
+  );
+
   const handleDownloadPDF = () => {
     const doc = new jsPDF();
-    let y = 20; // posisi Y awal
+    let y = 20;
 
-    // === Produk ===
     doc.text("Laporan Produk", 14, y);
     autoTable(doc, {
       startY: y + 10,
@@ -205,34 +169,18 @@ const StatisticAdminPage: React.FC = () => {
     });
     y = doc.lastAutoTable?.finalY ? doc.lastAutoTable.finalY + 10 : y + 30;
 
-    // === Tren ===
     doc.text("Laporan Tren", 14, y);
     autoTable(doc, {
       startY: y + 10,
-      head: [["Bulan", "Total"]],
+      head: [["Periode", "Total"]],
       body: dataTren.map((t) => [
-        "bulan" in t ? t.bulan : t.tanggal,
-        t.total.toString(),
+        "bulan" in t ? t.bulan : t.tahun,
+        `Rp ${formatNumber(t.total)}`,
       ]),
       headStyles: { fillColor: [21, 128, 61] },
     });
     y = doc.lastAutoTable?.finalY ? doc.lastAutoTable.finalY + 10 : y + 30;
 
-    // === Customer ===
-    doc.text("Laporan Customer", 14, y);
-    autoTable(doc, {
-      startY: y + 10,
-      head: [["Nama", "Total Transaksi", "Terakhir Transaksi"]],
-      body: dummyCustomer.map((c) => [
-        c.nama,
-        c.totalTransaksi.toString(),
-        c.terakhir,
-      ]),
-      headStyles: { fillColor: [21, 128, 61] },
-    });
-    y = doc.lastAutoTable?.finalY ? doc.lastAutoTable.finalY + 10 : y + 30;
-
-    // === Stok ===
     doc.text("Laporan Stok", 14, y);
     autoTable(doc, {
       startY: y + 10,
@@ -242,7 +190,6 @@ const StatisticAdminPage: React.FC = () => {
     });
     y = doc.lastAutoTable?.finalY ? doc.lastAutoTable.finalY + 10 : y + 30;
 
-    // === Histori Stok ===
     doc.text("Histori Stok", 14, y);
     autoTable(doc, {
       startY: y + 10,
@@ -257,21 +204,21 @@ const StatisticAdminPage: React.FC = () => {
     });
     y = doc.lastAutoTable?.finalY ? doc.lastAutoTable.finalY + 10 : y + 30;
 
-    // === Transaksi ===
     doc.text("Laporan Transaksi", 14, y);
     autoTable(doc, {
       startY: y + 10,
-      head: [["ID", "Nama", "Total", "Tanggal"]],
-      body: dummyTransaksi.map((trx) => [
-        trx.id,
-        trx.nama,
-        trx.total,
-        trx.tanggal,
+      head: [["ID", "Nama", "Tanggal", "Total", "Produk", "Status"]],
+      body: dummyTransaksi.map((t) => [
+        t.id,
+        t.nama,
+        t.tanggal,
+        t.total,
+        t.produk,
+        t.status,
       ]),
       headStyles: { fillColor: [21, 128, 61] },
     });
 
-    // Save file
     doc.save("Laporan_Statistik.pdf");
   };
 
@@ -281,7 +228,6 @@ const StatisticAdminPage: React.FC = () => {
     const sheets = [
       { data: dataProduk, name: "Produk Terlaris" },
       { data: dataTren, name: "Tren Penjualan" },
-      { data: dummyCustomer, name: "Data Customer" },
       { data: dummyStok, name: "Stok Bahan" },
       { data: dummyHistoriStok, name: "Histori Stok" },
       { data: dummyTransaksi, name: "Data Transaksi" },
@@ -289,35 +235,29 @@ const StatisticAdminPage: React.FC = () => {
 
     sheets.forEach(({ data, name }) => {
       const worksheet = workbook.addWorksheet(name);
-
-      // Add header row
       const headers = Object.keys(data[0]);
       worksheet.addRow(headers);
 
-      // Add data rows
       data.forEach((item) => {
-        worksheet.addRow(Object.values(item));
+        const row = Object.values(item).map((val) =>
+          typeof val === "number" ? formatNumber(val) : val
+        );
+        worksheet.addRow(row);
       });
 
-      // Style header row
       const headerRow = worksheet.getRow(1);
       headerRow.eachCell((cell) => {
         cell.fill = {
           type: "pattern",
           pattern: "solid",
-          fgColor: { argb: "15803D" }, // green-700 HEX tanpa '#'
+          fgColor: { argb: "15803D" },
         };
-        cell.font = {
-          color: { argb: "FFFFFFFF" }, // white
-          bold: true,
-        };
+        cell.font = { color: { argb: "FFFFFFFF" }, bold: true };
         cell.alignment = { horizontal: "center" };
       });
 
-      // Auto width
       worksheet.columns.forEach((column) => {
         let maxLength = 10;
-
         if (column.eachCell) {
           column.eachCell({ includeEmpty: true }, (cell) => {
             const cellLength = cell.value ? cell.value.toString().length : 0;
@@ -330,7 +270,6 @@ const StatisticAdminPage: React.FC = () => {
       });
     });
 
-    // Export file
     const buffer = await workbook.xlsx.writeBuffer();
     const blob = new Blob([buffer], {
       type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -339,63 +278,101 @@ const StatisticAdminPage: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-gray-50">
       <SidebarAdmin />
-      <div className="flex-1 w-full lg:ml-64">
+      <div className="flex-1 lg:ml-64">
         <NavbarAdmin />
+        <div className="p-6 space-y-8 lg:mt-24">
+          <div className="flex items-center gap-3">
+            <Icon icon="mdi:chart-box" className="w-8 h-8 text-green-700" />
+            <h1 className="text-2xl font-bold text-green-700">
+              LAPORAN & STATISTIK
+            </h1>
+          </div>
 
-        <div className="p-4 lg:p-6 space-y-10 mt-18 lg:mt-24">
-          <h1 className="text-xl md:text-2xl font-bold text-center lg:text-left text-green-700 flex items-center gap-2 mb-4">
-            <Icon icon="mdi:chart-box" className="w-8 h-8" />
-            LAPORAN & STATISTIK
-          </h1>
           {/* Laporan Penjualan */}
-          <section className="bg-white rounded-2xl shadow-md p-6">
-            <h2 className="text-xl flex items-center gap-3 font-semibold mb-6 text-green-700">
-              <Icon icon="mdi:chart-areaspline" className="w-6 h-6" /> LAPORAN
-              PENJUALAN
-            </h2>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="bg-gray-50 p-4 rounded-xl shadow-sm">
-                <h3 className="text-center font-semibold mb-3 text-green-700">
-                  Grafik Produk Terlaris
-                </h3>
+          <Card
+            title="Laporan Penjualan"
+            icon="mdi:chart-areaspline"
+            className="space-y-6"
+          >
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+              <div className="bg-white border border-gray-200 p-4 rounded-xl shadow-sm min-h-[220px]">
+                <div className="flex justify-between items-center mb-3">
+                  <h3 className="text-center font-semibold text-green-700">
+                    Grafik Produk Terlaris
+                  </h3>
+                  <select
+                    value={produkFilter}
+                    onChange={(e) =>
+                      setProdukFilter(e.target.value as "bulanan" | "tahunan")
+                    }
+                    className="text-sm border rounded-md px-2 py-1 text-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500"
+                  >
+                    <option value="bulanan">Bulanan</option>
+                    <option value="tahunan">Tahunan</option>
+                  </select>
+                </div>
                 <ResponsiveContainer width="100%" height={220}>
                   <BarChart data={dataProduk}>
                     <XAxis dataKey="name" />
                     <YAxis />
                     <Tooltip />
-                    <Bar dataKey="terjual" fill="#F9A825" />
+                    <Bar
+                      dataKey="terjual"
+                      fill="#F9A825"
+                      radius={[4, 4, 0, 0]}
+                    />
                   </BarChart>
                 </ResponsiveContainer>
+                <p className="text-sm text-gray-600 text-center mt-2">
+                  Data{" "}
+                  {produkFilter === "bulanan" ? "Bulan Mei 2025" : "Tahun 2025"}
+                </p>
+                <button
+                  onClick={() => setShowProdukDetail(!showProdukDetail)}
+                  className="mt-4 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center gap-2 mx-auto text-sm"
+                >
+                  <Icon icon="mdi:eye" />{" "}
+                  {showProdukDetail ? "Sembunyikan" : "Lihat"} Detail
+                </button>
+                {showProdukDetail && (
+                  <div className="mt-4">
+                    <ModernTable
+                      headers={["Nama Produk", "Terjual"]}
+                      data={dataProduk.map((p) => ({
+                        "Nama Produk": p.name,
+                        Terjual: p.terjual,
+                      }))}
+                    />
+                  </div>
+                )}
               </div>
-              <div className="bg-gray-50 p-4 rounded-xl shadow-sm">
+              <div className="bg-white border border-gray-200 p-4 rounded-xl shadow-sm min-h-[220px]">
                 <div className="flex justify-between items-center mb-3">
                   <h3 className="font-semibold text-green-700">
                     Grafik Tren Penjualan
                   </h3>
                   <select
-                    value={filter}
+                    value={trenFilter}
                     onChange={(e) =>
-                      setFilter(e.target.value as "harian" | "bulanan")
+                      setTrenFilter(e.target.value as "bulanan" | "tahunan")
                     }
-                    className="text-sm border rounded-md px-2 py-1 text-gray-600"
+                    className="text-sm border rounded-md px-2 py-1 text-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500"
                   >
                     <option value="bulanan">Bulanan</option>
-                    <option value="harian">Harian</option>
+                    <option value="tahunan">Tahunan</option>
                   </select>
                 </div>
                 <ResponsiveContainer width="100%" height={220}>
                   <LineChart data={dataTren}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis
-                      dataKey={filter === "bulanan" ? "bulan" : "tanggal"}
+                      dataKey={trenFilter === "bulanan" ? "bulan" : "tahun"}
                     />
-                    <YAxis />
+                    <YAxis tickFormatter={formatNumber} />
                     <Tooltip
-                      formatter={(value: number) =>
-                        `Rp ${value.toLocaleString()}`
-                      }
+                      formatter={(value: number) => formatNumber(value)}
                     />
                     <Line
                       type="monotone"
@@ -406,105 +383,142 @@ const StatisticAdminPage: React.FC = () => {
                     />
                   </LineChart>
                 </ResponsiveContainer>
+                <p className="text-sm text-gray-600 text-center mt-2">
+                  Data {trenFilter === "bulanan" ? "Jan-Mei 2025" : "2023-2025"}
+                </p>
+                <button
+                  onClick={() => setShowTrenDetail(!showTrenDetail)}
+                  className="mt-4 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center gap-2 mx-auto text-sm"
+                >
+                  <Icon icon="mdi:eye" />{" "}
+                  {showTrenDetail ? "Sembunyikan" : "Lihat"} Detail
+                </button>
+                {showTrenDetail && (
+                  <div className="mt-4">
+                    <ModernTable
+                      headers={["Periode", "Total"]}
+                      data={dataTren.map((t) => ({
+                        Periode: "bulan" in t ? t.bulan : t.tahun,
+                        Total: `Rp ${formatNumber(t.total)}`,
+                      }))}
+                    />
+                  </div>
+                )}
               </div>
             </div>
-            <p className="mt-8 font-semibold text-center sm:text-left text-lg text-green-700">
-              TOTAL PENDAPATAN:{" "}
-              <span className="text-yellow-500">RP 25.000.000</span>
-            </p>
-          </section>
-          {/* Laporan Customer */}
-          <section className="bg-white rounded-2xl shadow-md p-6 space-y-4">
-            <h2 className="text-xl flex items-center gap-3 font-semibold mb-6 text-green-700">
-              <Icon icon="mdi:account" className="w-6 h-6" /> LAPORAN CUSTOMER
-            </h2>
-            <Table
-              headers={[
-                "Nama Customer",
-                "Total Transaksi",
-                "Terakhir Transaksi",
+            <div
+              className="bg-white border border-gray-200 p-4 rounded-xl shadow-sm flex items-center justify-between gap-4"
+              title={`Bulan lalu: Rp ${formatNumber(pendapatanBulanLalu)}`}
+            >
+              <div className="flex items-center gap-3">
+                <Icon icon="mdi:cash" className="w-6 h-6 text-green-700" />
+                <p className="text-lg font-semibold text-green-700">
+                  Total Pendapatan Bulan Ini:{" "}
+                  <span className="text-yellow-500">
+                    Rp {formatNumber(pendapatanBulanIni)}
+                  </span>
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Icon
+                  icon={kenaikanPersen >= 0 ? "mdi:arrow-up" : "mdi:arrow-down"}
+                  className={`w-5 h-5 ${
+                    kenaikanPersen >= 0 ? "text-green-700" : "text-red-600"
+                  }`}
+                />
+                <p
+                  className={`text-sm font-medium ${
+                    kenaikanPersen >= 0 ? "text-green-700" : "text-red-600"
+                  }`}
+                >
+                  {Math.abs(kenaikanPersen).toFixed(1)}%
+                </p>
+              </div>
+            </div>
+            <Tabs
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+              tabs={[
+                { id: "stok", label: "Laporan Stok Bahan" },
+                { id: "transaksi", label: "Laporan Transaksi" },
               ]}
-              data={dummyCustomer.map((c) => ({
-                "Nama Customer": c.nama,
-                "Total Transaksi": c.totalTransaksi,
-                "Terakhir Transaksi": c.terakhir,
-              }))}
             />
-          </section>
-          {/* Laporan Stok Bahan */}
-          <section className="bg-white rounded-2xl shadow-md p-6 space-y-4">
-            <h2 className="text-xl flex items-center gap-3 font-semibold mb-6 text-green-700">
-              <Icon icon="mdi:store-check" className="w-6 h-6" /> LAPORAN STOK
-              BAHAN
-            </h2>
-            <Table
-              headers={["Nama Bahan", "Stok Tersedia", "Keterangan"]}
-              data={dummyStok.map((s) => ({
-                "Nama Bahan": s.nama,
-                "Stok Tersedia": s.stok,
-                Keterangan: s.keterangan,
-              }))}
-              showHistoryButton={true}
-              onHistoryClick={handleHistoryClick}
-            />
-            {selectedBahan && (
-              <div className="mt-4">
-                <h3 className="text-lg font-semibold mb-4 text-green-700">
-                  Histori Penggunaan: {selectedBahan}
-                </h3>
-                <Table
-                  headers={["Tanggal", "Aktivitas", "Jumlah"]}
-                  data={filteredHistory.map((h) => ({
-                    Tanggal: h.tanggal,
-                    Aktivitas: h.aktivitas,
-                    Jumlah: h.jumlah,
+            {activeTab === "stok" && (
+              <div className="mt-4 space-y-4">
+                <input
+                  type="text"
+                  placeholder="Cari nama bahan..."
+                  value={stokSearch}
+                  onChange={(e) => setStokSearch(e.target.value)}
+                  className="w-full sm:w-64 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                />
+                <ModernTable
+                  headers={[
+                    "Nama Bahan",
+                    "Stok Tersedia",
+                    "Keterangan",
+                    "Aksi",
+                  ]}
+                  data={filteredStok.map((s) => ({
+                    "Nama Bahan": s.nama,
+                    "Stok Tersedia": s.stok,
+                    Keterangan: s.keterangan,
+                    Aksi: null, // Tombol akan dirender di dalam ModernTable
+                  }))}
+                  expandableHistori={dummyHistoriStok}
+                />
+              </div>
+            )}
+            {activeTab === "transaksi" && (
+              <div className="mt-4 space-y-4">
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <input
+                    type="text"
+                    placeholder="Cari berdasarkan nama atau ID..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full sm:w-64 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  />
+                  <input
+                    type="date"
+                    value={dateFilter}
+                    onChange={(e) => setDateFilter(e.target.value)}
+                    className="w-full sm:w-40 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  />
+                </div>
+                <ModernTable
+                  headers={[
+                    "ID Transaksi",
+                    "Nama Customer",
+                    "Tanggal",
+                    "Total",
+                    "Produk",
+                    "Status",
+                  ]}
+                  data={filteredTransaksi.map((t) => ({
+                    "ID Transaksi": t.id,
+                    "Nama Customer": t.nama,
+                    Tanggal: t.tanggal,
+                    Total: t.total,
+                    Produk: t.produk,
+                    Status: t.status,
                   }))}
                 />
               </div>
             )}
-          </section>
-          {/* Laporan Transaksi */}
-          <section className="bg-white rounded-2xl shadow-md p-6 space-y-4">
-            <h2 className="text-xl flex items-center gap-3 font-semibold mb-6 text-green-700">
-              <Icon icon="mdi:wallet" className="w-6 h-6" /> LAPORAN TRANSAKSI
-            </h2>
-            <div className="flex flex-col md:flex-row gap-4 mb-4">
-              <input
-                type="text"
-                placeholder="Cari berdasarkan nama atau ID..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full md:w-auto px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-              />
-              <input
-                type="date"
-                value={dateFilter}
-                onChange={(e) => setDateFilter(e.target.value)}
-                className="w-full md:w-auto px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-              />
-            </div>
-            <div className="overflow-x-auto">
-              <Table
-                headers={["ID", "Nama", "Total", "Tanggal"]}
-                data={filteredTransaksi.map((t) => ({
-                  ID: t.id,
-                  Nama: t.nama,
-                  Total: t.total,
-                  Tanggal: t.tanggal,
-                }))}
-              />
-            </div>
-          </section>
-          <div className="flex justify-end gap-2">
+          </Card>
+
+          {/* Download Buttons */}
+          <div className="flex justify-end gap-3">
             <button
               onClick={handleDownloadPDF}
-              className="bg-green-700 hover:bg-green-600 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 shadow cursor-pointer"
+              className="bg-green-700 hover:bg-green-600 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 shadow transition-colors duration-200"
             >
               <Icon icon="mdi:file-pdf" className="text-xl" /> Unduh PDF
             </button>
             <button
               onClick={handleDownloadExcel}
-              className="bg-yellow-500 hover:bg-yellow-600 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 shadow cursor-pointer"
+              className="bg-yellow-500 hover:bg-yellow-600 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 shadow transition-colors duration-200"
             >
               <Icon icon="mdi:microsoft-excel" className="text-xl" /> Unduh
               Excel
