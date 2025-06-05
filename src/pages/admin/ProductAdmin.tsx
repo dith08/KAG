@@ -6,10 +6,19 @@ import StokBahanTabel from "../../components/admin/StokBahanTabel";
 import ProdukTabel from "../../components/admin/ProdukTabel";
 import FinishingTabel from "../../components/admin/FinishingTabel";
 import { Tabs } from "../../components/admin/Tabs";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 
 const ProductAdminPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState("produk");
+  const location = useLocation();
+
+  useEffect(() => {
+    // Periksa state navigasi untuk mengatur tab aktif
+    if (location.state?.activeTab) {
+      setActiveTab(location.state.activeTab);
+    }
+  }, [location.state]);
 
   const tabs = [
     { id: "produk", label: "Produk" },
@@ -31,7 +40,7 @@ const ProductAdminPage: React.FC = () => {
 
           <Tabs activeTab={activeTab} setActiveTab={setActiveTab} tabs={tabs} />
 
-          <div className="bg-white rounded-2xl shadow-lg p-6">
+          <div className="bg-white border border-gray-200 rounded-xl shadow-md p-6">
             {activeTab === "produk" && <ProdukTabel />}
             {activeTab === "bahan" && <StokBahanTabel />}
             {activeTab === "ukuran" && <UkuranTabel />}

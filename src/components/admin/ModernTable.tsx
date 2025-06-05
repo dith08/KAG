@@ -30,20 +30,34 @@ const TableRow: React.FC<TableRowProps> = ({ row, headers, expandableHistori, in
       ref={detailsRef}
       className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md transition-shadow duration-200"
     >
-      <summary className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-4 cursor-pointer">
+      <summary className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-2 items-start cursor-pointer">
         {Object.entries(row).map(([key, value], idx) => (
-          <div key={idx}>
-            <span className="text-xs font-semibold text-gray-500 uppercase">
+          <div key={idx} className="space-y-1 flex flex-col min-w-0">
+            <span className="text-xs font-semibold text-gray-500 uppercase block truncate">
               {headers[idx]}
             </span>
-            <p className="text-sm text-gray-800">
+            <p className="text-sm text-gray-800 p-0 truncate">
               {key === "Aksi" && (value === null || typeof value === "object") ? (
-                <button
-                  onClick={handleHistoryClick}
-                  className="bg-green-600 text-white px-3 py-1 rounded-lg hover:bg-green-700 flex items-center gap-2 text-sm"
-                >
-                  <Icon icon="mdi:history" /> Lihat Histori
-                </button>
+                <div className="flex-shrink-0">
+                  {detailRoute ? (
+                    <Link
+                      to={`${detailRoute}/${String(row[keyField] || '').replace("#", "")}`}
+                      className="bg-green-600 text-white px-2 py-1 rounded-lg hover:bg-green-700 flex items-center gap-1 text-sm"
+                      onClick={handleLinkClick}
+                    >
+                      <Icon icon="mdi:eye-outline" /> Lihat Detail
+                    </Link>
+                  ) : expandableHistori ? (
+                    <button
+                      onClick={handleHistoryClick}
+                      className="bg-green-600 text-white px-2 py-1 rounded-lg hover:bg-green-700 flex items-center gap-1 text-sm"
+                    >
+                      <Icon icon="mdi:history" /> Lihat Histori
+                    </button>
+                  ) : (
+                    value
+                  )}
+                </div>
               ) : (
                 value
               )}

@@ -225,7 +225,9 @@ const AddBahanBakuAdminPage: React.FC = () => {
             <button
               type="button"
               className="flex items-center bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 cursor-pointer"
-              onClick={() => navigate("/admin/produk")}
+              onClick={() =>
+                navigate("/admin/produk", { state: { activeTab: "bahan" } })
+              }
             >
               <Icon icon="mdi:arrow-left" className="mr-2" />
               Batal

@@ -54,6 +54,47 @@ const PesananAdminPage: React.FC = () => {
               />
             ))}
           </div>
+
+          <div className="bg-white border border-gray-200 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 p-6">
+          {/* Daftar Pesanan dengan Filter di Sebelah Kanan */}
+          <div className="flex flex-col lg:flex-row justify-between items-center gap-4 mb-6">
+            <h2 className="text-xl font-bold text-green-700 flex items-center gap-2">
+              <Icon icon="mdi:view-list" className="w-6 h-6" />
+              Daftar Pesanan
+            </h2>
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="w-full lg:w-56 px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-1 focus:ring-green-700"
+            >
+              <option value="Semua">Semua Pesanan</option>
+              <option value="Menunggu Konfirmasi">Menunggu Konfirmasi</option>
+              <option value="Sedang Diproses">Sedang Diproses</option>
+              <option value="Dikirim">Dikirim</option>
+              <option value="Selesai">Selesai</option>
+            </select>
+          </div>
+            <ModernTable
+              headers={[
+                "ID Pesanan",
+                "Nama Customer",
+                "Tanggal",
+                "Total",
+                "Status",
+                "Aksi",
+              ]}
+              data={filteredPesanan.map((p) => ({
+                id: p.id,
+                "Nama Customer": p.nama,
+                Tanggal: p.tanggal,
+                Total: p.total,
+                Status: <StatusBadge status={p.status} />,
+                Aksi: null,
+              }))}
+              detailRoute="/admin/pesanan"
+              keyField="id"
+            />
+          </div>
         </div>
       </div>
   );
