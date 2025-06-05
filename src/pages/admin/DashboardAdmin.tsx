@@ -120,7 +120,7 @@ const DashboardAdminPage: React.FC = () => {
       <div className="flex-1 w-full lg:ml-64">
         <NavbarAdmin />
         <div className="p-4 lg:p-6 space-y-6 mt-20 lg:mt-24">
-          <h1 className="text-2xl lg:text-3xl font-bold text-green-700 flex items-center gap-3 mb-6">
+          <h1 className="text-xl md:text-2xl font-bold text-green-700 flex items-center gap-3 mb-6">
             <Icon icon="mdi:home" className="w-8 h-8" />
             DASHBOARD ADMIN
           </h1>

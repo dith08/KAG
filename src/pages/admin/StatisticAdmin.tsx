@@ -281,9 +281,9 @@ const StatisticAdminPage: React.FC = () => {
       <div className="flex-1 lg:ml-64">
         <NavbarAdmin />
         <div className="p-6 space-y-6 lg:mt-24">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 mt-18 lg:mt-0">
             <Icon icon="mdi:chart-box" className="w-8 h-8 text-green-700" />
-            <h1 className="text-2xl lg:text-3xl font-bold text-green-700">
+            <h1 className="text-xl md:text-2xl font-bold text-green-700">
               LAPORAN & STATISTIK
             </h1>
           </div>
@@ -409,11 +409,11 @@ const StatisticAdminPage: React.FC = () => {
               className="bg-white border border-gray-200 p-4 rounded-xl shadow-md flex items-center justify-between gap-4"
               title={`Bulan lalu: Rp ${formatNumber(pendapatanBulanLalu)}`}
             >
-              <div className="flex items-center gap-3">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
                 <Icon icon="mdi:cash" className="w-6 h-6 text-green-700" />
-                <p className="text-lg font-semibold text-green-700">
+                <p className="text-base sm:text-lg font-semibold text-green-700">
                   Total Pendapatan Bulan Ini:{" "}
-                  <span className="text-yellow-500">
+                  <span className="block sm:inline mt-1 sm:mt-0 text-yellow-500">
                     Rp {formatNumber(pendapatanBulanIni)}
                   </span>
                 </p>

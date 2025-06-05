@@ -49,13 +49,13 @@ const TableRow: React.FC<TableRowProps> = ({
       ref={detailsRef}
       className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md transition-shadow duration-200"
     >
-      <summary className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-4 cursor-pointer">
+      <summary className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-2 items-start cursor-pointer">
         {Object.entries(row).map(([key, value], idx) => (
-          <div key={idx}>
-            <span className="text-xs font-semibold text-gray-500 uppercase">
+          <div key={idx} className="space-y-1 flex flex-col min-w-0">
+            <span className="text-xs font-semibold text-gray-500 uppercase block truncate">
               {headers[idx]}
             </span>
-            <p className="text-sm text-gray-800">
+            <p className="text-sm text-gray-800 p-0 truncate">
               {key === "Aksi" && (value === null || typeof value === "object") ? (
                 detailRoute ? (
                   <Link

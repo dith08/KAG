@@ -5,6 +5,7 @@ import api from "../../services/api";
 import { getBaseUrl } from "../../utils/getBaseUrl";
 import { useToast } from "../toast/useToast";
 import ConfirmPopup from "../ConfirmPopup";
+import { ModernTable } from "../../components/admin/ModernTable";
 
 type Product = {
   id: number;
@@ -104,6 +105,44 @@ const ProdukTabel = () => {
     filter === "all" ? true : filter === "tersedia" ? p.status : !p.status
   );
 
+  const tableData = filteredProducts.map((p) => ({
+    Gambar: (
+      <img
+        src={p.imageUrl}
+        onError={(e) => (e.currentTarget.src = "/default.png")}
+        alt={p.name}
+        className="w-20 h-20 object-cover rounded-lg border"
+      />
+    ),
+    Nama: p.name,
+    Harga: `Rp ${p.harga.toLocaleString()}`,
+    Status: (
+      <span
+        className={`px-2 py-1 rounded-lg text-xs ${
+          p.status ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+        }`}
+      >
+        {p.status ? "Tersedia" : "Tidak Tersedia"}
+      </span>
+    ),
+    Aksi: (
+      <div className="flex space-x-2">
+        <button
+          onClick={() => navigate(`/admin/products/${p.id}/edit`)}
+          className="text-green-700 hover:text-green-800 cursor-pointer"
+        >
+          <Icon icon="mdi:pencil-outline" width="20" height="20" />
+        </button>
+        <button
+          onClick={() => handleOpenPopup(p.id)}
+          className="text-red-600 hover:text-red-700 cursor-pointer"
+        >
+          <Icon icon="mdi:trash-can-outline" width="20" height="20" />
+        </button>
+      </div>
+    ),
+  }));
+
   return (
     <div className="bg-white p-2 rounded-2xl">
       <ConfirmPopup
@@ -146,127 +185,17 @@ const ProdukTabel = () => {
         </div>
       </div>
 
-      {/* Mobile View */}
-      <div className="lg:hidden space-y-4">
-        {filteredProducts.map((p) => (
-          <div key={p.id} className="bg-white p-4 rounded-lg border shadow-sm">
-            <div className="flex items-center gap-4">
-              <img
-                src={p.imageUrl}
-                alt={p.name}
-                className="w-20 h-20 object-contain rounded-lg border"
-              />
-              <div className="flex-1 space-y-2">
-                <div className="flex justify-between">
-                  <span className="font-medium">Nama:</span>
-                  <span>{p.name}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="font-medium">Harga:</span>
-                  <span>Rp {p.harga.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="font-medium">Status:</span>
-                  <span
-                    className={`px-2 py-1 rounded-lg text-xs ${
-                      p.status
-                        ? "bg-green-100 text-green-700"
-                        : "bg-red-100 text-red-700"
-                    }`}
-                  >
-                    {p.status ? "Tersedia" : "Tidak Tersedia"}
-                  </span>
-                </div>
-                <div className="flex justify-end gap-2 mt-2">
-                  <button
-                    onClick={() => navigate(`/admin/products/${p.id}/edit`)}
-                    className="text-green-700 hover:text-green-800 cursor-pointer"
-                  >
-                    <Icon icon="mdi:pencil-outline" width="20" height="20" />
-                  </button>
-                  <button
-                    onClick={() => handleOpenPopup(p.id)}
-                    className="text-red-600 hover:text-red-700 cursor-pointer"
-                  >
-                    <Icon icon="mdi:trash-can-outline" width="20" height="20" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Desktop View */}
       {isLoading ? (
         <div className="flex justify-start items-center">
           <Icon icon="mdi:loading" className="animate-spin mr-2" />
           <p className="text-gray-500">Memuat data...</p>
         </div>
       ) : (
-        <div className="hidden lg:block overflow-x-auto rounded-xl shadow">
-          <table className="w-full text-sm text-left">
-            <thead className="bg-green-700 text-white">
-              <tr>
-                <th className="p-3 whitespace-nowrap">Gambar</th>
-                <th className="p-3 whitespace-nowrap">Nama</th>
-                <th className="p-3 whitespace-nowrap">Harga</th>
-                <th className="p-3 whitespace-nowrap">Status</th>
-                <th className="p-3 whitespace-nowrap">Aksi</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredProducts.map((p) => (
-                <tr
-                  key={p.id}
-                  className="border-b border-gray-200 hover:bg-green-50 transition"
-                >
-                  <td className="p-3 whitespace-nowrap">
-                    <img
-                      src={p.imageUrl}
-                      onError={(e) => (e.currentTarget.src = "/default.png")}
-                      alt={p.name}
-                      className="w-20 h-20 object-cover rounded-lg border"
-                    />
-                  </td>
-                  <td className="p-3 whitespace-nowrap">{p.name}</td>
-                  <td className="p-3 whitespace-nowrap">
-                    Rp {p.harga.toLocaleString()}
-                  </td>
-                  <td className="p-3 whitespace-nowrap">
-                    <span
-                      className={`px-2 py-1 rounded-lg text-xs ${
-                        p.status
-                          ? "bg-green-100 text-green-700"
-                          : "bg-red-100 text-red-700"
-                      }`}
-                    >
-                      {p.status ? "Tersedia" : "Tidak Tersedia"}
-                    </span>
-                  </td>
-                  <td className="p-3 text-left space-x-2 whitespace-nowrap">
-                    <button
-                      onClick={() => navigate(`/admin/products/${p.id}/edit`)}
-                      className="text-green-700 hover:text-green-800 cursor-pointer"
-                    >
-                      <Icon icon="mdi:pencil-outline" width="20" height="20" />
-                    </button>
-                    <button
-                      onClick={() => handleOpenPopup(p.id)}
-                      className="text-red-600 hover:text-red-700 cursor-pointer"
-                    >
-                      <Icon
-                        icon="mdi:trash-can-outline"
-                        width="20"
-                        height="20"
-                      />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <ModernTable
+          headers={["Gambar", "Nama", "Harga", "Status", "Aksi"]}
+          data={tableData}
+          keyField="id"
+        />
       )}
     </div>
   );
