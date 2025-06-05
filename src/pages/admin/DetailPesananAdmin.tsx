@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import NavbarAdmin from "../../components/admin/NavbarAdmin";
@@ -7,16 +7,76 @@ import SidebarAdmin from "../../components/admin/SidebarAdmin";
 import { Icon } from "@iconify/react";
 import StatusDropdown from "../../components/admin/StatusDropdown";
 
-const DetailPesananAdminPage: React.FC = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const order = location.state;
+// Dummy Data Pesanan (Tanggal diperbarui ke Juni 2025)
+const dummyPesanan = [
+  {
+    id: "#ORD001",
+    user_id: "USR001",
+    alamat_pengiriman: "Jl. Raya No. 123, Jakarta",
+    total_harga: 250000,
+    metode_pembayaran: "Transfer Bank",
+    metode_pengiriman: "JNE",
+    nomor_resi: "JN123456789",
+    catatan: "Harap antar pagi hari",
+    lat: -6.1745,
+    lng: 106.8227,
+    status: "Menunggu Konfirmasi",
+    status_desain: "Sedang Diverifikasi",
+    order_id: "#ORD001",
+    product_id: "PROD001",
+    quantity: 2,
+    harga: 125000,
+    bahan: "Karton",
+    ukuran: "A4",
+    finishing: "Laminasi",
+    file_desain: "https://example.com/design.pdf",
+  },
+  {
+    id: "#ORD002",
+    user_id: "USR002",
+    alamat_pengiriman: "Jl. Sudirman No. 45, Bandung",
+    total_harga: 300000,
+    metode_pembayaran: "COD",
+    metode_pengiriman: "J&T",
+    nomor_resi: null,
+    catatan: null,
+    lat: -6.9175,
+    lng: 107.6191,
+    status: "Sedang Diproses",
+    status_desain: "Diterima",
+    order_id: "#ORD002",
+    product_id: "PROD002",
+    quantity: 1,
+    harga: 300000,
+    bahan: "HVS",
+    ukuran: "A3",
+    finishing: "Matte",
+    file_desain: "https://example.com/design2.pdf",
+  },
+];
 
-  const [statusPesanan, setStatusPesanan] = useState(order.status);
+const DetailPesananAdminPage: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const [order, setOrder] = useState<any>(null);
+  const [statusPesanan, setStatusPesanan] = useState("");
   const [detailStatusPesanan, setDetailStatusPesanan] = useState("");
-  const [statusDesain, setStatusDesain] = useState(
-    order.status_desain || "Sedang Diverifikasi"
-  );
+  const [statusDesain, setStatusDesain] = useState("Sedang Diverifikasi");
+
+  useEffect(() => {
+    // Simulasi pengambilan data berdasarkan id (ganti dengan API call)
+    console.log("ID received from params:", id); // Logging untuk debugging
+    const normalizedId = id ? `#${id.replace("#", "")}` : ""; // Tambahkan # jika tidak ada
+    const foundOrder = dummyPesanan.find((p) => p.id === normalizedId || p.id === id);
+    if (foundOrder) {
+      setOrder(foundOrder);
+      setStatusPesanan(foundOrder.status);
+      setStatusDesain(foundOrder.status_desain || "Sedang Diverifikasi");
+    } else {
+      console.error("Pesanan tidak ditemukan untuk ID:", id);
+      navigate("/admin/pesanan"); // Redirect jika tidak ditemukan
+    }
+  }, [id, navigate]);
 
   const markerIcon = L.icon({
     iconUrl: "https://unpkg.com/leaflet@1.9.3/dist/images/marker-icon.png",
@@ -30,6 +90,8 @@ const DetailPesananAdminPage: React.FC = () => {
     );
   };
 
+  if (!order) return <div className="p-4 text-center">Memuat...</div>;
+
   return (
     <div className="min-h-screen bg-gray-50">
       <NavbarAdmin />
@@ -39,14 +101,14 @@ const DetailPesananAdminPage: React.FC = () => {
           {/* Header */}
           <div className="flex items-center gap-4 mb-8">
             <button
-              onClick={() => navigate("/admin/pesanan")}
+              onClick={() => navigate("/admin/pesanan")} // Ubah ke /admin/pesanan untuk konsistensi
               className="flex items-center gap-2 bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg transition cursor-pointer"
             >
               <Icon icon="mdi:arrow-left" className="text-xl" />
             </button>
             <h1 className="text-2xl md:text-3xl font-bold text-green-700 flex items-center gap-3">
               <Icon icon="mdi:clipboard-list" className="text-3xl" />
-              Detail Pesanan #{order.id}
+              Detail Pesanan {order.id}
             </h1>
           </div>
 
@@ -65,7 +127,7 @@ const DetailPesananAdminPage: React.FC = () => {
                 >
                   <TileLayer
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    attribution="&copy; OpenStreetMap contributors"
+                    attribution="© OpenStreetMap contributors"
                   />
                   <Marker position={[order.lat, order.lng]} icon={markerIcon}>
                     <Popup>{order.alamat_pengiriman}</Popup>
@@ -122,7 +184,7 @@ const DetailPesananAdminPage: React.FC = () => {
                 <StatusDropdown
                   initialStatus={statusPesanan}
                   options={[
-                    "Menunggu Pembayaran",
+                    "Menunggu Konfirmasi",
                     "Sedang Diproses",
                     "Dikirim",
                     "Selesai",
@@ -184,7 +246,7 @@ const DetailPesananAdminPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* BUTTON UPDATE STATUS (dipindahkan ke bawah semua) */}
+              {/* BUTTON UPDATE STATUS */}
               <button
                 onClick={handleUpdateStatus}
                 className="mt-6 w-full bg-green-600 hover:bg-green-700 text-white px-6 py-2.5 rounded-lg shadow transition cursor-pointer"

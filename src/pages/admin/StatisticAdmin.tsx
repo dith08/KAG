@@ -37,29 +37,28 @@ const formatNumber = (num: number): string => {
   return num.toString();
 };
 
-// Data
+// Data diperbarui ke Juni 2025
 const dataProdukBulanan = [
-  { name: "Produk A", terjual: 240 },
-  { name: "Produk B", terjual: 456 },
-  { name: "Produk C", terjual: 300 },
-  { name: "Produk D", terjual: 120 },
+  { name: "Paper Bag", terjual: 240 },
+  { name: "Kertas Kado", terjual: 456 },
+  { name: "Box Packaging", terjual: 300 },
+  { name: "Kertas HVS", terjual: 120 },
 ];
 
 const dataProdukTahunan = [
-  { name: "Produk A", terjual: 2880 },
-  { name: "Produk B", terjual: 5472 },
-  { name: "Produk C", terjual: 3600 },
-  { name: "Produk D", terjual: 1440 },
+  { name: "Paper Bag", terjual: 2880 },
+  { name: "Kertas Kado", terjual: 5472 },
+  { name: "Box Packaging", terjual: 3600 },
+  { name: "Kertas HVS", terjual: 1440 },
 ];
 
 const dataBulanan = [
-  { bulan: "Jan", total: 4000000 },
-  { bulan: "Feb", total: 3000000 },
-  { bulan: "Mar", total: 5000000 },
-  { bulan: "Apr", total: 2000000 },
-  { bulan: "Mei", total: 25000000 },
+  { bulan: "Feb", total: 12000000 },
+  { bulan: "Mar", total: 9500000 },
+  { bulan: "Apr", total: 13500000 },
+  { bulan: "Mei", total: 11000000 },
+  { bulan: "Jun", total: 15000000 },
 ];
-
 const dataTahunan = [
   { tahun: "2023", total: 18000000 },
   { tahun: "2024", total: 22000000 },
@@ -70,25 +69,25 @@ const dummyTransaksi = [
   {
     id: "#TRX001",
     nama: "Isham",
-    tanggal: "15 April 2025",
+    tanggal: "01 Juni 2025",
     total: "Rp 250.000",
-    produk: "Produk A",
+    produk: "Paper Bag",
     status: "Selesai",
   },
   {
     id: "#TRX002",
     nama: "Aulia",
-    tanggal: "16 April 2025",
+    tanggal: "02 Juni 2025",
     total: "Rp 300.000",
-    produk: "Produk B",
+    produk: "Kertas Kado",
     status: "Menunggu",
   },
   {
     id: "#TRX003",
     nama: "Rizki",
-    tanggal: "17 April 2025",
+    tanggal: "03 Juni 2025",
     total: "Rp 150.000",
-    produk: "Produk C",
+    produk: "Box Packaging",
     status: "Selesai",
   },
 ];
@@ -102,19 +101,19 @@ const dummyStok = [
 const dummyHistoriStok = [
   {
     nama: "Kertas HVS",
-    tanggal: "15 Mei 2025",
+    tanggal: "01 Juni 2025",
     aktivitas: "Penambahan",
     jumlah: "+500 lembar",
   },
   {
     nama: "Kertas Art Carton",
-    tanggal: "14 Mei 2025",
+    tanggal: "02 Juni 2025",
     aktivitas: "Penggunaan",
     jumlah: "-200 lembar",
   },
   {
     nama: "Tinta Hitam",
-    tanggal: "13 Mei 2025",
+    tanggal: "03 Juni 2025",
     aktivitas: "Penambahan",
     jumlah: "+10 botol",
   },
@@ -140,8 +139,7 @@ const StatisticAdminPage: React.FC = () => {
   const [showTrenDetail, setShowTrenDetail] = useState(false);
   const [stokSearch, setStokSearch] = useState("");
 
-  const dataProduk =
-    produkFilter === "bulanan" ? dataProdukBulanan : dataProdukTahunan;
+  const dataProduk = produkFilter === "bulanan" ? dataProdukBulanan : dataProdukTahunan;
   const dataTren = trenFilter === "bulanan" ? dataBulanan : dataTahunan;
 
   const filteredTransaksi = dummyTransaksi.filter((t) => {
@@ -278,14 +276,14 @@ const StatisticAdminPage: React.FC = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-gray-100">
       <SidebarAdmin />
       <div className="flex-1 lg:ml-64">
         <NavbarAdmin />
-        <div className="p-6 space-y-8 lg:mt-24">
-          <div className="flex items-center gap-3">
+        <div className="p-6 space-y-6 lg:mt-24">
+          <div className="flex items-center gap-3 mt-18 lg:mt-0">
             <Icon icon="mdi:chart-box" className="w-8 h-8 text-green-700" />
-            <h1 className="text-2xl font-bold text-green-700">
+            <h1 className="text-xl md:text-2xl font-bold text-green-700">
               LAPORAN & STATISTIK
             </h1>
           </div>
@@ -297,9 +295,9 @@ const StatisticAdminPage: React.FC = () => {
             className="space-y-6"
           >
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-              <div className="bg-white border border-gray-200 p-4 rounded-xl shadow-sm min-h-[220px]">
-                <div className="flex justify-between items-center mb-3">
-                  <h3 className="text-center font-semibold text-green-700">
+              <div className="bg-white border border-gray-200 p-4 rounded-xl shadow-md min-h-[260px]">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-semibold text-green-700">
                     Grafik Produk Terlaris
                   </h3>
                   <select
@@ -307,7 +305,7 @@ const StatisticAdminPage: React.FC = () => {
                     onChange={(e) =>
                       setProdukFilter(e.target.value as "bulanan" | "tahunan")
                     }
-                    className="text-sm border rounded-md px-2 py-1 text-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className="text-sm border border-gray-300 rounded-md px-3 py-1.5 text-gray-700 focus:outline-none focus:ring-1 focus:ring-green-700"
                   >
                     <option value="bulanan">Bulanan</option>
                     <option value="tahunan">Tahunan</option>
@@ -315,25 +313,24 @@ const StatisticAdminPage: React.FC = () => {
                 </div>
                 <ResponsiveContainer width="100%" height={220}>
                   <BarChart data={dataProduk}>
-                    <XAxis dataKey="name" />
-                    <YAxis />
+                    <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+                    <YAxis tick={{ fontSize: 12 }} />
                     <Tooltip />
                     <Bar
                       dataKey="terjual"
                       fill="#F9A825"
-                      radius={[4, 4, 0, 0]}
+                      radius={[6, 6, 0, 0]}
+                      barSize={80}
                     />
                   </BarChart>
                 </ResponsiveContainer>
                 <p className="text-sm text-gray-600 text-center mt-2">
-                  Data{" "}
-                  {produkFilter === "bulanan" ? "Bulan Mei 2025" : "Tahun 2025"}
+                  Data {produkFilter === "bulanan" ? "Juni 2025" : "2025"}
                 </p>
                 <button
                   onClick={() => setShowProdukDetail(!showProdukDetail)}
-                  className="mt-4 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center gap-2 mx-auto text-sm"
+                  className="mt-4 w-full bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors duration-200 text-sm"
                 >
-                  <Icon icon="mdi:eye" />{" "}
                   {showProdukDetail ? "Sembunyikan" : "Lihat"} Detail
                 </button>
                 {showProdukDetail && (
@@ -348,9 +345,9 @@ const StatisticAdminPage: React.FC = () => {
                   </div>
                 )}
               </div>
-              <div className="bg-white border border-gray-200 p-4 rounded-xl shadow-sm min-h-[220px]">
-                <div className="flex justify-between items-center mb-3">
-                  <h3 className="font-semibold text-green-700">
+              <div className="bg-white border border-gray-200 p-4 rounded-xl shadow-md min-h-[260px]">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-semibold text-green-700">
                     Grafik Tren Penjualan
                   </h3>
                   <select
@@ -358,7 +355,7 @@ const StatisticAdminPage: React.FC = () => {
                     onChange={(e) =>
                       setTrenFilter(e.target.value as "bulanan" | "tahunan")
                     }
-                    className="text-sm border rounded-md px-2 py-1 text-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className="text-sm border border-gray-300 rounded-md px-3 py-1.5 text-gray-700 focus:outline-none focus:ring-1 focus:ring-green-700"
                   >
                     <option value="bulanan">Bulanan</option>
                     <option value="tahunan">Tahunan</option>
@@ -366,31 +363,33 @@ const StatisticAdminPage: React.FC = () => {
                 </div>
                 <ResponsiveContainer width="100%" height={220}>
                   <LineChart data={dataTren}>
-                    <CartesianGrid strokeDasharray="3 3" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
                     <XAxis
                       dataKey={trenFilter === "bulanan" ? "bulan" : "tahun"}
+                      tick={{ fontSize: 12 }}
                     />
-                    <YAxis tickFormatter={formatNumber} />
-                    <Tooltip
-                      formatter={(value: number) => formatNumber(value)}
+                    <YAxis
+                      tick={{ fontSize: 12 }}
+                      tickFormatter={formatNumber}
                     />
+                    <Tooltip formatter={(value: number) => formatNumber(value)} />
                     <Line
                       type="monotone"
                       dataKey="total"
                       stroke="#F9A825"
-                      strokeWidth={2}
-                      dot={{ r: 4 }}
+                      strokeWidth={3}
+                      dot={{ r: 5 }}
+                      activeDot={{ r: 7 }}
                     />
                   </LineChart>
                 </ResponsiveContainer>
                 <p className="text-sm text-gray-600 text-center mt-2">
-                  Data {trenFilter === "bulanan" ? "Jan-Mei 2025" : "2023-2025"}
+                  Data {trenFilter === "bulanan" ? "Feb-Jun 2025" : "2023-2025"}
                 </p>
                 <button
                   onClick={() => setShowTrenDetail(!showTrenDetail)}
-                  className="mt-4 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center gap-2 mx-auto text-sm"
+                  className="mt-4 w-full bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors duration-200 text-sm"
                 >
-                  <Icon icon="mdi:eye" />{" "}
                   {showTrenDetail ? "Sembunyikan" : "Lihat"} Detail
                 </button>
                 {showTrenDetail && (
@@ -407,14 +406,14 @@ const StatisticAdminPage: React.FC = () => {
               </div>
             </div>
             <div
-              className="bg-white border border-gray-200 p-4 rounded-xl shadow-sm flex items-center justify-between gap-4"
+              className="bg-white border border-gray-200 p-4 rounded-xl shadow-md flex items-center justify-between gap-4"
               title={`Bulan lalu: Rp ${formatNumber(pendapatanBulanLalu)}`}
             >
-              <div className="flex items-center gap-3">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
                 <Icon icon="mdi:cash" className="w-6 h-6 text-green-700" />
-                <p className="text-lg font-semibold text-green-700">
+                <p className="text-base sm:text-lg font-semibold text-green-700">
                   Total Pendapatan Bulan Ini:{" "}
-                  <span className="text-yellow-500">
+                  <span className="block sm:inline mt-1 sm:mt-0 text-yellow-500">
                     Rp {formatNumber(pendapatanBulanIni)}
                   </span>
                 </p>
@@ -450,7 +449,7 @@ const StatisticAdminPage: React.FC = () => {
                   placeholder="Cari nama bahan..."
                   value={stokSearch}
                   onChange={(e) => setStokSearch(e.target.value)}
-                  className="w-full sm:w-64 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full sm:w-72 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-green-700"
                 />
                 <ModernTable
                   headers={[
@@ -463,7 +462,7 @@ const StatisticAdminPage: React.FC = () => {
                     "Nama Bahan": s.nama,
                     "Stok Tersedia": s.stok,
                     Keterangan: s.keterangan,
-                    Aksi: null, // Tombol akan dirender di dalam ModernTable
+                    Aksi: null,
                   }))}
                   expandableHistori={dummyHistoriStok}
                 />
@@ -477,13 +476,13 @@ const StatisticAdminPage: React.FC = () => {
                     placeholder="Cari berdasarkan nama atau ID..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full sm:w-64 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className="w-full sm:w-72 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-green-700"
                   />
                   <input
                     type="date"
                     value={dateFilter}
                     onChange={(e) => setDateFilter(e.target.value)}
-                    className="w-full sm:w-40 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className="w-full sm:w-48 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-green-700"
                   />
                 </div>
                 <ModernTable
@@ -503,6 +502,8 @@ const StatisticAdminPage: React.FC = () => {
                     Produk: t.produk,
                     Status: t.status,
                   }))}
+                  detailRoute="/admin/pesanan"
+                  keyField="id"
                 />
               </div>
             )}
@@ -512,13 +513,13 @@ const StatisticAdminPage: React.FC = () => {
           <div className="flex justify-end gap-3">
             <button
               onClick={handleDownloadPDF}
-              className="bg-green-700 hover:bg-green-600 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 shadow transition-colors duration-200"
+              className="bg-green-700 hover:bg-green-600 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 shadow-md transition-colors duration-200"
             >
               <Icon icon="mdi:file-pdf" className="text-xl" /> Unduh PDF
             </button>
             <button
               onClick={handleDownloadExcel}
-              className="bg-yellow-500 hover:bg-yellow-600 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 shadow transition-colors duration-200"
+              className="bg-yellow-500 hover:bg-yellow-600 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 shadow-md transition-colors duration-200"
             >
               <Icon icon="mdi:microsoft-excel" className="text-xl" /> Unduh
               Excel

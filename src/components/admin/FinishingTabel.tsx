@@ -296,7 +296,7 @@ const FinishingTabel = () => {
         <select
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
-          className="border border-black/50 rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-green-700 text-sm"
+          className="w-full sm:w-auto border border-black/50 rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-green-700 text-sm"
         >
           <option value="">Semua Kategori</option>
           <option value="cover">Cover</option>
