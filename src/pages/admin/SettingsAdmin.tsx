@@ -6,6 +6,15 @@ import "leaflet/dist/leaflet.css";
 import MapPicker from "../../components/MapPicker";
 import api from "../../services/api";
 import { useToast } from "../../components/toast/useToast";
+import { ModernTable } from "../../components/admin/ModernTable";
+
+interface ShippingRule {
+  id: number;
+  maxDistance: number;
+  cost: number;
+  isEditing?: boolean;
+  isAdding?: boolean;
+}
 
 const SettingsAdminPage: React.FC = () => {
   const [namaToko, setNamaToko] = useState("");
@@ -19,9 +28,14 @@ const SettingsAdminPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { showToast } = useToast();
 
-  const [shippingRules, setShippingRules] = useState<
-    { maxDistance: number; cost: number }[]
-  >([{ maxDistance: 10, cost: 15000 }]);
+  const [shippingRules, setShippingRules] = useState<ShippingRule[]>([
+    { id: 1, maxDistance: 10, cost: 15000 },
+    { id: 2, maxDistance: 20, cost: 25000 },
+    { id: 3, maxDistance: 30, cost: 35000 },
+  ]);
+  const [editData, setEditData] = useState<ShippingRule | null>(null);
+  const [newRule, setNewRule] = useState<ShippingRule | null>(null);
+  const [isAdding, setIsAdding] = useState(false);
 
   const fetchWebsiteSettings = useCallback(() => {
     api
@@ -37,7 +51,6 @@ const SettingsAdminPage: React.FC = () => {
         setKontak(data.kontak);
         setJamOperasional(data.jam_operasional);
 
-        // Set coordinates if available
         if (data.lat && data.lng) {
           setStoreLocation([parseFloat(data.lat), parseFloat(data.lng)]);
         }
@@ -85,21 +98,191 @@ const SettingsAdminPage: React.FC = () => {
     }
   };
 
+  const validateRule = (rule: ShippingRule): boolean => {
+    if (rule.maxDistance <= 0) {
+      showToast("Maks. Jarak harus lebih besar dari 0", "error");
+      return false;
+    }
+    if (rule.cost <= 0) {
+      showToast("Biaya Pengiriman harus lebih besar dari 0", "error");
+      return false;
+    }
+    return true;
+  };
+
   const handleAddRule = () => {
-    setShippingRules([...shippingRules, { maxDistance: 0, cost: 0 }]);
+    if (isAdding) {
+      showToast("Selesaikan penambahan aturan sebelum menambah yang baru", "error");
+      return;
+    }
+
+    const newId = shippingRules.length > 0 ? Math.max(...shippingRules.map(r => r.id)) + 1 : 1;
+    const newRuleData = { id: newId, maxDistance: 0, cost: 0, isAdding: true, isEditing: true };
+    setNewRule(newRuleData);
+    setShippingRules([...shippingRules, newRuleData]);
+    setIsAdding(true);
   };
 
-  const handleRuleChange = (index: number, field: string, value: number) => {
-    const newRules = [...shippingRules];
-    newRules[index] = { ...newRules[index], [field]: value };
-    setShippingRules(newRules);
+  const handleSaveNewRule = () => {
+    if (newRule) {
+      if (!validateRule(newRule)) return;
+
+      setShippingRules(
+        shippingRules.map((r) =>
+          r.id === newRule.id
+            ? { ...newRule, isAdding: false, isEditing: false }
+            : r
+        )
+      );
+      setNewRule(null);
+      setIsAdding(false);
+      showToast("Aturan baru berhasil ditambahkan", "success");
+    }
   };
 
-  const handleDeleteRule = (index: number) => {
-    const newRules = [...shippingRules];
-    newRules.splice(index, 1);
-    setShippingRules(newRules);
+  const handleCancelAddRule = (id: number) => {
+    setShippingRules(shippingRules.filter((r) => r.id !== id));
+    setNewRule(null);
+    setIsAdding(false);
   };
+
+  const handleEditRule = (id: number) => {
+    if (isAdding) {
+      showToast("Selesaikan penambahan aturan sebelum mengedit", "error");
+      return;
+    }
+
+    const ruleToEdit = shippingRules.find((r) => r.id === id);
+    if (ruleToEdit) {
+      setEditData({ ...ruleToEdit });
+      setShippingRules(
+        shippingRules.map((r) =>
+          r.id === id ? { ...r, isEditing: true } : { ...r, isEditing: false }
+        )
+      );
+    }
+  };
+
+  const handleSaveEditRule = () => {
+    if (editData) {
+      if (!validateRule(editData)) return;
+
+      setShippingRules(
+        shippingRules.map((r) =>
+          r.id === editData.id
+            ? { ...editData, isEditing: false }
+            : r
+        )
+      );
+      setEditData(null);
+      showToast("Aturan berhasil diperbarui", "success");
+    }
+  };
+
+  const handleCancelEdit = (id: number) => {
+    setShippingRules(
+      shippingRules.map((r) =>
+        r.id === id ? { ...r, isEditing: false } : r
+      )
+    );
+    setEditData(null);
+  };
+
+  const handleDeleteRule = (id: number) => {
+    if (isAdding) {
+      showToast("Selesaikan penambahan aturan sebelum menghapus", "error");
+      return;
+    }
+
+    setShippingRules(shippingRules.filter((r) => r.id !== id));
+    showToast("Aturan berhasil dihapus", "success");
+  };
+
+  const handleRuleChange = (field: string, value: number) => {
+    if (editData) {
+      setEditData({ ...editData, [field]: value });
+    } else if (newRule) {
+      setNewRule({ ...newRule, [field]: value });
+    }
+  };
+
+  const tableData = shippingRules.map((rule) => ({
+    "Maks. Jarak (km)": rule.isEditing ? (
+      <input
+        type="number"
+        value={
+          rule.isAdding
+            ? newRule?.id === rule.id
+              ? newRule.maxDistance
+              : rule.maxDistance
+            : editData?.id === rule.id
+            ? editData.maxDistance
+            : rule.maxDistance
+        }
+        onChange={(e) => handleRuleChange("maxDistance", parseFloat(e.target.value))}
+        className="w-full border rounded-lg px-2 py-1"
+      />
+    ) : (
+      rule.maxDistance
+    ),
+    "Biaya Pengiriman (Rp)": rule.isEditing ? (
+      <input
+        type="number"
+        value={
+          rule.isAdding
+            ? newRule?.id === rule.id
+              ? newRule.cost
+              : rule.cost
+            : editData?.id === rule.id
+            ? editData.cost
+            : rule.cost
+        }
+        onChange={(e) => handleRuleChange("cost", parseFloat(e.target.value))}
+        className="w-full border rounded-lg px-2 py-1"
+      />
+    ) : (
+      `Rp ${rule.cost.toLocaleString()}`
+    ),
+    Aksi: (
+      <div className="flex space-x-2">
+        {rule.isEditing ? (
+          <>
+            <button
+              onClick={rule.isAdding ? handleSaveNewRule : handleSaveEditRule}
+              className="flex items-center gap-1 bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded cursor-pointer"
+            >
+              <Icon icon="mdi:content-save" />
+              Simpan
+            </button>
+            <button
+              onClick={() =>
+                rule.isAdding ? handleCancelAddRule(rule.id) : handleCancelEdit(rule.id)
+              }
+              className="flex items-center gap-1 bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded cursor-pointer"
+            >
+              <Icon icon="mdi:cancel" width="18" />
+              Batal
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              onClick={() => handleEditRule(rule.id)}
+              className="text-green-700 hover:underline cursor-pointer"
+            >
+              <Icon icon="mdi:pencil-outline" width="18" height="18" />
+            </button>
+            <button
+              onClick={() => handleDeleteRule(rule.id)}
+              className="text-red-600 hover:underline cursor-pointer"
+            >
+              <Icon icon="mdi:trash-can-outline" width="18" height="18" />
+            </button>
+          </>
+        )}
+      </div>
+    ),
+  }));
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-gray-50">
@@ -216,64 +399,18 @@ const SettingsAdminPage: React.FC = () => {
                 <Icon icon="mdi:truck-delivery-outline" className="w-6 h-6" />
                 ATURAN BIAYA PENGIRIMAN
               </h2>
-              <div className="space-y-3">
-                {shippingRules.map((rule, index) => (
-                  <div
-                    key={index}
-                    className="flex flex-col md:flex-row gap-3 items-center bg-gray-50 p-3 lg:p-4 rounded-lg shadow-sm"
-                  >
-                    <div className="flex-1 w-full">
-                      <label className="text-sm font-semibold block mb-1 text-green-700">
-                        Maks. Jarak (km)
-                      </label>
-                      <input
-                        type="number"
-                        value={rule.maxDistance}
-                        onChange={(e) =>
-                          handleRuleChange(
-                            index,
-                            "maxDistance",
-                            parseFloat(e.target.value)
-                          )
-                        }
-                        className="w-full border rounded-lg px-3 py-2 focus:outline-green-700"
-                      />
-                    </div>
-                    <div className="flex-1 w-full">
-                      <label className="text-sm font-semibold block mb-1 text-green-700">
-                        Biaya Pengiriman (Rp)
-                      </label>
-                      <input
-                        type="number"
-                        value={rule.cost}
-                        onChange={(e) =>
-                          handleRuleChange(
-                            index,
-                            "cost",
-                            parseFloat(e.target.value)
-                          )
-                        }
-                        className="w-full border rounded-lg px-3 py-2 focus:outline-green-700"
-                      />
-                    </div>
-                    <div className="flex items-center mt-4 md:mt-6">
-                      <button
-                        onClick={() => handleDeleteRule(index)}
-                        className="text-red-500 hover:text-red-700"
-                      >
-                        <Icon icon="mdi:delete" width={24} />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-                <button
-                  onClick={handleAddRule}
-                  className="bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded-lg flex items-center gap-2 cursor-pointer mt-4"
-                >
-                  <Icon icon="mdi:plus" />
-                  Tambah Aturan
-                </button>
-              </div>
+              <ModernTable
+                headers={["Maks. Jarak (km)", "Biaya Pengiriman (Rp)", "Aksi"]}
+                data={tableData}
+                keyField="id"
+              />
+              <button
+                onClick={handleAddRule}
+                className="bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded-lg flex items-center gap-2 cursor-pointer mt-4"
+              >
+                <Icon icon="mdi:plus" />
+                Tambah Aturan
+              </button>
             </div>
           </section>
         </div>
