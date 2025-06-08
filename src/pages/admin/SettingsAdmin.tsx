@@ -11,7 +11,7 @@ import { ModernTable } from "../../components/admin/ModernTable";
 interface ShippingRule {
   id: number;
   maxDistance: number;
-  cost: number;
+  shipping_cost: number;
   isEditing?: boolean;
   isAdding?: boolean;
 }
@@ -28,14 +28,63 @@ const SettingsAdminPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { showToast } = useToast();
 
-  const [shippingRules, setShippingRules] = useState<ShippingRule[]>([
-    { id: 1, maxDistance: 10, cost: 15000 },
-    { id: 2, maxDistance: 20, cost: 25000 },
-    { id: 3, maxDistance: 30, cost: 35000 },
-  ]);
+  // Hapus data dummy, gunakan state kosong
+  const [shippingRules, setShippingRules] = useState<ShippingRule[]>([]);
   const [editData, setEditData] = useState<ShippingRule | null>(null);
   const [newRule, setNewRule] = useState<ShippingRule | null>(null);
   const [isAdding, setIsAdding] = useState(false);
+  const [isLoadingRules, setIsLoadingRules] = useState(false);
+
+  // Fungsi untuk fetch shipping rules dari API
+  const fetchShippingRules = useCallback(async () => {
+    setIsLoadingRules(true);
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("Token tidak ditemukan");
+      }
+
+      const response = await api.get("/api/shipping-rules", {
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+      });
+      
+      console.log("Response shipping rules:", response.data);
+      
+      // Handle response structure from Laravel controller
+      const rulesData = response.data?.data || [];
+      
+      setShippingRules(rulesData.map((rule: any) => ({
+        id: rule.id,
+        maxDistance: rule.max_distance,
+        shipping_cost: rule.shipping_cost,
+        isEditing: false,
+        isAdding: false,
+      })));
+    } catch (error: any) {
+      console.error("Gagal mengambil aturan pengiriman:", error);
+      
+      // Handle berbagai jenis error
+      if (error.response?.status === 401) {
+        showToast("Sesi telah berakhir, silakan login kembali", "error");
+      } else if (error.response?.status === 403) {
+        showToast("Anda tidak memiliki akses untuk melihat data ini", "error");
+      } else if (error.response?.status === 404) {
+        console.log("Endpoint shipping rules belum tersedia");
+      } else if (error.response?.status >= 500) {
+        showToast("Terjadi kesalahan server", "error");
+      } else if (!error.response) {
+        console.log("Network error atau API tidak tersedia");
+      } else {
+        showToast("Gagal mengambil aturan pengiriman", "error");
+      }
+    } finally {
+      setIsLoadingRules(false);
+    }
+  }, []); // Hapus dependency showToast untuk menghindari infinite loop
 
   const fetchWebsiteSettings = useCallback(() => {
     api
@@ -57,13 +106,16 @@ const SettingsAdminPage: React.FC = () => {
       })
       .catch((err) => {
         console.error("Gagal ambil pengaturan website:", err);
-        showToast("Gagal mengambil pengaturan website", "error");
+        if (err.response?.status !== 404) {
+          showToast("Gagal mengambil pengaturan website", "error");
+        }
       });
-  }, [showToast]);
+  }, []); // Hapus dependency showToast
 
   useEffect(() => {
     fetchWebsiteSettings();
-  }, [fetchWebsiteSettings]);
+    fetchShippingRules();
+  }, []); // Kosongkan dependency array
 
   const handleSaveChanges = async () => {
     setIsLoading(true);
@@ -103,7 +155,7 @@ const SettingsAdminPage: React.FC = () => {
       showToast("Maks. Jarak harus lebih besar dari 0", "error");
       return false;
     }
-    if (rule.cost <= 0) {
+    if (rule.shipping_cost <= 0) {
       showToast("Biaya Pengiriman harus lebih besar dari 0", "error");
       return false;
     }
@@ -116,27 +168,79 @@ const SettingsAdminPage: React.FC = () => {
       return;
     }
 
-    const newId = shippingRules.length > 0 ? Math.max(...shippingRules.map(r => r.id)) + 1 : 1;
-    const newRuleData = { id: newId, maxDistance: 0, cost: 0, isAdding: true, isEditing: true };
+    const newId = Date.now(); // Gunakan timestamp untuk ID sementara
+    const newRuleData = { id: newId, maxDistance: 0, shipping_cost: 0, isAdding: true, isEditing: true };
     setNewRule(newRuleData);
     setShippingRules([...shippingRules, newRuleData]);
     setIsAdding(true);
   };
 
-  const handleSaveNewRule = () => {
-    if (newRule) {
-      if (!validateRule(newRule)) return;
+  // Update fungsi untuk menyimpan rule baru ke API
+  const handleSaveNewRule = async () => {
+    if (!newRule || !validateRule(newRule)) return;
 
-      setShippingRules(
-        shippingRules.map((r) =>
-          r.id === newRule.id
-            ? { ...newRule, isAdding: false, isEditing: false }
-            : r
-        )
-      );
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        showToast("Token tidak ditemukan, silakan login kembali", "error");
+        return;
+      }
+
+      const response = await api.post("/api/shipping-rules", {
+        max_distance: newRule.maxDistance,
+        shipping_cost: newRule.shipping_cost,
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Accept': 'application/json',
+          "Content-Type": "application/json",
+        },
+      });
+
+      console.log("Response create shipping rule:", response.data);
+
+      // Show success message from API response
+      if (response.data?.message) {
+        showToast(response.data.message, "success");
+      } else {
+        showToast("Aturan baru berhasil ditambahkan", "success");
+      }
+
+      // Refresh data dari server
+      await fetchShippingRules();
       setNewRule(null);
       setIsAdding(false);
-      showToast("Aturan baru berhasil ditambahkan", "success");
+    } catch (error: any) {
+      console.error("Gagal menambah aturan pengiriman:", error);
+      
+      // Handle berbagai jenis error
+      if (error.response?.status === 401) {
+        showToast("Sesi telah berakhir, silakan login kembali", "error");
+      } else if (error.response?.status === 403) {
+        showToast("Anda tidak memiliki akses untuk menambah data", "error");
+      } else if (error.response?.status === 422) {
+        const errorMessages = error.response.data?.errors;
+        if (errorMessages) {
+          const firstError = Object.values(errorMessages)[0] as string[];
+          showToast(firstError[0] || "Data tidak valid", "error");
+        } else {
+          showToast("Data tidak valid", "error");
+        }
+      } else if (error.response?.status === 404 || !error.response) {
+        // Fallback ke update lokal jika API tidak tersedia
+        setShippingRules(
+          shippingRules.map((r) =>
+            r.id === newRule.id
+              ? { ...newRule, isAdding: false, isEditing: false }
+              : r
+          )
+        );
+        setNewRule(null);
+        setIsAdding(false);
+        showToast("Aturan baru berhasil ditambahkan (mode offline)", "success");
+      } else {
+        showToast("Gagal menambahkan aturan pengiriman", "error");
+      }
     }
   };
 
@@ -163,19 +267,70 @@ const SettingsAdminPage: React.FC = () => {
     }
   };
 
-  const handleSaveEditRule = () => {
-    if (editData) {
-      if (!validateRule(editData)) return;
+  // Update fungsi untuk menyimpan edit rule ke API
+  const handleSaveEditRule = async () => {
+    if (!editData || !validateRule(editData)) return;
 
-      setShippingRules(
-        shippingRules.map((r) =>
-          r.id === editData.id
-            ? { ...editData, isEditing: false }
-            : r
-        )
-      );
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        showToast("Token tidak ditemukan, silakan login kembali", "error");
+        return;
+      }
+
+      const response = await api.put(`/api/shipping-rules/${editData.id}`, {
+        max_distance: editData.maxDistance,
+        shipping_cost: editData.shipping_cost,
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Accept': 'application/json',
+          "Content-Type": "application/json",
+        },
+      });
+
+      console.log("Response update shipping rule:", response.data);
+
+      // Show success message from API response
+      if (response.data?.message) {
+        showToast(response.data.message, "success");
+      } else {
+        showToast("Aturan berhasil diperbarui", "success");
+      }
+
+      // Refresh data dari server
+      await fetchShippingRules();
       setEditData(null);
-      showToast("Aturan berhasil diperbarui", "success");
+    } catch (error: any) {
+      console.error("Gagal memperbarui aturan pengiriman:", error);
+      
+      // Handle berbagai jenis error
+      if (error.response?.status === 401) {
+        showToast("Sesi telah berakhir, silakan login kembali", "error");
+      } else if (error.response?.status === 403) {
+        showToast("Anda tidak memiliki akses untuk mengubah data", "error");
+      } else if (error.response?.status === 422) {
+        const errorMessages = error.response.data?.errors;
+        if (errorMessages) {
+          const firstError = Object.values(errorMessages)[0] as string[];
+          showToast(firstError[0] || "Data tidak valid", "error");
+        } else {
+          showToast("Data tidak valid", "error");
+        }
+      } else if (error.response?.status === 404 || !error.response) {
+        // Fallback ke update lokal jika API tidak tersedia
+        setShippingRules(
+          shippingRules.map((r) =>
+            r.id === editData.id
+              ? { ...editData, isEditing: false }
+              : r
+          )
+        );
+        setEditData(null);
+        showToast("Aturan berhasil diperbarui (mode offline)", "success");
+      } else {
+        showToast("Gagal memperbarui aturan pengiriman", "error");
+      }
     }
   };
 
@@ -188,14 +343,54 @@ const SettingsAdminPage: React.FC = () => {
     setEditData(null);
   };
 
-  const handleDeleteRule = (id: number) => {
+  // Update fungsi untuk menghapus rule dari API
+  const handleDeleteRule = async (id: number) => {
     if (isAdding) {
       showToast("Selesaikan penambahan aturan sebelum menghapus", "error");
       return;
     }
 
-    setShippingRules(shippingRules.filter((r) => r.id !== id));
-    showToast("Aturan berhasil dihapus", "success");
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        showToast("Token tidak ditemukan, silakan login kembali", "error");
+        return;
+      }
+
+      const response = await api.delete(`/api/shipping-rules/${id}`, {
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'Accept': 'application/json',
+        },
+      });
+
+      console.log("Response delete shipping rule:", response.data);
+
+      // Show success message from API response
+      if (response.data?.message) {
+        showToast(response.data.message, "success");
+      } else {
+        showToast("Aturan berhasil dihapus", "success");
+      }
+
+      // Refresh data dari server
+      await fetchShippingRules();
+    } catch (error: any) {
+      console.error("Gagal menghapus aturan pengiriman:", error);
+      
+      // Handle berbagai jenis error
+      if (error.response?.status === 401) {
+        showToast("Sesi telah berakhir, silakan login kembali", "error");
+      } else if (error.response?.status === 403) {
+        showToast("Anda tidak memiliki akses untuk menghapus data", "error");
+      } else if (error.response?.status === 404 || !error.response) {
+        // Fallback ke update lokal jika API tidak tersedia
+        setShippingRules(shippingRules.filter((r) => r.id !== id));
+        showToast("Aturan berhasil dihapus (mode offline)", "success");
+      } else {
+        showToast("Gagal menghapus aturan pengiriman", "error");
+      }
+    }
   };
 
   const handleRuleChange = (field: string, value: number) => {
@@ -219,7 +414,7 @@ const SettingsAdminPage: React.FC = () => {
             ? editData.maxDistance
             : rule.maxDistance
         }
-        onChange={(e) => handleRuleChange("maxDistance", parseFloat(e.target.value))}
+        onChange={(e) => handleRuleChange("maxDistance", parseFloat(e.target.value) || 0)}
         className="w-full border rounded-lg px-2 py-1"
       />
     ) : (
@@ -231,17 +426,17 @@ const SettingsAdminPage: React.FC = () => {
         value={
           rule.isAdding
             ? newRule?.id === rule.id
-              ? newRule.cost
-              : rule.cost
+              ? newRule.shipping_cost
+              : rule.shipping_cost
             : editData?.id === rule.id
-            ? editData.cost
-            : rule.cost
+            ? editData.shipping_cost
+            : rule.shipping_cost
         }
-        onChange={(e) => handleRuleChange("cost", parseFloat(e.target.value))}
+        onChange={(e) => handleRuleChange("shipping_cost", parseFloat(e.target.value) || 0)}
         className="w-full border rounded-lg px-2 py-1"
       />
     ) : (
-      `Rp ${rule.cost.toLocaleString()}`
+      `Rp ${rule.shipping_cost.toLocaleString()}`
     ),
     Aksi: (
       <div className="flex space-x-2">
@@ -399,14 +594,24 @@ const SettingsAdminPage: React.FC = () => {
                 <Icon icon="mdi:truck-delivery-outline" className="w-6 h-6" />
                 ATURAN BIAYA PENGIRIMAN
               </h2>
-              <ModernTable
-                headers={["Maks. Jarak (km)", "Biaya Pengiriman (Rp)", "Aksi"]}
-                data={tableData}
-                keyField="id"
-              />
+              
+              {isLoadingRules ? (
+                <div className="flex justify-center items-center py-4">
+                  <Icon icon="mdi:loading" className="animate-spin w-6 h-6" />
+                  <span className="ml-2">Memuat aturan pengiriman...</span>
+                </div>
+              ) : (
+                <ModernTable
+                  headers={["Maks. Jarak (km)", "Biaya Pengiriman (Rp)", "Aksi"]}
+                  data={tableData}
+                  keyField="id"
+                />
+              )}
+              
               <button
                 onClick={handleAddRule}
-                className="bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded-lg flex items-center gap-2 cursor-pointer mt-4"
+                disabled={isLoadingRules}
+                className="bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded-lg flex items-center gap-2 cursor-pointer mt-4 disabled:opacity-50"
               >
                 <Icon icon="mdi:plus" />
                 Tambah Aturan
