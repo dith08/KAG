@@ -79,10 +79,10 @@ const PesananSayaPage: React.FC = () => {
       <Navbar
         brand="KARYA ADI GRAFIKA"
         navItems={[
-          { label: "Home", href: "/" },
-          { label: "Produk", href: "/customer/produk" },
-          { label: "Pesanan Saya", href: "/customer/pesanan" },
-          { label: "Keranjang", href: "/customer/keranjang" },
+          { label: "Home", to: "/" },
+          { label: "Produk", to: "/customer/produk" },
+          { label: "Pesanan Saya", to: "/customer/pesanan" },
+          { label: "Keranjang", to: "/customer/keranjang" },
         ]}
       />
       <div className="w-full mx-auto pt-24 px-4 sm:px-6 md:px-10 lg:px-14 mb-10">

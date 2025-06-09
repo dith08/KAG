@@ -1,14 +1,13 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Icon } from "@iconify/react";
 import { Link, useLocation } from "react-router-dom";
 import { useNavbar } from "./useNavbar";
 import { useAuth } from "../../context/AuthContext";
-import { useEffect, useState } from "react";
 import api from "../../services/api";
 
 interface NavItem {
   label: string;
-  href: string;
+  to: string; // Ganti href menjadi to untuk konsistensi dengan React Router
 }
 
 interface NavbarProps {
@@ -30,7 +29,7 @@ const Navbar: React.FC<NavbarProps> = ({ brand, navItems }) => {
   } = useNavbar();
 
   // Fetch user profile data to get the avatar
-  useEffect(() => {
+  const fetchUserAvatar = () => {
     if (isLoggedIn) {
       api
         .get("/api/profile", {
@@ -39,13 +38,26 @@ const Navbar: React.FC<NavbarProps> = ({ brand, navItems }) => {
         .then((res) => {
           if (res.data.avatar && res.data.avatar !== "") {
             setUserAvatar(res.data.avatar);
+          } else {
+            setUserAvatar("/images/user.png");
           }
         })
         .catch((err) => {
           console.error("Failed to fetch profile avatar:", err);
         });
+    } else {
+      setUserAvatar("/images/user.png");
     }
+  };
+
+  useEffect(() => {
+    fetchUserAvatar();
   }, [isLoggedIn]);
+
+  // Listen to navigation changes to refresh avatar
+  useEffect(() => {
+    fetchUserAvatar();
+  }, [pathname]);
 
   const closeDrawer = () => setIsDrawerOpen(false);
 
@@ -81,26 +93,24 @@ const Navbar: React.FC<NavbarProps> = ({ brand, navItems }) => {
             </button>
 
             {/* Profile Section */}
-            <div className="">
+            <div>
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <Link
-                    to={isLoggedIn ? "/customer/profile" : "#"}
-                    onClick={closeDrawer}
-                    className="flex items-center space-x-4"
-                  >
-                    <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-300 rounded-full overflow-hidden">
-                      <img
-                        src={userAvatar}
-                        alt="Profile"
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <p className="text-green-700 font-medium text-base sm:text-lg">
-                      {isLoggedIn ? "Akun Saya" : "Selamat Datang"}
-                    </p>
-                  </Link>
-                </div>
+                <Link
+                  to={isLoggedIn ? "/customer/profile" : "#"}
+                  onClick={closeDrawer}
+                  className="flex items-center space-x-4"
+                >
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-300 rounded-full overflow-hidden">
+                    <img
+                      src={userAvatar}
+                      alt="Profile"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <p className="text-green-700 font-medium text-base sm:text-lg">
+                    {isLoggedIn ? "Akun Saya" : "Selamat Datang"}
+                  </p>
+                </Link>
 
                 {isLoggedIn && (
                   <Link
@@ -142,11 +152,11 @@ const Navbar: React.FC<NavbarProps> = ({ brand, navItems }) => {
             {/* Drawer Navigation Links */}
             <ul className="space-y-3 sm:space-y-4 mt-4 sm:mt-6">
               {navItems.map((item) => (
-                <li key={item.href}>
+                <li key={item.to}>
                   <Link
-                    to={item.href}
+                    to={item.to}
                     className={`block px-4 py-2 rounded-md text-sm sm:text-base text-green-700 hover:bg-green-100 ${
-                      pathname === item.href ? "bg-green-100 font-medium" : ""
+                      pathname === item.to ? "bg-green-100 font-medium" : ""
                     }`}
                     onClick={closeDrawer}
                   >
@@ -161,11 +171,11 @@ const Navbar: React.FC<NavbarProps> = ({ brand, navItems }) => {
         {/* Desktop Navigation */}
         <ul className="hidden lg:flex space-x-6 items-center">
           {navItems.map((item) => (
-            <li key={item.href}>
+            <li key={item.to}>
               <Link
-                to={item.href}
+                to={item.to}
                 className={`text-white px-4 py-2 rounded-lg hover:underline underline-offset-8 ${
-                  pathname === item.href ? "underline font-medium" : ""
+                  pathname === item.to ? "underline font-medium" : ""
                 }`}
               >
                 {item.label}
@@ -215,12 +225,14 @@ const Navbar: React.FC<NavbarProps> = ({ brand, navItems }) => {
                     <Link
                       to="/login"
                       className="block px-4 py-2 text-green-700 hover:bg-green-50 rounded-t-lg"
+                      onClick={() => setIsDropdownOpen(false)}
                     >
                       Login
                     </Link>
                     <Link
                       to="/register"
                       className="block px-4 py-2 text-green-700 hover:bg-green-50 rounded-b-lg"
+                      onClick={() => setIsDropdownOpen(false)}
                     >
                       Register
                     </Link>

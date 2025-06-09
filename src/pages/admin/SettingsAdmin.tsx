@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useCallback, useEffect, useState } from "react";
 import SidebarAdmin from "../../components/admin/SidebarAdmin";
 import NavbarAdmin from "../../components/admin/NavbarAdmin";
@@ -21,70 +23,53 @@ const SettingsAdminPage: React.FC = () => {
   const [alamat, setAlamat] = useState("");
   const [kontak, setKontak] = useState("");
   const [jamOperasional, setJamOperasional] = useState("");
-  const [storeLocation, setStoreLocation] = useState<[number, number]>([
-    -6.2, 106.816666,
-  ]);
-
+  const [storeLocation, setStoreLocation] = useState<[number, number]>([0, 0]);
   const [isLoading, setIsLoading] = useState(false);
   const { showToast } = useToast();
-
-  // Hapus data dummy, gunakan state kosong
   const [shippingRules, setShippingRules] = useState<ShippingRule[]>([]);
   const [editData, setEditData] = useState<ShippingRule | null>(null);
   const [newRule, setNewRule] = useState<ShippingRule | null>(null);
   const [isAdding, setIsAdding] = useState(false);
   const [isLoadingRules, setIsLoadingRules] = useState(false);
 
-  // Fungsi untuk fetch shipping rules dari API
   const fetchShippingRules = useCallback(async () => {
     setIsLoadingRules(true);
     try {
       const token = localStorage.getItem("token");
-      if (!token) {
-        throw new Error("Token tidak ditemukan");
-      }
+      if (!token) throw new Error("Token tidak ditemukan");
 
       const response = await api.get("/api/shipping-rules", {
-        headers: { 
+        headers: {
           Authorization: `Bearer ${token}`,
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
+          Accept: "application/json",
+          "Content-Type": "application/json",
         },
       });
-      
-      console.log("Response shipping rules:", response.data);
-      
-      // Handle response structure from Laravel controller
+
       const rulesData = response.data?.data || [];
-      
-      setShippingRules(rulesData.map((rule: any) => ({
-        id: rule.id,
-        maxDistance: rule.max_distance,
-        shipping_cost: rule.shipping_cost,
-        isEditing: false,
-        isAdding: false,
-      })));
+      setShippingRules(
+        rulesData.map((rule: any) => ({
+          id: rule.id,
+          maxDistance: rule.max_distance,
+          shipping_cost: rule.shipping_cost,
+          isEditing: false,
+          isAdding: false,
+        }))
+      );
     } catch (error: any) {
-      console.error("Gagal mengambil aturan pengiriman:", error);
-      
-      // Handle berbagai jenis error
       if (error.response?.status === 401) {
         showToast("Sesi telah berakhir, silakan login kembali", "error");
       } else if (error.response?.status === 403) {
         showToast("Anda tidak memiliki akses untuk melihat data ini", "error");
-      } else if (error.response?.status === 404) {
-        console.log("Endpoint shipping rules belum tersedia");
       } else if (error.response?.status >= 500) {
         showToast("Terjadi kesalahan server", "error");
-      } else if (!error.response) {
-        console.log("Network error atau API tidak tersedia");
       } else {
         showToast("Gagal mengambil aturan pengiriman", "error");
       }
     } finally {
       setIsLoadingRules(false);
     }
-  }, []); // Hapus dependency showToast untuk menghindari infinite loop
+  }, []);
 
   const fetchWebsiteSettings = useCallback(() => {
     api
@@ -93,37 +78,33 @@ const SettingsAdminPage: React.FC = () => {
       })
       .then((res) => {
         const data = res.data;
-        console.log("Data pengaturan website:", data);
-
         setNamaToko(data.nama_toko);
         setAlamat(data.alamat);
         setKontak(data.kontak);
         setJamOperasional(data.jam_operasional);
-
         if (data.lat && data.lng) {
           setStoreLocation([parseFloat(data.lat), parseFloat(data.lng)]);
         }
       })
       .catch((err) => {
-        console.error("Gagal ambil pengaturan website:", err);
         if (err.response?.status !== 404) {
           showToast("Gagal mengambil pengaturan website", "error");
         }
       });
-  }, []); // Hapus dependency showToast
+  }, []);
 
   useEffect(() => {
     fetchWebsiteSettings();
     fetchShippingRules();
-  }, []); // Kosongkan dependency array
+  }, [fetchWebsiteSettings, fetchShippingRules]);
 
   const handleSaveChanges = async () => {
     setIsLoading(true);
     try {
       const websiteSettings = {
         nama_toko: namaToko,
-        alamat: alamat,
-        kontak: kontak,
+        alamat,
+        kontak,
         jam_operasional: jamOperasional,
         lat: storeLocation[0].toString(),
         lng: storeLocation[1].toString(),
@@ -136,27 +117,22 @@ const SettingsAdminPage: React.FC = () => {
         },
       });
 
-      console.log("Pengaturan toko berhasil diperbarui");
-      showToast("Pengaturan toko berhasil diperbarui", "success");
-
+      showToast("Pengaturan toko berhasil disimpan", "success");
       fetchWebsiteSettings();
-    } catch (error) {
-      console.error("Gagal update pengaturan toko:", error);
+    } catch {
       showToast("Gagal memperbarui pengaturan toko", "error");
     } finally {
-      setTimeout(() => {
-        setIsLoading(false);
-      }, 1000);
+      setTimeout(() => setIsLoading(false), 1000);
     }
   };
 
   const validateRule = (rule: ShippingRule): boolean => {
     if (rule.maxDistance <= 0) {
-      showToast("Maks. Jarak harus lebih besar dari 0", "error");
+      showToast("Maks. jarak harus lebih besar dari 0", "error");
       return false;
     }
     if (rule.shipping_cost <= 0) {
-      showToast("Biaya Pengiriman harus lebih besar dari 0", "error");
+      showToast("Biaya pengiriman harus lebih besar dari 0", "error");
       return false;
     }
     return true;
@@ -164,70 +140,64 @@ const SettingsAdminPage: React.FC = () => {
 
   const handleAddRule = () => {
     if (isAdding) {
-      showToast("Selesaikan penambahan aturan sebelum menambah yang baru", "error");
+      showToast("Selesaikan penambahan aturan sebelumnya", "error");
       return;
     }
 
-    const newId = Date.now(); // Gunakan timestamp untuk ID sementara
-    const newRuleData = { id: newId, maxDistance: 0, shipping_cost: 0, isAdding: true, isEditing: true };
+    const newId = Date.now();
+    const newRuleData = {
+      id: newId,
+      maxDistance: 0,
+      shipping_cost: 0,
+      isAdding: true,
+      isEditing: true,
+    };
     setNewRule(newRuleData);
     setShippingRules([...shippingRules, newRuleData]);
     setIsAdding(true);
   };
 
-  // Update fungsi untuk menyimpan rule baru ke API
   const handleSaveNewRule = async () => {
     if (!newRule || !validateRule(newRule)) return;
 
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        showToast("Token tidak ditemukan, silakan login kembali", "error");
+        showToast("Token tidak ditemukan", "error");
         return;
       }
 
-      const response = await api.post("/api/shipping-rules", {
-        max_distance: newRule.maxDistance,
-        shipping_cost: newRule.shipping_cost,
-      }, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Accept': 'application/json',
-          "Content-Type": "application/json",
+      const response = await api.post(
+        "/api/shipping-rules",
+        {
+          max_distance: newRule.maxDistance,
+          shipping_cost: newRule.shipping_cost,
         },
-      });
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-      console.log("Response create shipping rule:", response.data);
-
-      // Show success message from API response
-      if (response.data?.message) {
-        showToast(response.data.message, "success");
-      } else {
-        showToast("Aturan baru berhasil ditambahkan", "success");
-      }
-
-      // Refresh data dari server
+      showToast(
+        response.data?.message || "Aturan baru berhasil ditambahkan",
+        "success"
+      );
       await fetchShippingRules();
       setNewRule(null);
       setIsAdding(false);
     } catch (error: any) {
-      console.error("Gagal menambah aturan pengiriman:", error);
-      
-      // Handle berbagai jenis error
       if (error.response?.status === 401) {
-        showToast("Sesi telah berakhir, silakan login kembali", "error");
+        showToast("Sesi telah berakhir", "error");
       } else if (error.response?.status === 403) {
-        showToast("Anda tidak memiliki akses untuk menambah data", "error");
+        showToast("Anda tidak memiliki akses", "error");
       } else if (error.response?.status === 422) {
         const errorMessages = error.response.data?.errors;
-        if (errorMessages) {
-          const firstError = Object.values(errorMessages)[0] as string[];
-          showToast(firstError[0] || "Data tidak valid", "error");
-        } else {
-          showToast("Data tidak valid", "error");
-        }
-      } else if (error.response?.status === 404 || !error.response) {
-        // Fallback ke update lokal jika API tidak tersedia
+        showToast(errorMessages?.[0]?.[0] || "Data tidak valid", "error");
+      } else {
         setShippingRules(
           shippingRules.map((r) =>
             r.id === newRule.id
@@ -237,9 +207,7 @@ const SettingsAdminPage: React.FC = () => {
         );
         setNewRule(null);
         setIsAdding(false);
-        showToast("Aturan baru berhasil ditambahkan (mode offline)", "success");
-      } else {
-        showToast("Gagal menambahkan aturan pengiriman", "error");
+        showToast("Aturan baru disimpan (offline)", "success");
       }
     }
   };
@@ -267,83 +235,64 @@ const SettingsAdminPage: React.FC = () => {
     }
   };
 
-  // Update fungsi untuk menyimpan edit rule ke API
   const handleSaveEditRule = async () => {
     if (!editData || !validateRule(editData)) return;
 
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        showToast("Token tidak ditemukan, silakan login kembali", "error");
+        showToast("Token tidak ditemukan", "error");
         return;
       }
 
-      const response = await api.put(`/api/shipping-rules/${editData.id}`, {
-        max_distance: editData.maxDistance,
-        shipping_cost: editData.shipping_cost,
-      }, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Accept': 'application/json',
-          "Content-Type": "application/json",
+      const response = await api.put(
+        `/api/shipping-rules/${editData.id}`,
+        {
+          max_distance: editData.maxDistance,
+          shipping_cost: editData.shipping_cost,
         },
-      });
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-      console.log("Response update shipping rule:", response.data);
-
-      // Show success message from API response
-      if (response.data?.message) {
-        showToast(response.data.message, "success");
-      } else {
-        showToast("Aturan berhasil diperbarui", "success");
-      }
-
-      // Refresh data dari server
+      showToast(
+        response.data?.message || "Aturan berhasil diperbarui",
+        "success"
+      );
       await fetchShippingRules();
       setEditData(null);
     } catch (error: any) {
-      console.error("Gagal memperbarui aturan pengiriman:", error);
-      
-      // Handle berbagai jenis error
       if (error.response?.status === 401) {
-        showToast("Sesi telah berakhir, silakan login kembali", "error");
+        showToast("Sesi telah berakhir", "error");
       } else if (error.response?.status === 403) {
-        showToast("Anda tidak memiliki akses untuk mengubah data", "error");
+        showToast("Anda tidak memiliki akses", "error");
       } else if (error.response?.status === 422) {
         const errorMessages = error.response.data?.errors;
-        if (errorMessages) {
-          const firstError = Object.values(errorMessages)[0] as string[];
-          showToast(firstError[0] || "Data tidak valid", "error");
-        } else {
-          showToast("Data tidak valid", "error");
-        }
-      } else if (error.response?.status === 404 || !error.response) {
-        // Fallback ke update lokal jika API tidak tersedia
+        showToast(errorMessages?.[0]?.[0] || "Data tidak valid", "error");
+      } else {
         setShippingRules(
           shippingRules.map((r) =>
-            r.id === editData.id
-              ? { ...editData, isEditing: false }
-              : r
+            r.id === editData.id ? { ...editData, isEditing: false } : r
           )
         );
         setEditData(null);
-        showToast("Aturan berhasil diperbarui (mode offline)", "success");
-      } else {
-        showToast("Gagal memperbarui aturan pengiriman", "error");
+        showToast("Aturan diperbarui (offline)", "success");
       }
     }
   };
 
   const handleCancelEdit = (id: number) => {
     setShippingRules(
-      shippingRules.map((r) =>
-        r.id === id ? { ...r, isEditing: false } : r
-      )
+      shippingRules.map((r) => (r.id === id ? { ...r, isEditing: false } : r))
     );
     setEditData(null);
   };
 
-  // Update fungsi untuk menghapus rule dari API
   const handleDeleteRule = async (id: number) => {
     if (isAdding) {
       showToast("Selesaikan penambahan aturan sebelum menghapus", "error");
@@ -353,42 +302,27 @@ const SettingsAdminPage: React.FC = () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        showToast("Token tidak ditemukan, silakan login kembali", "error");
+        showToast("Token tidak ditemukan", "error");
         return;
       }
 
       const response = await api.delete(`/api/shipping-rules/${id}`, {
-        headers: { 
+        headers: {
           Authorization: `Bearer ${token}`,
-          'Accept': 'application/json',
+          Accept: "application/json",
         },
       });
 
-      console.log("Response delete shipping rule:", response.data);
-
-      // Show success message from API response
-      if (response.data?.message) {
-        showToast(response.data.message, "success");
-      } else {
-        showToast("Aturan berhasil dihapus", "success");
-      }
-
-      // Refresh data dari server
+      showToast(response.data?.message || "Aturan berhasil dihapus", "success");
       await fetchShippingRules();
     } catch (error: any) {
-      console.error("Gagal menghapus aturan pengiriman:", error);
-      
-      // Handle berbagai jenis error
       if (error.response?.status === 401) {
-        showToast("Sesi telah berakhir, silakan login kembali", "error");
+        showToast("Sesi telah berakhir", "error");
       } else if (error.response?.status === 403) {
-        showToast("Anda tidak memiliki akses untuk menghapus data", "error");
-      } else if (error.response?.status === 404 || !error.response) {
-        // Fallback ke update lokal jika API tidak tersedia
-        setShippingRules(shippingRules.filter((r) => r.id !== id));
-        showToast("Aturan berhasil dihapus (mode offline)", "success");
+        showToast("Anda tidak memiliki akses", "error");
       } else {
-        showToast("Gagal menghapus aturan pengiriman", "error");
+        setShippingRules(shippingRules.filter((r) => r.id !== id));
+        showToast("Aturan dihapus (offline)", "success");
       }
     }
   };
@@ -408,17 +342,22 @@ const SettingsAdminPage: React.FC = () => {
         value={
           rule.isAdding
             ? newRule?.id === rule.id
-              ? newRule.maxDistance
-              : rule.maxDistance
+              ? Math.floor(newRule.maxDistance) || ""
+              : Math.floor(rule.maxDistance) || ""
             : editData?.id === rule.id
-            ? editData.maxDistance
-            : rule.maxDistance
+            ? Math.floor(editData.maxDistance) || ""
+            : Math.floor(rule.maxDistance) || ""
         }
-        onChange={(e) => handleRuleChange("maxDistance", parseFloat(e.target.value) || 0)}
+        onChange={(e) =>
+          handleRuleChange(
+            "maxDistance",
+            Math.floor(parseFloat(e.target.value)) || 0
+          )
+        }
         className="w-full border rounded-lg px-2 py-1"
       />
     ) : (
-      rule.maxDistance
+      Math.floor(rule.maxDistance)
     ),
     "Biaya Pengiriman (Rp)": rule.isEditing ? (
       <input
@@ -426,17 +365,22 @@ const SettingsAdminPage: React.FC = () => {
         value={
           rule.isAdding
             ? newRule?.id === rule.id
-              ? newRule.shipping_cost
-              : rule.shipping_cost
+              ? Math.floor(newRule.shipping_cost) || ""
+              : Math.floor(rule.shipping_cost) || ""
             : editData?.id === rule.id
-            ? editData.shipping_cost
-            : rule.shipping_cost
+            ? Math.floor(editData.shipping_cost) || ""
+            : Math.floor(rule.shipping_cost) || ""
         }
-        onChange={(e) => handleRuleChange("shipping_cost", parseFloat(e.target.value) || 0)}
+        onChange={(e) =>
+          handleRuleChange(
+            "shipping_cost",
+            Math.floor(parseFloat(e.target.value)) || 0
+          )
+        }
         className="w-full border rounded-lg px-2 py-1"
       />
     ) : (
-      `Rp ${rule.shipping_cost.toLocaleString()}`
+      `Rp ${Math.floor(rule.shipping_cost).toLocaleString()}`
     ),
     Aksi: (
       <div className="flex space-x-2">
@@ -451,7 +395,9 @@ const SettingsAdminPage: React.FC = () => {
             </button>
             <button
               onClick={() =>
-                rule.isAdding ? handleCancelAddRule(rule.id) : handleCancelEdit(rule.id)
+                rule.isAdding
+                  ? handleCancelAddRule(rule.id)
+                  : handleCancelEdit(rule.id)
               }
               className="flex items-center gap-1 bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded cursor-pointer"
             >
@@ -484,21 +430,17 @@ const SettingsAdminPage: React.FC = () => {
       <SidebarAdmin />
       <div className="flex-1 w-full lg:ml-64">
         <NavbarAdmin />
-
         <div className="p-4 lg:p-6 space-y-8 mt-18 lg:mt-24">
           <h1 className="text-xl md:text-2xl font-bold text-center lg:text-left text-green-700 flex items-center gap-2 mb-6">
-            <Icon icon="mdi:cog" className="text-green-700 w-8 h-8" />{" "}
+            <Icon icon="mdi:cog" className="text-green-700 w-8 h-8" />
             PENGATURAN TOKO
           </h1>
-
           <section className="bg-white border border-gray-200 rounded-xl shadow-md p-4 lg:p-8 grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
-            {/* Profile Toko */}
             <div className="lg:col-span-1 space-y-4 lg:space-y-6">
               <h2 className="text-green-700 font-semibold text-xl flex items-center gap-2">
                 <Icon icon="mdi:storefront" className="w-6 h-6" />
                 PROFILE TOKO
               </h2>
-
               <div className="space-y-3">
                 <div>
                   <label className="text-sm font-semibold block mb-1 text-green-700">
@@ -563,8 +505,6 @@ const SettingsAdminPage: React.FC = () => {
                 </button>
               </div>
             </div>
-
-            {/* Map Picker & Biaya Kirim */}
             <div className="lg:col-span-2 space-y-4 lg:space-y-6">
               <h2 className="text-green-700 font-semibold text-xl flex items-center gap-2">
                 <Icon icon="mdi:map-marker-radius" className="w-6 h-6" />
@@ -573,6 +513,9 @@ const SettingsAdminPage: React.FC = () => {
               <MapPicker
                 setAddress={setAlamat}
                 setCoordinates={(lat, lng) => setStoreLocation([lat, lng])}
+                latitude={storeLocation[0].toString()}
+                longitude={storeLocation[1].toString()}
+                initialAddress={alamat}
               />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -589,12 +532,20 @@ const SettingsAdminPage: React.FC = () => {
                   />
                 </div>
               </div>
-              {/* Aturan biaya kirim */}
-              <h2 className="text-green-700 font-semibold text-xl flex items-center gap-2 mt-6">
-                <Icon icon="mdi:truck-delivery-outline" className="w-6 h-6" />
-                ATURAN BIAYA PENGIRIMAN
-              </h2>
-              
+              <div className="flex justify-between items-center">
+                <h2 className="text-green-700 font-semibold text-xl flex items-center gap-2 mt-6">
+                  <Icon icon="mdi:truck-delivery-outline" className="w-6 h-6" />
+                  ATURAN BIAYA PENGIRIMAN
+                </h2>
+                <button
+                  onClick={handleAddRule}
+                  disabled={isLoadingRules}
+                  className="bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded-lg flex items-center gap-2 cursor-pointer mt-6 disabled:opacity-50"
+                >
+                  <Icon icon="mdi:plus" />
+                  Tambah Aturan
+                </button>
+              </div>
               {isLoadingRules ? (
                 <div className="flex justify-center items-center py-4">
                   <Icon icon="mdi:loading" className="animate-spin w-6 h-6" />
@@ -602,20 +553,15 @@ const SettingsAdminPage: React.FC = () => {
                 </div>
               ) : (
                 <ModernTable
-                  headers={["Maks. Jarak (km)", "Biaya Pengiriman (Rp)", "Aksi"]}
+                  headers={[
+                    "Maks. Jarak (km)",
+                    "Biaya Pengiriman (Rp)",
+                    "Aksi",
+                  ]}
                   data={tableData}
                   keyField="id"
                 />
-              )}
-              
-              <button
-                onClick={handleAddRule}
-                disabled={isLoadingRules}
-                className="bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded-lg flex items-center gap-2 cursor-pointer mt-4 disabled:opacity-50"
-              >
-                <Icon icon="mdi:plus" />
-                Tambah Aturan
-              </button>
+              )}{" "}
             </div>
           </section>
         </div>

@@ -16,10 +16,10 @@ const ProdukPage = () => {
       <Navbar
         brand="KARYA ADI GRAFIKA"
         navItems={[
-          { label: "Home", href: "/" },
-          { label: "Produk", href: "/customer/produk" },
-          { label: "Pesanan Saya", href: "/customer/pesanan" },
-          { label: "Keranjang", href: "/customer/keranjang" },
+          { label: "Home", to: "/" },
+          { label: "Produk", to: "/customer/produk" },
+          { label: "Pesanan Saya", to: "/customer/pesanan" },
+          { label: "Keranjang", to: "/customer/keranjang" },
         ]}
       />
       <div className="w-full py-4 sm:py-6 px-4 sm:px-8 pt-10 sm:pt-16 md:pt-20 mt-10">

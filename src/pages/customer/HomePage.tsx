@@ -14,10 +14,10 @@ const HomePage = () => {
       <Navbar
         brand="KARYA ADI GRAFIKA"
         navItems={[
-          { label: "Home", href: "/" },
-          { label: "Produk", href: "/customer/produk" },
-          { label: "Pesanan Saya", href: "/customer/pesanan" },
-          { label: "Keranjang", href: "/customer/keranjang" },
+          { label: "Home", to: "/" },
+          { label: "Produk", to: "/customer/produk" },
+          { label: "Pesanan Saya", to: "/customer/pesanan" },
+          { label: "Keranjang", to: "/customer/keranjang" },
         ]}
       />
       <Slider />

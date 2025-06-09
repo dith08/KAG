@@ -9,6 +9,7 @@ interface InputFieldProps {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   showPassword?: boolean;
   togglePasswordVisibility?: () => void;
+  disabled?: boolean; // Tambahkan prop disabled
 }
 
 const InputField: React.FC<InputFieldProps> = ({
@@ -19,6 +20,7 @@ const InputField: React.FC<InputFieldProps> = ({
   onChange,
   showPassword,
   togglePasswordVisibility,
+  disabled = false, // Default ke false jika tidak disediakan
 }) => {
   return (
     <div className="relative">
@@ -27,17 +29,25 @@ const InputField: React.FC<InputFieldProps> = ({
         placeholder={placeholder}
         value={value}
         onChange={onChange}
-        className="w-full p-3 pl-12 pr-12 border border-black/50 rounded-[15px] focus:outline-none focus:ring-1 focus:ring-green-700"
+        disabled={disabled}
+        className={`w-full p-3 pl-12 pr-12 border border-black/50 rounded-[15px] focus:outline-none focus:ring-1 focus:ring-green-700 transition-all duration-200 ${
+          disabled ? "opacity-50 cursor-not-allowed bg-gray-100" : "opacity-100"
+        }`}
       />
       <Icon
         icon={icon}
-        className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-2xl"
+        className={`absolute left-3 top-1/2 -translate-y-1/2 text-2xl ${
+          disabled ? "text-gray-400" : "text-gray-500"
+        }`}
       />
       {togglePasswordVisibility && (
         <button
           type="button"
           onClick={togglePasswordVisibility}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-2xl cursor-pointer"
+          disabled={disabled}
+          className={`absolute right-3 top-1/2 -translate-y-1/2 text-2xl cursor-pointer transition-opacity duration-200 ${
+            disabled ? "text-gray-400 opacity-50 cursor-not-allowed" : "text-gray-500 opacity-100"
+          }`}
         >
           <Icon icon={showPassword ? "mdi:eye" : "mdi:eye-off"} />
         </button>
