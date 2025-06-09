@@ -24,6 +24,7 @@ const ProfilePage = () => {
   const [isProfileUpdated, setIsProfileUpdated] = useState(false);
   const [latitude, setLatitude] = useState<string>("");
   const [longitude, setLongitude] = useState<string>("");
+  const [isUploading, setIsUploading] = useState(false); // State untuk loading upload foto
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [previewImage, setPreviewImage] = useState<string>();
@@ -34,7 +35,6 @@ const ProfilePage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
 
-  // Using useCallback to memoize the fetchUserProfile function
   const fetchUserProfile = useCallback(() => {
     api
       .get("/api/profile", {
@@ -43,14 +43,13 @@ const ProfilePage = () => {
       .then((res) => {
         console.log("Data profil:", res.data);
         const data = res.data;
-        const alamatOnly = data.alamat?.split("| lat:")[0].trim() || "";
         setUsername(data.name);
-        setAddress(alamatOnly);
+        setAddress(data.alamat || "");
         setPhone(data.phone);
         setEmail(data.email);
         setPassword("");
-
-        // Only update preview image from server if no local file is selected
+        setLatitude(data.lat || "");
+        setLongitude(data.lng || "");
         if (!selectedFile) {
           setPreviewImage(
             data.avatar && data.avatar !== "" ? data.avatar : "/images/user.png"
@@ -63,7 +62,6 @@ const ProfilePage = () => {
       });
   }, [selectedFile, showToast]);
 
-  // Load user profile on mount and when profile is updated
   useEffect(() => {
     fetchUserProfile();
   }, [fetchUserProfile]);
@@ -90,18 +88,15 @@ const ProfilePage = () => {
     try {
       const formData = new FormData();
       formData.append("name", username);
-      formData.append(
-        "alamat",
-        `${address} | lat: ${latitude}, lng: ${longitude}`
-      );
+      formData.append("alamat", address);
       formData.append("phone", phone);
       formData.append("email", email);
-
+      if (latitude) formData.append("lat", latitude);
+      if (longitude) formData.append("lng", longitude);
       if (password.trim() !== "") {
         formData.append("password", password);
         formData.append("password_confirmation", password);
       }
-
       if (selectedFile) {
         formData.append("avatar", selectedFile);
       }
@@ -130,32 +125,30 @@ const ProfilePage = () => {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // Validasi ekstensi
       if (!file.type.startsWith("image/")) {
         showToast("Hanya file gambar yang diperbolehkan", "error");
         return;
       }
-
-      // Validasi ukuran maksimal 2MB
       if (file.size > 2 * 1024 * 1024) {
         showToast("Ukuran gambar maksimal 2MB", "error");
         return;
       }
 
-      // Simpan file yang dipilih
+      setIsUploading(true); // Aktifkan loading
       setSelectedFile(file);
-
-      // Tampilkan preview
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreviewImage(reader.result as string);
+        setTimeout(() => setIsUploading(false), 1000); // Simulasi loading selesai
       };
       reader.readAsDataURL(file);
     }
   };
 
   const handleClickUpload = () => {
-    fileInputRef.current?.click();
+    if (!isUploading) {
+      fileInputRef.current?.click();
+    }
   };
 
   const handleConfirm = () => {
@@ -174,34 +167,55 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className="bg-[#D9D9D9] min-h-screen">
+    <div className="bg-[#D9D9D9] min-h-screen transition-all duration-300">
+      <ConfirmPopup
+        isOpen={isPopupOpen}
+        message="Apakah Anda yakin ingin keluar dari akun ini?"
+        onConfirm={handleConfirm}
+        onCancel={handleCancel}
+        onClose={() => setIsPopupOpen(false)}
+        title="Logout?"
+      />
       <Navbar
         brand="KARYA ADI GRAFIKA"
         navItems={[
-          { label: "Home", href: "/" },
-          { label: "Produk", href: "/customer/produk" },
-          { label: "Pesanan Saya", href: "/customer/pesanan" },
-          { label: "Keranjang", href: "/customer/keranjang" },
+          { label: "Home", to: "/" },
+          { label: "Produk", to: "/customer/produk" },
+          { label: "Pesanan Saya", to: "/customer/pesanan" },
+          { label: "Keranjang", to: "/customer/keranjang" },
         ]}
       />
 
       <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8 pt-24 pb-18">
         <h1 className="text-3xl font-bold text-green-700 mb-6">PROFIL SAYA</h1>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-white p-6 rounded-lg shadow-md w-full">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-white p-6 rounded-lg shadow-md w-full transform transition-all duration-300 hover:shadow-lg">
           <form onSubmit={handleSaveChanges} className="space-y-6 w-full">
             {/* Foto Profil & Username */}
             <div className="flex flex-col sm:flex-row items-center gap-4">
-              <div className="relative">
+              <div className="relative group">
                 <img
                   src={previewImage}
                   alt="Profile"
-                  className="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover shadow-md"
+                  className={`w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover shadow-md transition-opacity duration-300 ${
+                    isUploading ? "opacity-50" : "opacity-100"
+                  }`}
                 />
+                {isUploading && (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <Icon
+                      icon="mdi:loading"
+                      className="text-3xl text-green-700 animate-spin"
+                    />
+                  </div>
+                )}
                 <button
                   type="button"
                   onClick={handleClickUpload}
-                  className="absolute bottom-0 right-0 bg-white p-2 rounded-full border border-gray-300 shadow cursor-pointer"
+                  disabled={isUploading}
+                  className={`absolute bottom-0 right-0 bg-white p-2 rounded-full border border-gray-300 shadow cursor-pointer transition-transform duration-200 transform hover:scale-110 ${
+                    isUploading ? "cursor-not-allowed opacity-50" : ""
+                  }`}
                 >
                   <Icon
                     icon="mdi:image-edit"
@@ -214,6 +228,7 @@ const ProfilePage = () => {
                   ref={fileInputRef}
                   className="hidden"
                   onChange={handleImageChange}
+                  disabled={isUploading}
                 />
               </div>
 
@@ -227,6 +242,7 @@ const ProfilePage = () => {
                   icon="mdi:account"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
+                  disabled={isUploading || isLoading}
                 />
               </div>
             </div>
@@ -243,10 +259,12 @@ const ProfilePage = () => {
                 readOnly
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
-                className="w-full pl-12 p-3 border border-black/50 rounded-lg focus:outline-none focus:ring-1 focus:ring-green-700"
+                className="w-full pl-12 p-3 border border-black/50 rounded-lg focus:outline-none focus:ring-1 focus:ring-green-700 transition-all duration-200"
                 rows={2}
+                disabled={isUploading || isLoading}
               />
             </div>
+
             <div>
               <label className="block text-base font-medium pb-2">No HP</label>
               <InputField
@@ -255,6 +273,7 @@ const ProfilePage = () => {
                 icon="mdi:phone"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
+                disabled={isUploading || isLoading}
               />
             </div>
 
@@ -266,6 +285,7 @@ const ProfilePage = () => {
                 icon="mdi:email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                disabled={isUploading || isLoading}
               />
             </div>
 
@@ -281,6 +301,7 @@ const ProfilePage = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 showPassword={showPassword}
                 togglePasswordVisibility={togglePasswordVisibility}
+                disabled={isUploading || isLoading}
               />
             </div>
 
@@ -290,6 +311,7 @@ const ProfilePage = () => {
               text="Save Changes"
               className="bg-yellow-500 text-white hover:bg-yellow-600"
               loading={isLoading}
+              disabled={isUploading}
             />
 
             {/* Logout button khusus tampil di desktop */}
@@ -299,23 +321,15 @@ const ProfilePage = () => {
                 text="Logout"
                 className="bg-red-500 text-white hover:bg-red-600"
                 onClick={handleOpenPopup}
+                disabled={isUploading || isLoading}
               />
             </div>
-
-            <ConfirmPopup
-              isOpen={isPopupOpen}
-              message="Apakah Anda yakin ingin keluar dari akun ini?"
-              onConfirm={handleConfirm}
-              onCancel={handleCancel}
-              onClose={() => setIsPopupOpen(false)}
-              title="Logout?"
-            />
           </form>
 
           {/* Map Picker Section */}
           <div className="w-full">
-            <div className="bg-white p-4 rounded-lg shadow-md">
-              <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden w-full">
+            <div className="bg-white p-4 rounded-lg shadow-md transition-all duration-300 hover:shadow-lg">
+              <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden w-full focus-within:ring-1 focus-within:ring-green-700 focus-within:outline-none transition-all duration-200">
                 <input
                   type="text"
                   placeholder="Cari alamat atau nama tempat"
@@ -327,11 +341,13 @@ const ProfilePage = () => {
                       handleSearch();
                     }
                   }}
+                  disabled={isUploading || isLoading}
                 />
                 <button
                   type="button"
-                  className="bg-yellow-500 p-3 flex items-center justify-center cursor-pointer"
+                  className="bg-yellow-500 p-3 flex items-center justify-center cursor-pointer transition-transform duration-200 hover:scale-110"
                   onClick={handleSearch}
+                  disabled={isUploading || isLoading}
                 >
                   <Icon
                     icon="cuida:search-outline"
@@ -339,16 +355,17 @@ const ProfilePage = () => {
                   />
                 </button>
               </div>
-
               <div className="h-64 lg:h-96 w-full bg-gray-200 rounded-lg overflow-hidden mt-4">
                 <MapPicker
                   setAddress={setAddress}
-                  searchLocation={searchTrigger}
                   setCoordinates={(lat, lng) => {
-                    console.log("Latitude:", lat, "Longitude:", lng);
                     setLatitude(lat.toString());
                     setLongitude(lng.toString());
                   }}
+                  searchLocation={searchTrigger}
+                  latitude={latitude}
+                  longitude={longitude}
+                  initialAddress={address}
                 />
               </div>
             </div>
@@ -360,6 +377,7 @@ const ProfilePage = () => {
               text="Logout"
               className="bg-red-500 text-white hover:bg-red-600 w-full"
               onClick={handleOpenPopup}
+              disabled={isUploading || isLoading}
             />
           </div>
         </div>
