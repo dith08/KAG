@@ -8,7 +8,6 @@ import CartSummary from "../../components/customer/keranjang_page/CartSummary";
 import api from "../../services/api";
 import { Icon } from "@iconify/react";
 import { getBaseUrl } from "../../utils/getBaseUrl";
-import { useToast } from "../../components/toast/useToast";
 import { useNavigate } from "react-router-dom";
 
 // Interface for cart item from backend
@@ -37,7 +36,6 @@ const KeranjangPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
-  const { showToast } = useToast();
   const navigate = useNavigate();
 
   const footerRef = useRef<HTMLDivElement>(null);
@@ -232,24 +230,58 @@ const KeranjangPage = () => {
       return;
     }
 
-    const invalidItems = products.filter((p) => p.quantity < 100);
+    if (checkedItems.length === 0) {
+      alert("Pilih minimal satu produk untuk checkout!");
+      return;
+    }
+
+    const invalidItems = products.filter(
+      (p) => checkedItems.includes(p.id) && p.quantity < 100
+    );
+
     if (invalidItems.length > 0) {
       alert(
-        "Beberapa item memiliki jumlah kurang dari minimum (100). Silakan sesuaikan terlebih dahulu."
+        "Beberapa item yang dipilih memiliki jumlah kurang dari minimum (100). Silakan sesuaikan terlebih dahulu."
       );
       return;
     }
 
     try {
+      // Update cart quantities first
       const updateSuccess = await updateCartQuantities();
-      if (updateSuccess) {
-        console.log("Proceeding to checkout with products:", products);
-        showToast("Checkout berhasil!", "success");
+      if (!updateSuccess) return;
+
+      // Get checkout data for selected items
+      const token = localStorage.getItem("token");
+      const response = await api.post(
+        "/api/cart/checkout-data",
+        {
+          cart_ids: checkedItems,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.data.status === "success") {
+        // Store checkout data in sessionStorage untuk diakses di checkout page
+        sessionStorage.setItem(
+          "checkoutData",
+          JSON.stringify(response.data.data)
+        );
+
+        console.log("Proceeding to checkout with data:", response.data.data);
         navigate("/customer/checkout");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Checkout error:", error);
-      alert("Terjadi kesalahan saat checkout. Silakan coba lagi.");
+      if (error.response?.status === 401) {
+        alert("Sesi Anda telah berakhir. Silakan login kembali!");
+      } else {
+        alert("Terjadi kesalahan saat checkout. Silakan coba lagi.");
+      }
     }
   };
 
