@@ -38,7 +38,7 @@ const RegisterPage: React.FC = () => {
     }
 
     try {
-      const response = await api.post("/api/register", {
+      await api.post("/api/register", {
         name,
         email,
         password,

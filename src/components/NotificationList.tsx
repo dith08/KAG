@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import dayjs from "dayjs";
 import "dayjs/locale/id"; // Import untuk format tanggal bahasa Indonesia
 import { Icon } from "@iconify/react"; // Menggunakan iconify
@@ -15,13 +14,11 @@ type Notification = {
 interface NotificationListProps {
   userId: number;
   role: "admin" | "customer";
-  apiUrl: string;
 }
 
 const NotificationList: React.FC<NotificationListProps> = ({
   userId,
   role,
-  apiUrl,
 }) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);

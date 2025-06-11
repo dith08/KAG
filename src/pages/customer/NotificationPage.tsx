@@ -14,7 +14,7 @@ const NotificationPage = () => {
         ]}
       />
       <div className="pt-24 px-10 md:px-18">
-        <NotificationList userId={5} role="customer" apiUrl="" />
+        <NotificationList userId={5} role="customer"/>
       </div>
     </div>
   );

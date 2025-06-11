@@ -12,8 +12,9 @@ const ResetPasswordPage = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
-  const { showToast } = useToast();
   const { email, code } = location.state as { email: string; code: string };
+  const { showToast } = useToast();
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
