@@ -42,7 +42,7 @@ const HomePage = () => {
           {/* Produk Terlaris */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 justify-items-center mt-8 sm:mt-10">
             <ProdukTerlarisCard
-              image="/images/paperbag1.png"
+              image="/public/images/paperbag1.png"
               title={"Paperbag Kraft"}
             />
             <ProdukTerlarisCard
